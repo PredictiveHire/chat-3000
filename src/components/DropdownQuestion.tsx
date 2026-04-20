@@ -120,11 +120,8 @@ export function DropdownQuestion({
       )}
 
       {/* Text input — same style as ReplyBar */}
-      <form
-        onSubmit={(e) => { e.preventDefault(); submit(); }}
-        className="flex items-end gap-2"
-      >
-        <div className="flex flex-1 items-end rounded-2xl border border-input bg-white px-4 py-2 focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50">
+      <form onSubmit={(e) => { e.preventDefault(); submit(); }}>
+        <div className="flex flex-col rounded-2xl border border-input bg-white focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50">
           <input
             ref={inputRef}
             type="text"
@@ -135,22 +132,24 @@ export function DropdownQuestion({
             disabled={locked}
             placeholder={selected ? selected : placeholder}
             autoFocus
-            className="min-h-8 flex-1 bg-transparent py-0.5 text-sm leading-relaxed outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            className="min-h-8 flex-1 bg-transparent px-4 pt-3 text-sm leading-relaxed outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
             aria-autocomplete="list"
             aria-expanded={open}
           />
+          <div className="flex items-center justify-end px-2 pb-2">
+            <Button
+              type="submit"
+              disabled={locked || (!selected && filtered.length === 0 && !options.find((o) => o.toLowerCase() === query.trim().toLowerCase()))}
+              size="icon"
+              className="size-8 shrink-0 rounded-full bg-chat-primary text-chat-primary-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-chat-primary/90 active:not-disabled:scale-[0.96]"
+              aria-label="Confirm selection"
+            >
+              <SendHorizontal className="size-3.5" />
+            </Button>
+          </div>
         </div>
-        <Button
-          type="submit"
-          disabled={locked || (!selected && filtered.length === 0 && !options.find((o) => o.toLowerCase() === query.trim().toLowerCase()))}
-          size="icon"
-          className="relative mb-0.5 size-10 shrink-0 rounded-full bg-chat-primary text-chat-primary-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-chat-primary/90 active:not-disabled:scale-[0.96]"
-          aria-label="Confirm selection"
-        >
-          <SendHorizontal className="size-4" />
-        </Button>
       </form>
-      <p className="mt-2 text-center text-xs text-muted-foreground">
+      <p className="mt-2 text-left text-xs text-muted-foreground">
         We encourage you to share more about your experiences to get better evaluation
       </p>
     </div>
