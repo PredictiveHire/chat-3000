@@ -71,4 +71,12 @@ export const mockInterview: InterviewStep[] = [
       "Last one: what's an area you're actively trying to level up in right now — technically or otherwise? Even a short phrase works.",
     ],
   },
+  {
+    id: "contact-number",
+    type: "phone",
+    messages: [
+      "Great answer, thank you.",
+      "Before we wrap up, please share your mobile number so our team can contact you for next steps.",
+    ],
+  },
 ];

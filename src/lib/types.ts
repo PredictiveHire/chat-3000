@@ -1,4 +1,4 @@
-export type QuestionType = "text" | "mcq" | "dropdown";
+export type QuestionType = "text" | "mcq" | "dropdown" | "phone";
 
 export interface InterviewStep {
   id: string;
