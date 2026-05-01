@@ -1,5 +1,5 @@
-import { InterviewChat } from "@/components/InterviewChat";
+import { ChatApp } from "@/components/ChatApp";
 
 export default function Home() {
-  return <InterviewChat />;
+  return <ChatApp />;
 }

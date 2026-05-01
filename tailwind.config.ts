@@ -45,8 +45,8 @@ const config: Config = {
         ring: "var(--ring)",
         /** Brand tokens (hex) for chat UI accents */
         chat: {
-          primary: "#FFCEFF",
-          "primary-foreground": "#3d1539",
+          primary: "#2B2732",
+          "primary-foreground": "#ffffff",
           wash: "#FFF5FC",
         },
       },
@@ -55,6 +55,18 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      transitionTimingFunction: {
+        "out-quart": "cubic-bezier(0.25, 1, 0.5, 1)",
+      },
+      animation: {
+        "pulse-scale": "pulse-scale 1.5s ease-in-out infinite",
+      },
+      keyframes: {
+        "pulse-scale": {
+          "0%, 100%": { transform: "scale(0.8)", opacity: "0.5" },
+          "50%": { transform: "scale(1.2)", opacity: "1" },
+        }
+      }
     },
   },
   plugins: [],

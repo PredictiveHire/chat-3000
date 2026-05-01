@@ -220,7 +220,7 @@ export function ReplyBar({
               disabled={disabled || !text.trim()}
               size="icon"
               className={cn(
-                "size-8 shrink-0 rounded-full bg-chat-primary text-chat-primary-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-chat-primary/90 active:not-disabled:scale-[0.96]",
+                "size-8 shrink-0 rounded-full bg-primary text-black transition-[background-color,scale] duration-150 ease-out hover:opacity-90 active:not-disabled:scale-[0.96]",
                 !expanded && "mb-0.5 sm:mb-0"
               )}
               aria-label="Send reply"

@@ -9,16 +9,16 @@ export function ProgressBar({ current, total }: ProgressBarProps) {
 
   return (
     <div
-      className="fixed inset-x-0 top-0 z-50 h-1"
+      className="fixed inset-x-0 top-0 z-50 h-1.5"
       role="progressbar"
       aria-valuenow={current}
       aria-valuemin={1}
       aria-valuemax={total}
       aria-label={`Question ${current} of ${total}`}
     >
-      <div className="h-full bg-muted">
+      <div className="h-full bg-muted overflow-hidden">
         <div
-          className="h-full bg-chat-primary transition-[width] duration-300 ease-out"
+          className="h-full bg-chat-primary transition-all duration-1000 ease-out-quart"
           style={{ width: `${pct}%` }}
         />
       </div>

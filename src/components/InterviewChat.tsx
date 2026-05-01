@@ -11,7 +11,8 @@ import { TypingIndicator } from "@/components/TypingIndicator";
 import { mockInterview } from "@/lib/mockData";
 import type { ChatMessage, QuestionType } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Pencil, X } from "lucide-react";
+import { ArrowRight, Check, Link, Pencil } from "lucide-react";
+import { RoleDescriptionPanel } from "@/components/RoleDescriptionPanel";
 
 const TYPING_DELAY_MS = 3000;
 
@@ -65,10 +66,20 @@ function newId() {
   return crypto.randomUUID();
 }
 
-export function InterviewChat() {
+export function InterviewChat({ onComplete }: { onComplete: () => void }) {
   const total = mockInterview.length;
   const [stepIndex, setStepIndex] = useState(0);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const copyLink = useCallback(() => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    });
+  }, []);
+  const [showRoleDescription, setShowRoleDescription] = useState(false);
   const [complete, setComplete] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputTypeOverride, setInputTypeOverride] = useState<QuestionType | null>(null);
@@ -151,6 +162,13 @@ export function InterviewChat() {
       // keyword override applies only to the *current* waiting step;
       // it is cleared when the step advances in the onDone callbacks below.
       const keyword = answer.trim().toLowerCase();
+      if (keyword === "submit") {
+        enqueueInterviewerMessages(
+          ["That's everything — thank you so much for your time! Review your answers below and hit submit when you're ready."],
+          () => setComplete(true),
+        );
+        return;
+      }
       if (keyword === "mcq") setInputTypeOverride("mcq");
       else if (keyword === "dropdown") setInputTypeOverride("dropdown");
       else setInputTypeOverride(null);
@@ -164,7 +182,7 @@ export function InterviewChat() {
         });
       } else {
         enqueueInterviewerMessages(
-          ["Thanks — that's everything for this chat interview. We'll follow up soon!"],
+          ["That's everything — thank you so much for your time! Review your answers below and hit submit when you're ready."],
           () => setComplete(true),
         );
       }
@@ -206,7 +224,7 @@ export function InterviewChat() {
 
   const progressCurrent = complete ? total : stepIndex + 1;
 
-  // The input is ready only when all bubbles for the current step have landed
+  // The input is ready only when all bubbles for the current main-interview step have landed
   const inputReady = !isTyping && !complete;
 
   let editingActiveType: QuestionType | null = null;
@@ -240,26 +258,86 @@ export function InterviewChat() {
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <main className="mx-auto flex h-full w-full max-w-3xl flex-col sm:px-4 sm:pb-6 sm:pt-8">
-        <h1 className="mb-4 hidden shrink-0 text-xl font-bold tracking-tight text-foreground sm:block">
-          Applying for Staff Engineer at Sapia.ai
-        </h1>
-        <ProgressBar current={progressCurrent} total={total} />
+      {/* Mobile header */}
+      <div className="flex shrink-0 items-center justify-between border-b border-border bg-background px-4 py-3 sm:hidden">
+        <div>
+          <p className="text-sm font-semibold text-foreground">Staff Engineer · Sapia.ai</p>
+          <p className="text-xs text-muted-foreground">Chat Interview</p>
+        </div>
+        <button
+          onClick={copyLink}
+          className="flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+        >
+          {linkCopied ? (
+            <Check className="size-3 text-green-500" />
+          ) : (
+            <Link className="size-3" />
+          )}
+          {linkCopied ? "Copied!" : "Copy link"}
+        </button>
+      </div>
+
+      <div className={cn(
+        "mx-auto flex min-h-0 w-full flex-1 gap-4 sm:px-4 sm:pb-6 sm:pt-8",
+        showRoleDescription ? "max-w-[1200px]" : "max-w-3xl"
+      )}>
+        <main className="relative flex min-w-0 flex-1 flex-col">
+          <div className="mb-4 hidden shrink-0 items-center justify-between sm:flex">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-foreground">
+              Applying for Staff Engineer at Sapia.ai
+            </h1>
+            <div className="mt-0.5 flex items-center gap-2">
+              <p className="text-sm text-muted-foreground">
+                You can pause and come back to this interview later.
+              </p>
+              <button
+                onClick={copyLink}
+                className="flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+              >
+                {linkCopied ? (
+                  <Check className="size-3 text-green-500" />
+                ) : (
+                  <Link className="size-3" />
+                )}
+                {linkCopied ? "Copied!" : "Copy link"}
+              </button>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowRoleDescription((v) => !v)}
+            className="rounded-full border border-border px-3.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+          >
+            {showRoleDescription ? "Hide role description" : "View role description"}
+          </button>
+          </div>
+          <ProgressBar current={progressCurrent} total={total} />
         <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden sm:rounded-2xl sm:bg-card sm:shadow-[var(--shadow-border)]">
           <div ref={scrollContainerRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
-            {messages.map((m) => (
-              <MessageRow
-                key={m.id}
-                message={m}
-                isPinned={m.id === pinnedId}
-                pinnedIdRef={pinnedIdRef}
-                onEdit={
-                  m.role === "candidate"
-                    ? () => startEditing(m.id, m.content)
-                    : undefined
-                }
-              />
-            ))}
+            {messages.map((m, index) => {
+              const isActiveMcqQuestion =
+                inputReady &&
+                activeType === "mcq" &&
+                !editingMessageId &&
+                index === messages.length - 1 &&
+                m.role === "interviewer";
+
+              if (isActiveMcqQuestion) return null;
+
+              return (
+                <MessageRow
+                  key={m.id}
+                  message={m}
+                  isPinned={m.id === pinnedId}
+                  pinnedIdRef={pinnedIdRef}
+                  onEdit={
+                    m.role === "candidate"
+                      ? () => startEditing(m.id, m.content)
+                      : undefined
+                  }
+                />
+              );
+            })}
 
             {isTyping && <TypingIndicator />}
 
@@ -268,27 +346,41 @@ export function InterviewChat() {
 
           {editingMessageId ? (
             <div className="animate-fade-up flex flex-col bg-background/95 backdrop-blur-sm">
-              <div className="flex items-center gap-2 px-4 py-2.5">
-                <Pencil className="size-3.5 shrink-0 text-muted-foreground" />
-                <p className="flex-1 text-xs text-muted-foreground leading-snug line-clamp-2">
-                  <span className="font-medium text-foreground">Editing: </span>
-                  {editingQuestion}
-                </p>
-                <button
-                  onClick={() => handleCancelClick(editingText !== editingOriginalText)}
-                  className={cn(
-                    "shrink-0 rounded-full px-2.5 py-1 text-xs font-medium transition-colors duration-150",
-                    cancelPending
-                      ? "bg-destructive/10 text-destructive hover:bg-destructive/20"
-                      : "text-muted-foreground hover:bg-black/5 hover:text-foreground"
-                  )}
-                >
-                  {cancelPending ? "Confirm" : "Cancel"}
-                </button>
-              </div>
+              {editingActiveType !== "mcq" && (
+                <div className="flex items-center gap-2 px-4 py-2.5">
+                  <Pencil className="size-3.5 shrink-0 text-muted-foreground" />
+                  <p className="flex-1 text-xs text-muted-foreground leading-snug line-clamp-2">
+                    <span className="font-medium text-foreground">Editing: </span>
+                    {editingQuestion}
+                  </p>
+                  <button
+                    onClick={() => handleCancelClick(editingText !== editingOriginalText)}
+                    className={cn(
+                      "shrink-0 rounded-full px-2.5 py-1 text-xs font-medium transition-colors duration-150",
+                      cancelPending
+                        ? "bg-destructive/10 text-destructive hover:bg-destructive/20"
+                        : "text-muted-foreground hover:bg-black/5 hover:text-foreground"
+                    )}
+                  >
+                    {cancelPending ? "Confirm" : "Cancel"}
+                  </button>
+                </div>
+              )}
               {editingActiveType === "mcq" ? (
-                <div className="shrink-0 px-3 pb-3 pt-3">
+                <div className="shrink-0 px-3 pb-3 pt-3 relative">
+                  <button
+                    onClick={() => handleCancelClick(editingText !== editingOriginalText)}
+                    className={cn(
+                      "absolute right-6 top-6 z-10 shrink-0 rounded-full px-2.5 py-1 text-xs font-medium transition-colors duration-150",
+                      cancelPending
+                        ? "bg-destructive/10 text-destructive hover:bg-destructive/20"
+                        : "bg-muted text-muted-foreground hover:bg-black/5 hover:text-foreground"
+                    )}
+                  >
+                    {cancelPending ? "Confirm" : "Cancel"}
+                  </button>
                   <MCQQuestion
+                    question={editingQuestion}
                     options={editingActiveOptions.length ? editingActiveOptions : ["Option A", "Option B", "Option C", "Option D"]}
                     onSelect={submitEditing}
                   />
@@ -316,6 +408,7 @@ export function InterviewChat() {
               {inputReady && activeType === "mcq" && (
                 <div className="animate-fade-up shrink-0 px-3 pb-3">
                   <MCQQuestion
+                    question={currentStep.messages[currentStep.messages.length - 1]}
                     options={activeOptions.length ? activeOptions : ["Option A", "Option B", "Option C", "Option D"]}
                     onSelect={advance}
                   />
@@ -333,21 +426,56 @@ export function InterviewChat() {
                 </div>
               )}
 
-              {/* Text reply bar — always in flow at the bottom */}
+              {/* Text reply bar */}
               {inputReady && activeType === "text" && (
                 <ReplyBar onSend={advance} />
               )}
 
-              {/* Phone number input — in-flow at the bottom */}
+              {/* Phone number input */}
               {inputReady && activeType === "phone" && (
                 <div className="animate-fade-up">
                   <MobileNumberQuestion onConfirm={advance} />
                 </div>
               )}
+
+              {/* Submit CTA — shown after interview is complete */}
+              {complete && !isTyping && !submitted && (
+                <div className="animate-fade-up shrink-0 px-4 pb-4 pt-2">
+                  <button
+                    onClick={() => {
+                      setSubmitted(true);
+                      setMessages((prev) => [...prev, { id: newId(), role: "candidate" as const, content: "Submit interview" }]);
+                    }}
+                    className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-black transition-all hover:opacity-90 active:scale-[0.98]"
+                  >
+                    Submit interview
+                  </button>
+                </div>
+              )}
+
+              {/* Post-submit CTA */}
+              {submitted && (
+                <div className="animate-fade-up shrink-0 px-4 pb-4 pt-2">
+                  <button
+                    onClick={onComplete}
+                    className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-black transition-all hover:opacity-90 active:scale-[0.98]"
+                  >
+                    View your insights report
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>
-      </main>
+        </main>
+
+        {/* Role description panel — flex sibling, no absolute positioning */}
+        {showRoleDescription && (
+          <aside className="hidden lg:flex w-[360px] xl:w-[420px] shrink-0 flex-col">
+            <RoleDescriptionPanel onClose={() => setShowRoleDescription(false)} />
+          </aside>
+        )}
+      </div>
     </div>
   );
 }
