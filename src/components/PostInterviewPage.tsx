@@ -73,7 +73,11 @@ function getCompanyResponse(input: string) {
   return "Great question! Our team will be best placed to answer that — feel free to raise it in your next interview stage, or email hiring@sapia.ai.";
 }
 
-function newId() { return crypto.randomUUID(); }
+function newId() {
+  return typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
 
 type Props = {
   reportProgress: number;

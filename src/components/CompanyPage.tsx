@@ -13,7 +13,9 @@ type Props = {
 type Message = { id: string; role: "user" | "ai"; content: string };
 
 function newId() {
-  return crypto.randomUUID();
+  return typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
 const INITIAL_AI = "Hi! I'm here to answer any questions about Sapia.ai, the role, or the hiring process. What would you like to know?";

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { SendHorizontal, Maximize2, Minimize2, List } from "lucide-react";
+import { ArrowUp, Maximize2, Minimize2, List } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ReplyBarProps = {
@@ -178,12 +178,12 @@ export function ReplyBar({
     )}>
       <form onSubmit={onSubmit} className={cn("flex flex-col", expanded && "h-full")}>
         <div className={cn(
-          "relative flex rounded-2xl border border-input bg-white focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50",
-          expanded ? "flex-col flex-1" : "flex-row items-end sm:flex-col sm:items-stretch"
+          "relative flex flex-col rounded-2xl border border-[#e0e0e0] bg-white focus-within:border-[#aaa] focus-within:ring-2 focus-within:ring-black/10",
+          expanded && "flex-1"
         )}>
           <textarea
             ref={textareaRef}
-            rows={viewport.width > 0 && viewport.width < 640 && !expanded ? 1 : 4}
+            rows={expanded ? undefined : 3}
             value={text}
             onChange={(e) => { setText(e.target.value); onTextChange?.(e.target.value); }}
             onKeyDown={onKeyDown}
@@ -191,17 +191,17 @@ export function ReplyBar({
             placeholder={placeholder}
             className={cn(
               "w-full resize-none bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
-              expanded 
-                ? "flex-1 p-4" 
-                : "min-h-10 py-2.5 pl-4 pr-10 sm:min-h-24 sm:px-4 sm:pt-3 sm:pr-4"
+              expanded
+                ? "flex-1 p-4"
+                : "min-h-20 px-4 pt-3 pr-4 sm:min-h-24"
             )}
             style={{ overflowY: "hidden" }}
             aria-label="Your reply"
           />
-          
+
           <div className={cn(
             "flex items-center",
-            expanded ? "justify-end p-3" : "pb-1 pl-2 pr-1 sm:justify-between sm:px-3 sm:pb-2 sm:pt-1"
+            expanded ? "justify-end p-3" : "justify-between px-3 pb-2 pt-1"
           )}>
             <div className="flex items-center">
               <Button
@@ -209,7 +209,7 @@ export function ReplyBar({
                 variant="ghost"
                 size="icon"
                 onClick={insertBullet}
-                className="hidden sm:flex size-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-black/5"
+                className="flex size-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-black/5"
                 title="Add bullet point"
               >
                 <List className="size-4" />
@@ -225,7 +225,7 @@ export function ReplyBar({
               )}
               aria-label="Send reply"
             >
-              <SendHorizontal className="size-3.5" />
+              <ArrowUp className="size-3.5" />
             </Button>
           </div>
 

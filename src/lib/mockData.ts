@@ -28,12 +28,26 @@ export const COUNTRIES = [
 export const mockInterview: InterviewStep[] = [
   {
     id: "intro",
-    type: "text",
+    type: "next",
     messages: [
-      "Hey! Thanks for making time today — really appreciate it. 👋",
-      "I'm Alex, and I'll be guiding you through this chat interview for the Staff Engineer role at Sapia.ai.",
-      "It's pretty relaxed — just a few questions to get to know you better. There are no right or wrong answers, so feel free to be yourself.",
-      "To kick things off: in a sentence or two, what drew you to this role specifically?",
+      "Thanks for applying to the Staff Engineer role at Sapia.ai.\n\nSapia.ai is a ~80-person tech company headquartered in Melbourne, with teams in London and Singapore. We build AI-powered tools that help large employers hire more fairly and at scale — our customers include some of the world's biggest retailers, banks, and telcos.",
+    ],
+    textLayout: "heading-first",
+  },
+  {
+    id: "format",
+    type: "next",
+    messages: [
+      "Today's interview is for a Senior Engineer role based in Melbourne, Australia. We're looking for someone who can do fullstack coding.\n\nHere is what to expect in this interview:",
+    ],
+    textLayout: "heading-first",
+    widget: "question-format",
+  },
+  {
+    id: "profile",
+    type: "profile",
+    messages: [
+      "Before we get started, let's grab a few quick details.",
     ],
   },
   {
@@ -41,24 +55,15 @@ export const mockInterview: InterviewStep[] = [
     type: "mcq",
     messages: [
       "Nice, that's a great reason to be here.",
-      "Let's talk background a little. How many years of professional engineering experience do you have?",
+      "How many years of professional engineering experience do you have?",
     ],
     options: ["0–1 years", "2–4 years", "5–9 years", "10+ years"],
-  },
-  {
-    id: "work-style",
-    type: "dropdown",
-    messages: [
-      "Got it, thanks for sharing.",
-      "Where are you currently based? Pick your country from the list.",
-    ],
-    options: COUNTRIES,
   },
   {
     id: "ownership",
     type: "text",
     messages: [
-      "Perfect.",
+      "Got it, thanks for sharing.",
       "One thing we really value at Sapia is a strong sense of ownership — engineers who take an idea all the way from ambiguity to production.",
       "Can you tell me about a time you drove a technical initiative end-to-end? What was the challenge, and how did you approach it?",
     ],
@@ -68,8 +73,17 @@ export const mockInterview: InterviewStep[] = [
     type: "text",
     messages: [
       "That's a really strong example, thanks for walking me through it.",
-      "Last one: what's an area you're actively trying to level up in right now — technically or otherwise? Even a short phrase works.",
+      "What's an area you're actively trying to level up in right now — technically or otherwise? Even a short phrase works.",
     ],
+  },
+  {
+    id: "work-style",
+    type: "dropdown",
+    messages: [
+      "Great, thank you.",
+      "Where are you currently based? Pick your country from the list.",
+    ],
+    options: COUNTRIES,
   },
   {
     id: "contact-number",
