@@ -49,6 +49,36 @@ function InterviewerText({ content, cursor, textLayout = "heading-last" }: {
   );
 }
 
+function CandidateTextBubble({ content, isNextVariant }: { content: string; isNextVariant: boolean }) {
+  const [isMultiline, setIsMultiline] = useState(false);
+  const bubbleRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!bubbleRef.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setIsMultiline(entry.contentRect.height > 24);
+      }
+    });
+    observer.observe(bubbleRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={bubbleRef}
+      className={cn(
+        "px-4 py-2.5 text-[14px] leading-relaxed break-words",
+        isNextVariant
+          ? cn("bg-[#FFCEFF] text-[#2B2732]", isMultiline ? "rounded-[10px] rounded-tr-sm" : "rounded-full rounded-tr-md")
+          : cn("bg-[#F4F4F4] text-black ring-1 ring-black/5", isMultiline ? "rounded-[10px] rounded-tr-sm" : "rounded-full rounded-tr-md")
+      )}
+    >
+      <p className="whitespace-pre-wrap">{content}</p>
+    </div>
+  );
+}
+
 
 function newId() {
   return typeof crypto !== "undefined" && crypto.randomUUID
@@ -70,14 +100,16 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
   const [editingOriginalText, setEditingOriginalText] = useState("");
   const [cancelPending, setCancelPending] = useState(false);
 
+  // Preparing loader
+  const [isPreparing, setIsPreparing] = useState(true);
+  const isMobileRef = useRef(false);
+
   // Streaming
   const [streamingText, setStreamingText] = useState("");
   const [streamingLayout, setStreamingLayout] = useState<TextLayout>("heading-last");
   const [isStreaming, setIsStreaming] = useState(false);
   const streamRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const pinnedIdRef = useRef<string | null>(null);
-  const [pinnedId, setPinnedId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const copyLink = useCallback(() => {
@@ -113,22 +145,29 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
 
   // Seed first question on mount — cleanup handles StrictMode double-invoke
   useEffect(() => {
-    const first = mockInterview[0];
-    streamMessage(first.messages.join("\n\n"), undefined, first.widget, first.textLayout);
+    isMobileRef.current = window.matchMedia("(max-width: 639px)").matches;
+    const prepDuration = isMobileRef.current ? 5000 : 2200;
+    const streamDelay  = isMobileRef.current ? 1000 : 0;
+    let streamTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const prepTimer = setTimeout(() => {
+      setIsPreparing(false);
+      streamTimer = setTimeout(() => {
+        const first = mockInterview[0];
+        streamMessage(first.messages.join("\n\n"), undefined, first.widget, first.textLayout);
+      }, streamDelay);
+    }, prepDuration);
+
     return () => {
+      clearTimeout(prepTimer);
+      if (streamTimer) clearTimeout(streamTimer);
       if (streamRef.current) { clearInterval(streamRef.current); streamRef.current = null; }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Unpin when streaming ends
-  useEffect(() => {
-    if (!isStreaming) { setPinnedId(null); pinnedIdRef.current = null; }
-  }, [isStreaming]);
-
   // Scroll to bottom on new content
   useEffect(() => {
-    if (pinnedIdRef.current) return;
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, streamingText]);
 
@@ -142,8 +181,6 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
     const isNext = answer === "__next__";
 
     const id = newId();
-    pinnedIdRef.current = id;
-    setPinnedId(id);
     setMessages(prev => [
       ...prev,
       {
@@ -232,20 +269,51 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
 
   return (
     <div className="flex h-full flex-col overflow-y-auto bg-white sm:overflow-hidden sm:bg-background">
+
+      {/* Mobile fullscreen preparing overlay */}
+      <AnimatePresence>
+        {isPreparing && (
+          <motion.div
+            key="preparing-overlay"
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-white sm:hidden"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <p className="text-[22px] font-semibold text-foreground">
+            Getting your questions ready <br></br> this will just take a moment 👋
+              <span className="ml-1.5 inline-flex translate-y-[2px] gap-[4px]">
+                {[0, 1, 2].map(i => (
+                  <span
+                    key={i}
+                    className="inline-block size-[5px] rounded-full bg-foreground/50"
+                    style={{ animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite` }}
+                  />
+                ))}
+              </span>
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Mobile header */}
-      <div className="sticky top-0 z-50 flex shrink-0 items-center justify-between border-b border-[#e5e5e5] bg-white/80 px-5 py-4 backdrop-blur-md sm:hidden">
-        <div>
-          <p className="text-base font-bold tracking-tight text-foreground">Applying for Staff Engineer at Sapia.ai</p>
-          <p className="mt-1 text-xs font-normal text-muted-foreground">You can pause and come back later with this link</p>
+      <motion.div
+        className="sticky top-0 z-50 flex shrink-0 flex-col items-start border-b border-[#e5e5e5] bg-white/80 px-5 py-4 backdrop-blur-md sm:hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isPreparing ? 0 : 1 }}
+        transition={{ duration: 0.5, delay: 0.35 }}
+      >
+        <p className="text-base font-bold tracking-tight text-foreground">Applying for Staff Engineer at Sapia.ai</p>
+        <div className="mt-1 flex items-center gap-2">
+          <p className="text-xs font-normal text-muted-foreground">You can pause and come back later with this link</p>
+          <button
+            onClick={copyLink}
+            className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            {linkCopied ? <Check className="size-3 text-green-500" /> : <Link className="size-3" />}
+            {linkCopied ? "Copied!" : "Copy link"}
+          </button>
         </div>
-        <button
-          onClick={copyLink}
-          className="ml-3 flex shrink-0 items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-        >
-          {linkCopied ? <Check className="size-3 text-green-500" /> : <Link className="size-3" />}
-          {linkCopied ? "Copied!" : "Copy link"}
-        </button>
-      </div>
+      </motion.div>
 
       <div className={cn(
         "mx-auto flex w-full gap-4 sm:min-h-0 sm:flex-1 sm:px-6 sm:pb-8 sm:pt-10",
@@ -263,7 +331,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                 <p className="text-sm text-muted-foreground">You can pause and come back later.</p>
                 <button
                   onClick={copyLink}
-                  className="flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+                  className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {linkCopied ? <Check className="size-3 text-green-500" /> : <Link className="size-3" />}
                   {linkCopied ? "Copied!" : "Copy link"}
@@ -298,12 +366,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                     >
                       <InterviewerText content={m.content} textLayout={m.textLayout} />
                       {m.widget === "question-format" && (
-                        <>
-                          <QuestionFormatWidget />
-                          <p className="mt-3 text-[14px] leading-relaxed text-foreground/60">
-                            So come as you are and be your authentic self! We recommend answering each question using between 50–150 words.
-                          </p>
-                        </>
+                        <QuestionFormatWidget />
                       )}
                     </motion.div>
                   );
@@ -316,27 +379,19 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                     initial={{ y: 32, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ type: "spring", stiffness: 480, damping: 30, mass: 0.8 }}
-                    className={cn(
-                      "group flex flex-col items-end",
-                      m.id === pinnedId && "sticky top-0 z-10"
-                    )}
+                    className="group flex flex-col items-end"
                   >
-                    <div className="flex flex-row-reverse items-start gap-2">
-                      <div className={cn(
-                        "rounded-[999px] px-4 py-2.5 text-[14px] leading-relaxed",
-                        isNextVariant
-                          ? "bg-[#FFCEFF] text-[#2B2732]"
-                          : "bg-[#efefef] text-foreground"
-                      )}>
-                        <p className="whitespace-pre-wrap">{m.content}</p>
+                    <div className="flex flex-col items-end gap-1">
+                      <div>
+                        <CandidateTextBubble content={m.content} isNextVariant={isNextVariant} />
                       </div>
                       {!editingMessageId && !isNextVariant && (
                         <button
                           onClick={() => startEditing(m.id, m.content)}
-                          className="mt-1 flex size-7 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-all hover:bg-black/5 hover:text-foreground active:scale-[0.96]"
+                          className="mr-2 text-[12px] font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
                           aria-label="Edit response"
                         >
-                          <Pencil className="size-3.5" />
+                          Edit
                         </button>
                       )}
                     </div>
@@ -344,6 +399,24 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                 );
               })}
               </AnimatePresence>
+
+              {/* Preparing loader — desktop only; mobile uses the fullscreen overlay */}
+              {isPreparing && (
+                <div className="hidden sm:flex flex-col items-start py-2">
+                  <p className="text-[18px] font-semibold leading-snug text-foreground">
+                  Getting your questions ready <br></br> this will just take a moment 👋
+                    <span className="inline-flex gap-[3px] ml-1 translate-y-[1px]">
+                      {[0, 1, 2].map(i => (
+                        <span
+                          key={i}
+                          className="inline-block size-[5px] rounded-full bg-foreground/50"
+                          style={{ animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite` }}
+                        />
+                      ))}
+                    </span>
+                  </p>
+                </div>
+              )}
 
               {/* Live streaming text */}
               {streamingText && (
@@ -432,7 +505,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                   <div className="animate-fade-up shrink-0 px-4 pb-4 pt-2">
                     <button
                       onClick={() => advance("__next__")}
-                      className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-black transition-all hover:opacity-90 active:scale-[0.98]"
+                      className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-black transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
                     >
                       Next
                     </button>
@@ -478,7 +551,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                         setSubmitted(true);
                         setMessages(prev => [...prev, { id: newId(), role: "candidate" as const, content: "Submit interview" }]);
                       }}
-                      className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-black transition-all hover:opacity-90 active:scale-[0.98]"
+                      className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-black transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
                     >
                       Submit interview
                     </button>
@@ -488,7 +561,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                   <div className="animate-fade-up shrink-0 px-4 pb-4 pt-2">
                     <button
                       onClick={onComplete}
-                      className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-black transition-all hover:opacity-90 active:scale-[0.98]"
+                      className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-black transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
                     >
                       View your insights report
                     </button>

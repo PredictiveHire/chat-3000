@@ -76,21 +76,4 @@ export const mockInterview: InterviewStep[] = [
       "What's an area you're actively trying to level up in right now — technically or otherwise? Even a short phrase works.",
     ],
   },
-  {
-    id: "work-style",
-    type: "dropdown",
-    messages: [
-      "Great, thank you.",
-      "Where are you currently based? Pick your country from the list.",
-    ],
-    options: COUNTRIES,
-  },
-  {
-    id: "contact-number",
-    type: "phone",
-    messages: [
-      "Great answer, thank you.",
-      "Before we wrap up, please share your mobile number so our team can contact you for next steps.",
-    ],
-  },
 ];

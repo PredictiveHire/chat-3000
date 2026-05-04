@@ -321,7 +321,7 @@ export function CompanyPage({ reportProgress, onViewReport, onBack }: Props) {
             </p>
             <div className="mt-1 h-1 rounded-full bg-muted overflow-hidden">
               <div
-                className={cn("h-full rounded-full transition-all duration-500", reportDone ? "bg-green-500" : "bg-primary")}
+                className={cn("h-full rounded-full transition-[width,background-color] duration-500", reportDone ? "bg-green-500" : "bg-primary")}
                 style={{ width: `${reportProgress}%` }}
               />
             </div>
@@ -355,7 +355,7 @@ export function CompanyPage({ reportProgress, onViewReport, onBack }: Props) {
           <button
             onClick={() => send(inputValue)}
             disabled={!inputValue.trim() || isTyping}
-            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-black transition-all hover:opacity-90 active:scale-[0.96] disabled:opacity-40"
+            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-black transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96] disabled:opacity-40"
           >
             <Send className="size-4" />
           </button>

@@ -1,9 +1,23 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowUp, Maximize2, Minimize2, List } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+function WordCount({ text, min }: { text: string; min: number }) {
+  const count = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+  const met = count >= min;
+  return (
+    <span className={cn(
+      "shrink-0 tabular-nums text-xs font-medium transition-colors",
+      count === 0 ? "text-muted-foreground/50" : met ? "text-green-500" : "text-muted-foreground"
+    )}>
+      {count}<span className="text-muted-foreground/50">/{min}</span>
+    </span>
+  );
+}
 
 type ReplyBarProps = {
   onSend: (text: string) => void;
@@ -174,11 +188,15 @@ export function ReplyBar({
     <div className={cn(
       "flex flex-col",
       !expanded && "animate-fade-up",
-      expanded ? "fixed inset-0 z-50 bg-background p-4" : "px-3 pb-3 pt-0"
+      expanded ? "fixed inset-x-0 bottom-0 top-[76px] z-[300] bg-background/80 backdrop-blur-md p-4 sm:inset-0" : "px-3 pb-3 pt-0"
     )}>
       <form onSubmit={onSubmit} className={cn("flex flex-col", expanded && "h-full")}>
         <div className={cn(
-          "relative flex flex-col rounded-2xl border border-[#e0e0e0] bg-white focus-within:border-[#aaa] focus-within:ring-2 focus-within:ring-black/10",
+          "relative flex flex-col rounded-[20px] bg-[#F4F4F4] shadow-[0_2px_12px_rgba(0,0,0,0.08)]",
+          expanded && "flex-1"
+        )}>
+        <div className={cn(
+          "relative flex flex-col rounded-[16px] border border-[#e5e5e5] bg-white",
           expanded && "flex-1"
         )}>
           <textarea
@@ -230,27 +248,55 @@ export function ReplyBar({
           </div>
 
           {/* Expand/Collapse Button (Mobile Only) */}
-          {(showExpand || expanded) && (
-            <button
-              type="button"
-              onClick={() => setExpanded(!expanded)}
-              className={cn(
-                "absolute flex items-center justify-center size-8 rounded-full text-muted-foreground hover:bg-black/5 active:scale-[0.96] transition-transform sm:hidden",
-                expanded ? "top-3 right-3" : "top-1 right-1"
-              )}
-              aria-label={expanded ? "Collapse" : "Expand"}
-            >
-              {expanded ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
+          <button
+            type="button"
+            onClick={() => setExpanded(!expanded)}
+            className={cn(
+              "absolute flex items-center justify-center size-8 rounded-full text-muted-foreground hover:bg-black/5 active:scale-[0.96] transition-[background-color,scale] duration-150 ease-out sm:hidden",
+              expanded ? "top-3 right-3" : "top-1 right-1"
+            )}
+            aria-label={expanded ? "Collapse" : "Expand"}
+          >
+              <div className="relative size-4">
+                <AnimatePresence initial={false} mode="popLayout">
+                  {expanded ? (
+                    <motion.span
+                      key="minimize"
+                      initial={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+                      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                      exit={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+                      transition={{ type: "spring", duration: 0.3, bounce: 0 }}
+                      className="absolute inset-0 flex items-center justify-center"
+                    >
+                      <Minimize2 className="size-4" />
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="maximize"
+                      initial={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+                      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                      exit={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+                      transition={{ type: "spring", duration: 0.3, bounce: 0 }}
+                      className="absolute inset-0 flex items-center justify-center"
+                    >
+                      <Maximize2 className="size-4" />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </div>
             </button>
-          )}
+        </div>
         </div>
       </form>
       
-      {/* Mobile hint text (outside container) */}
+      {/* Word count hint */}
       {!expanded && (
-        <p className="mt-2 text-center text-xs text-muted-foreground">
-          We encourage you to share more about your experiences to get better evaluation
-        </p>
+        <div className="mt-2 flex items-center justify-between px-1">
+          <p className="text-xs text-muted-foreground">
+            We encourage a minimum of 50 words so we can better evaluate your experience
+          </p>
+          <WordCount text={text} min={50} />
+        </div>
       )}
     </div>
   );

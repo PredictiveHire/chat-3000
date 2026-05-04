@@ -83,7 +83,7 @@ export function MobileNumberQuestion({ onConfirm, disabled, initialValue = "" }:
                 }}
                 className={cn(
                   "flex w-full items-center px-4 py-3 text-left text-sm font-medium transition-colors duration-100",
-                  countryCode === option.code ? "bg-chat-primary/10 text-foreground" : "text-foreground",
+                  countryCode === option.code ? "bg-chat-primary/10 text-foreground" : "text-foreground hover:bg-black/5",
                 )}
               >
                 {option.label} ({option.code})
@@ -99,57 +99,66 @@ export function MobileNumberQuestion({ onConfirm, disabled, initialValue = "" }:
         }}
         className="flex flex-col gap-2"
       >
-        <div className="relative flex items-end rounded-2xl border border-input bg-white focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50">
-          <button
-            type="button"
-            disabled={isLocked}
-            onClick={() => setOpen(!open)}
-            className={cn(
-              "flex items-center gap-1.5 h-10 shrink-0 border-r border-input bg-transparent px-3 text-sm font-medium outline-none",
-              "disabled:cursor-not-allowed disabled:opacity-50 sm:h-11 hover:bg-black/5 rounded-l-2xl transition-colors",
-            )}
-            aria-label="Country code"
-          >
-            {countryCode}
-            <ChevronDown className={cn("size-3.5 opacity-50 transition-transform", open && "rotate-180")} />
-          </button>
+        <div className="w-full rounded-[20px] bg-[#F4F4F4] shadow-[0_2px_12px_rgba(0,0,0,0.08)]">
+          <div className="px-5 py-3">
+            <p className="text-[12px] font-semibold text-[#373737]">Your mobile number</p>
+          </div>
+          <div className="rounded-[16px] border border-[#e5e5e5] bg-white">
+            <div className="px-5 py-4">
+              <label className="text-[12px] font-medium text-muted-foreground">Phone number</label>
+              <div className="mt-1.5 flex items-center">
+                <button
+                  type="button"
+                  disabled={isLocked}
+                  onClick={() => setOpen(!open)}
+                  className={cn(
+                    "flex items-center gap-1 shrink-0 pr-2 text-[12px] font-medium text-black outline-none transition-colors hover:text-foreground/70",
+                    "disabled:cursor-not-allowed disabled:opacity-50",
+                  )}
+                  aria-label="Country code"
+                >
+                  {countryCode}
+                  <ChevronDown className={cn("size-3 text-muted-foreground transition-transform duration-150", open && "rotate-180")} />
+                </button>
 
-          <label className="sr-only" htmlFor="mobile-number">
-            Mobile number
-          </label>
-          <input
-            id="mobile-number"
-            value={digits}
-            inputMode="numeric"
-            autoComplete="tel-national"
-            disabled={isLocked}
-            onChange={(e) => onChangeDigits(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                submit();
-              }
-            }}
-            placeholder="Mobile number"
-            className={cn(
-              "h-10 w-full bg-transparent px-3 text-sm outline-none placeholder:text-muted-foreground",
-              "disabled:cursor-not-allowed disabled:opacity-50 sm:h-11",
-            )}
-            aria-invalid={Boolean(error)}
-          />
-
-          <Button
-            type="submit"
-            size="icon"
-            disabled={isLocked || normalized.length === 0}
-            className="mb-1 mr-1 size-8 shrink-0 rounded-full bg-chat-primary text-chat-primary-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-chat-primary/90 active:not-disabled:scale-[0.96]"
-            aria-label="Confirm mobile number"
-          >
-            <SendHorizontal className="size-3.5" />
-          </Button>
+                <label className="sr-only" htmlFor="mobile-number">
+                  Mobile number
+                </label>
+                <input
+                  id="mobile-number"
+                  value={digits}
+                  inputMode="numeric"
+                  autoComplete="tel-national"
+                  disabled={isLocked}
+                  onChange={(e) => onChangeDigits(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      submit();
+                    }
+                  }}
+                  placeholder="e.g. 400 000 000"
+                  className={cn(
+                    "w-full bg-transparent text-[12px] outline-none placeholder-[#bbb] text-black",
+                    "disabled:cursor-not-allowed disabled:opacity-50",
+                  )}
+                  aria-invalid={Boolean(error)}
+                />
+              </div>
+              {error && <p className="mt-1.5 text-[10px] text-destructive">{error}</p>}
+            </div>
+            <div className="px-5 py-4">
+              <Button
+                type="submit"
+                disabled={isLocked || normalized.length === 0}
+                className="w-full rounded-2xl py-3.5 text-[14px] font-semibold bg-chat-primary text-chat-primary-foreground transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:not-disabled:scale-[0.96] h-auto"
+                aria-label="Confirm mobile number"
+              >
+                Continue
+              </Button>
+            </div>
+          </div>
         </div>
-
-        {error && <p className="px-1 text-xs text-destructive">{error}</p>}
       </form>
     </div>
   );

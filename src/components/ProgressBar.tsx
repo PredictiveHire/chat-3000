@@ -16,9 +16,9 @@ export function ProgressBar({ current, total }: ProgressBarProps) {
       aria-valuemax={total}
       aria-label={`Question ${current} of ${total}`}
     >
-      <div className="h-full bg-muted overflow-hidden">
+      <div className="h-full overflow-hidden bg-[#e5e5e5]">
         <div
-          className="h-full bg-chat-primary transition-all duration-1000 ease-out-quart"
+          className="h-full bg-chat-primary transition-[width] duration-1000 ease-out-quart"
           style={{ width: `${pct}%` }}
         />
       </div>

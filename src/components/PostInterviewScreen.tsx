@@ -74,7 +74,7 @@ export function PostInterviewScreen({ onViewCompany }: Props) {
             </div>
             <button
               onClick={() => setSubmitted(true)}
-              className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-black transition-all hover:opacity-90 active:scale-[0.98]"
+              className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-black transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
             >
               Submit interview
             </button>
@@ -138,7 +138,7 @@ export function PostInterviewScreen({ onViewCompany }: Props) {
                     key={i}
                     onClick={() => setRating({ type: "rated", value: i })}
                     className={cn(
-                      "size-9 rounded-full text-sm font-semibold ring-1 transition-all",
+                      "size-9 rounded-full text-sm font-semibold ring-1 transition-[background-color,scale] duration-150 ease-out active:scale-[0.96]",
                       c.bg, c.hoverBg, c.text, c.ring
                     )}
                   >

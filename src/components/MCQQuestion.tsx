@@ -50,13 +50,13 @@ export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuesti
                 onClick={() => pick(opt)}
                 style={{ animationDelay: `${i * 40}ms` }}
                 className={cn(
-                  "animate-bubble-in flex w-full items-center gap-3 px-5 py-[14px] text-left transition-colors",
+                  "animate-bubble-in flex w-full items-center gap-3 px-5 py-[14px] text-left transition-[background-color] duration-150",
                   isChosen ? "bg-[#f2f2f2]" : "hover:bg-[#fafafa]",
                   locked && !isChosen && "cursor-not-allowed opacity-40",
                 )}
               >
                 <div className={cn(
-                  "flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[10px] transition-colors",
+                  "flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[8px] transition-colors duration-150",
                   isChosen ? "bg-[#2B2732]" : "bg-[#f2f2f2]",
                 )}>
                   <span className={cn("text-[13px] font-medium", isChosen ? "text-white" : "text-[#666666]")}>

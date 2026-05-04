@@ -41,7 +41,7 @@ export function LandingPage({ onStart }: Props) {
             <img
               alt=""
               src={PHOTO}
-              className="absolute max-w-none"
+              className="absolute max-w-none outline outline-1 -outline-offset-1 outline-black/10"
               style={{ height: "100.08%", width: "194.48%", left: "-50.5%", top: "-0.04%" }}
             />
             {/* Woolworths badge */}
@@ -58,7 +58,7 @@ export function LandingPage({ onStart }: Props) {
 
           {/* Content panel */}
           <div className="flex flex-col gap-6 p-8 sm:gap-8 sm:p-10 xl:gap-10 xl:px-20 xl:py-[60px] xl:w-[678px]">
-            <img alt="" src={CHAT_ICON} className="size-9 shrink-0 sm:size-[42px]" />
+            <img alt="" src={CHAT_ICON} className="size-9 shrink-0 sm:size-[42px] outline outline-1 -outline-offset-1 outline-black/10" />
 
             <div className="flex flex-col gap-5 sm:gap-7">
               <p className="text-lg font-semibold leading-snug text-black sm:text-xl">
@@ -69,12 +69,12 @@ export function LandingPage({ onStart }: Props) {
                 {TIMELINE_ITEMS.map((item, i) => (
                   <div key={i} className="flex flex-col gap-1.5 sm:gap-2">
                     <div className="flex items-center gap-3">
-                      <img alt="" src={PURPLE_DOT} className="size-4 shrink-0" />
+                      <img alt="" src={PURPLE_DOT} className="size-4 shrink-0 outline outline-1 -outline-offset-1 outline-black/10" />
                       <p className="text-sm font-bold leading-normal text-black sm:text-[15px]">
                         {item.label}
                       </p>
                     </div>
-                    <p className="pl-7 text-sm leading-relaxed text-black/70 sm:text-[15px]">
+                    <p className="pl-7 text-sm leading-relaxed text-black/70 sm:text-[15px] text-pretty">
                       {item.description}
                     </p>
                   </div>
@@ -84,7 +84,7 @@ export function LandingPage({ onStart }: Props) {
 
             <button
               onClick={onStart}
-              className="w-full rounded-full bg-primary py-3 text-sm font-semibold leading-snug text-black transition-opacity hover:opacity-90 active:scale-[0.98] sm:text-[15px]"
+              className="w-full rounded-full bg-primary py-3 text-sm font-semibold leading-snug text-black transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96] sm:text-[15px]"
             >
               I&apos;m ready, let&apos;s go!
             </button>

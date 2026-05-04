@@ -155,32 +155,34 @@ export function DropdownQuestion({
 
       {/* Textarea — auto-expanding like ReplyBar */}
       <form onSubmit={(e) => { e.preventDefault(); submit(); }} className="flex flex-col">
-        <div className="relative flex flex-row items-end sm:flex-col sm:items-stretch rounded-2xl border border-input bg-white focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/50">
-          <textarea
-            ref={textareaRef}
-            rows={1}
-            value={query}
-            onChange={(e) => { if (!locked) { setQuery(e.target.value); } }}
-            onKeyDown={onKeyDown}
-            onFocus={() => filtered.length > 0 && setOpen(true)}
-            disabled={locked}
-            placeholder={selected ? selected : placeholder}
-            autoFocus
-            className="w-full resize-none bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 min-h-10 py-2.5 pl-4 pr-10 sm:px-4 sm:py-2.5 sm:pr-4 text-sm leading-relaxed"
-            style={{ overflowY: "hidden" }}
-            aria-autocomplete="list"
-            aria-expanded={open}
-          />
-          <div className="flex items-center pb-1 pl-2 pr-1 sm:justify-end sm:px-3 sm:pb-1 sm:pt-0">
-            <Button
-              type="submit"
-              disabled={locked || (!selected && filtered.length === 0 && !options.find((o) => o.toLowerCase() === query.trim().toLowerCase()))}
-              size="icon"
-              className="mb-0.5 sm:mb-0 size-8 shrink-0 rounded-full bg-chat-primary text-chat-primary-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-chat-primary/90 active:not-disabled:scale-[0.96]"
-              aria-label="Confirm selection"
-            >
-              <SendHorizontal className="size-3.5" />
-            </Button>
+        <div className="w-full rounded-[20px] bg-[#F4F4F4] shadow-[0_2px_12px_rgba(0,0,0,0.08)]">
+          <div className="relative flex flex-row items-end sm:flex-col sm:items-stretch rounded-[16px] border border-[#e5e5e5] bg-white">
+            <textarea
+              ref={textareaRef}
+              rows={1}
+              value={query}
+              onChange={(e) => { if (!locked) { setQuery(e.target.value); } }}
+              onKeyDown={onKeyDown}
+              onFocus={() => filtered.length > 0 && setOpen(true)}
+              disabled={locked}
+              placeholder={selected ? selected : placeholder}
+              autoFocus
+              className="w-full resize-none bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 min-h-10 py-2.5 pl-4 pr-10 sm:px-4 sm:py-2.5 sm:pr-4 text-sm leading-relaxed"
+              style={{ overflowY: "hidden" }}
+              aria-autocomplete="list"
+              aria-expanded={open}
+            />
+            <div className="flex items-center pb-1 pl-2 pr-1 sm:justify-end sm:px-3 sm:pb-1 sm:pt-0">
+              <Button
+                type="submit"
+                disabled={locked || (!selected && filtered.length === 0 && !options.find((o) => o.toLowerCase() === query.trim().toLowerCase()))}
+                size="icon"
+                className="mb-0.5 sm:mb-0 size-8 shrink-0 rounded-full bg-chat-primary text-chat-primary-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-chat-primary/90 active:not-disabled:scale-[0.96]"
+                aria-label="Confirm selection"
+              >
+                <SendHorizontal className="size-3.5" />
+              </Button>
+            </div>
           </div>
         </div>
       </form>

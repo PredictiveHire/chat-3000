@@ -313,7 +313,7 @@ export function ReportPage({ onBack }: Props) {
                 <button
                   onClick={() => send(inputValue)}
                   disabled={!inputValue.trim() || isTyping}
-                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-black transition-all hover:opacity-90 active:scale-[0.96] disabled:opacity-40"
+                  className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-black transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96] disabled:opacity-40"
                 >
                   <Send className="size-3.5" />
                 </button>

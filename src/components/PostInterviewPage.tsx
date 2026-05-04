@@ -285,7 +285,7 @@ export function PostInterviewPage({ reportProgress, onViewReport, onBack }: Prop
                         key={opt}
                         onClick={() => pickRating(opt)}
                         style={{ animationDelay: `${i * 50}ms` }}
-                        className="animate-bubble-in flex w-full items-center justify-between rounded-xl border border-border bg-card px-4 py-3.5 text-left text-sm font-medium text-foreground transition-all hover:border-chat-primary/30 hover:bg-chat-primary/5 hover:shadow-sm active:scale-[0.98]"
+                        className="animate-bubble-in flex w-full items-center justify-between rounded-xl border border-border bg-card px-4 py-3.5 text-left text-sm font-medium text-foreground transition-[border-color,background-color,box-shadow,scale] duration-150 ease-out hover:border-chat-primary/30 hover:bg-chat-primary/5 hover:shadow-sm active:scale-[0.96]"
                       >
                         {opt}
                       </button>
@@ -331,7 +331,7 @@ export function PostInterviewPage({ reportProgress, onViewReport, onBack }: Prop
                             key={opt}
                             onClick={() => pickDemo(q.id, opt)}
                             className={cn(
-                              "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-all duration-200 active:scale-[0.97]",
+                              "rounded-full border px-3.5 py-1.5 text-sm font-medium transition-[border-color,background-color,scale] duration-150 ease-out active:scale-[0.96]",
                               selected
                                 ? "border-transparent bg-foreground text-background"
                                 : "border-border bg-background text-foreground hover:border-foreground/30 hover:bg-muted/50"
@@ -356,7 +356,7 @@ export function PostInterviewPage({ reportProgress, onViewReport, onBack }: Prop
                 </button>
                 <button
                   onClick={submitDemographics}
-                  className="group flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-black transition-all hover:opacity-90 active:scale-[0.98]"
+                  className="group flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-black transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
                 >
                   Continue
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
