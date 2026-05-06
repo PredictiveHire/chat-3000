@@ -261,7 +261,7 @@ export function CompanyPage({ reportProgress, onViewReport, onBack }: Props) {
                 className={cn(
                   "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
                   m.role === "user"
-                    ? "bg-primary text-black rounded-tr-sm ring-1 ring-black/10"
+                    ? "bg-primary text-primary-foreground rounded-tr-sm ring-1 ring-black/10"
                     : "bg-card text-foreground rounded-tl-sm ring-1 ring-black/10 shadow-sm",
                 )}
               >
@@ -355,7 +355,7 @@ export function CompanyPage({ reportProgress, onViewReport, onBack }: Props) {
           <button
             onClick={() => send(inputValue)}
             disabled={!inputValue.trim() || isTyping}
-            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-black transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96] disabled:opacity-40"
+            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96] disabled:opacity-40"
           >
             <Send className="size-4" />
           </button>

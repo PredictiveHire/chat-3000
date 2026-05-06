@@ -74,7 +74,7 @@ export function PostInterviewScreen({ onViewCompany }: Props) {
             </div>
             <button
               onClick={() => setSubmitted(true)}
-              className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-black transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
+              className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
             >
               Submit interview
             </button>

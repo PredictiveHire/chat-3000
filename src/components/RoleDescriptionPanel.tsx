@@ -24,23 +24,23 @@ export function RoleDescriptionPanel({ onClose }: Props) {
         <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5 text-sm text-foreground">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Company</p>
-            <p className="font-medium">Sapia.ai</p>
+            <p className="font-medium">Woolworths</p>
           </div>
 
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Role</p>
-            <p className="font-medium">Staff Engineer</p>
+            <p className="font-medium">Team Member</p>
           </div>
 
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Location</p>
-            <p>Melbourne, AU · Hybrid</p>
+            <p>Australia · In-store</p>
           </div>
 
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">About the role</p>
             <p className="leading-relaxed text-muted-foreground">
-              We're looking for a Staff Engineer to help shape the technical direction of Sapia.ai's core platform. You'll work across the full stack, driving architectural decisions that enable our AI-powered hiring tools to scale reliably for enterprise customers.
+              We're looking for a Team Member to join our store team at Woolworths. You'll help customers find what they need, keep shelves stocked, and create a welcoming shopping experience every day.
             </p>
           </div>
 
@@ -81,7 +81,7 @@ export function RoleDescriptionPanel({ onClose }: Props) {
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Why Sapia.ai</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">Why Woolworths</p>
             <p className="leading-relaxed text-muted-foreground">
               We're a mission-driven team building fairer, more human hiring. Our platform is used by some of the world's largest employers. You'll have a real impact on both the product and the team around you.
             </p>

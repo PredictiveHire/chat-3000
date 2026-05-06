@@ -356,7 +356,7 @@ export function PostInterviewPage({ reportProgress, onViewReport, onBack }: Prop
                 </button>
                 <button
                   onClick={submitDemographics}
-                  className="group flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-black transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
+                  className="group flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
                 >
                   Continue
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />

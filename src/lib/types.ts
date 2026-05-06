@@ -1,5 +1,5 @@
-export type QuestionType = "text" | "mcq" | "dropdown" | "phone" | "next" | "profile";
-export type MessageWidget = "question-format";
+export type QuestionType = "text" | "mcq" | "dropdown" | "phone" | "next" | "profile" | "video-setup" | "video";
+export type MessageWidget = "question-format" | "text-question" | "video-question" | "company-intro-video";
 
 export type TextLayout = "heading-first" | "heading-last";
 
@@ -23,6 +23,12 @@ export interface ChatMessage {
   variant?: "next";
   /** Optional widget rendered below interviewer message */
   widget?: MessageWidget;
+  /** Metadata passed to the widget */
+  widgetMeta?: Record<string, number | string>;
   /** Controls which paragraph is rendered large. Default: "heading-last" */
   textLayout?: TextLayout;
+  /** Blob URL of a recorded video response */
+  videoUrl?: string;
+  /** Step type for special rendering (e.g. "mcq") */
+  stepType?: QuestionType;
 }

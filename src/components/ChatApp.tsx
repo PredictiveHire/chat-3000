@@ -13,7 +13,7 @@ const fadeVariants = {
   animate: { opacity: 1 },
   exit: { opacity: 0 },
 };
-const transition = { duration: 0.2 };
+const transition = { duration: 0.25 };
 
 export function ChatApp() {
   const [view, setView] = useState<View>("interview");

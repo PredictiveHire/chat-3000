@@ -213,7 +213,6 @@ export function ReplyBar({
                 ? "flex-1 p-4"
                 : "min-h-20 px-4 pt-3 pr-4 sm:min-h-24"
             )}
-            style={{ overflowY: "hidden" }}
             aria-label="Your reply"
           />
 
@@ -238,7 +237,7 @@ export function ReplyBar({
               disabled={disabled || !text.trim()}
               size="icon"
               className={cn(
-                "size-8 shrink-0 rounded-full bg-primary text-black transition-[background-color,scale] duration-150 ease-out hover:opacity-90 active:not-disabled:scale-[0.96]",
+                "size-8 shrink-0 rounded-full bg-primary text-primary-foreground transition-[background-color,scale] duration-150 ease-out hover:opacity-90 active:not-disabled:scale-[0.96]",
                 !expanded && "mb-0.5 sm:mb-0"
               )}
               aria-label="Send reply"

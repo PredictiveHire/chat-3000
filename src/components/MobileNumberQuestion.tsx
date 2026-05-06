@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Check } from "lucide-react";
 import { SendHorizontal, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -32,6 +33,7 @@ export function MobileNumberQuestion({ onConfirm, disabled, initialValue = "" }:
   const [digits, setDigits] = useState(initialDigits);
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
+  const [smsConsent, setSmsConsent] = useState(true);
   const rootRef = useRef<HTMLDivElement>(null);
 
   const isLocked = Boolean(disabled);
@@ -147,7 +149,28 @@ export function MobileNumberQuestion({ onConfirm, disabled, initialValue = "" }:
               </div>
               {error && <p className="mt-1.5 text-[10px] text-destructive">{error}</p>}
             </div>
-            <div className="px-5 py-4">
+            <div className="px-5 pb-4">
+              <button
+                type="button"
+                disabled={isLocked}
+                onClick={() => setSmsConsent(v => !v)}
+                className="flex items-start gap-2.5 text-left disabled:cursor-not-allowed"
+                aria-pressed={smsConsent}
+              >
+                <span className={cn(
+                  "mt-[1px] flex h-[16px] w-[16px] shrink-0 items-center justify-center rounded-[4px] border transition-colors duration-150",
+                  smsConsent
+                    ? "border-[#3770E5] bg-[#dce8fc]"
+                    : "border-[#d4d4d4] bg-white",
+                )}>
+                  {smsConsent && <Check className="size-2.5 text-[#3770E5]" strokeWidth={3} />}
+                </span>
+                <span className="text-[12px] leading-snug text-foreground/60">
+                  I consent receiving SMS about my application status.
+                </span>
+              </button>
+            </div>
+            <div className="px-5 pb-4">
               <Button
                 type="submit"
                 disabled={isLocked || normalized.length === 0}

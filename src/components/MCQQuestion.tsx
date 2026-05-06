@@ -57,7 +57,7 @@ export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuesti
               >
                 <div className={cn(
                   "flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[8px] transition-colors duration-150",
-                  isChosen ? "bg-[#2B2732]" : "bg-[#f2f2f2]",
+                  isChosen ? "bg-[#3770E5]" : "bg-[#f2f2f2]",
                 )}>
                   <span className={cn("text-[13px] font-medium", isChosen ? "text-white" : "text-[#666666]")}>
                     {i + 1}

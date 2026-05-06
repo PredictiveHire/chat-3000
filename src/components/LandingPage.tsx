@@ -84,7 +84,7 @@ export function LandingPage({ onStart }: Props) {
 
             <button
               onClick={onStart}
-              className="w-full rounded-full bg-primary py-3 text-sm font-semibold leading-snug text-black transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96] sm:text-[15px]"
+              className="w-full rounded-full bg-primary py-3 text-sm font-semibold leading-snug text-primary-foreground transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96] sm:text-[15px]"
             >
               I&apos;m ready, let&apos;s go!
             </button>

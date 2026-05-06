@@ -30,15 +30,16 @@ export const mockInterview: InterviewStep[] = [
     id: "intro",
     type: "next",
     messages: [
-      "Thanks for applying to the Staff Engineer role at Sapia.ai.\n\nSapia.ai is a ~80-person tech company headquartered in Melbourne, with teams in London and Singapore. We build AI-powered tools that help large employers hire more fairly and at scale — our customers include some of the world's biggest retailers, banks, and telcos.",
+      "Thanks for applying to the Team Member role at Woolworths Group, Australia's #1 trusted retail brand! 🍏\n\nWoolworths Group is one of Australia's largest retailers, serving millions of customers every week across our supermarkets, metro stores, and online. Our team members are the heart of everything we do.\n\nWatch this video to know more about us",
     ],
     textLayout: "heading-first",
+    widget: "company-intro-video",
   },
   {
     id: "format",
     type: "next",
     messages: [
-      "Today's interview is for a Senior Engineer role based in Melbourne, Australia. We're looking for someone who can do fullstack coding.\n\nHere is what to expect in this interview:",
+      "Today's interview is for a Team Member role at Woolworths. We're looking for someone who is friendly, reliable, and passionate about great customer service.\n\nHere is what to expect in this interview:",
     ],
     textLayout: "heading-first",
     widget: "question-format",
@@ -47,26 +48,17 @@ export const mockInterview: InterviewStep[] = [
     id: "profile",
     type: "profile",
     messages: [
-      "Before we get started, let's grab a few quick details.",
+      "Let's grab a few quick details.",
     ],
-  },
-  {
-    id: "experience",
-    type: "mcq",
-    messages: [
-      "Nice, that's a great reason to be here.",
-      "How many years of professional engineering experience do you have?",
-    ],
-    options: ["0–1 years", "2–4 years", "5–9 years", "10+ years"],
   },
   {
     id: "ownership",
     type: "text",
     messages: [
-      "Got it, thanks for sharing.",
       "One thing we really value at Sapia is a strong sense of ownership — engineers who take an idea all the way from ambiguity to production.",
       "Can you tell me about a time you drove a technical initiative end-to-end? What was the challenge, and how did you approach it?",
     ],
+    widget: "text-question",
   },
   {
     id: "growth",
@@ -75,5 +67,31 @@ export const mockInterview: InterviewStep[] = [
       "That's a really strong example, thanks for walking me through it.",
       "What's an area you're actively trying to level up in right now — technically or otherwise? Even a short phrase works.",
     ],
+    widget: "text-question",
+  },
+  {
+    id: "video-setup",
+    type: "video-setup",
+    messages: [
+      "Thank you for completing this portion of the interview.\n\nNext up, you will be answering 2 questions on video. Before we begin, let's make sure everything is set up.",
+    ],
+  },
+  {
+    id: "video-q1",
+    type: "video",
+    messages: [
+      "You're all set! Here's your first video question.",
+      "Tell us about a project you're most proud of and what made it successful.",
+    ],
+    widget: "video-question",
+  },
+  {
+    id: "experience",
+    type: "mcq",
+    messages: [
+      "Almost done! Just one last quick question.",
+      "How many years of professional engineering experience do you have?",
+    ],
+    options: ["0–1 years", "2–4 years", "5–9 years", "10+ years"],
   },
 ];
