@@ -11,7 +11,7 @@ import { mockInterview } from "@/lib/mockData";
 import type { ChatMessage, MessageWidget, QuestionType, TextLayout } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { CTAButton } from "@/components/ui/cta-button";
-import { Check, HelpCircle, Link, Pencil, RotateCcw } from "lucide-react";
+import { Accessibility, Check, HelpCircle, Link, Pencil, RotateCcw } from "lucide-react";
 import { QuestionFormatWidget } from "@/components/QuestionFormatWidget";
 import { TextQuestionHeader } from "@/components/TextQuestionHeader";
 import { CameraSetupModal } from "@/components/CameraSetupModal";
@@ -403,13 +403,13 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
       <div className="sticky top-0 z-50 flex shrink-0 flex-col items-start border-b border-[#e5e5e5] bg-white/80 px-5 py-4 backdrop-blur-md sm:hidden">
         <div className="flex w-full items-start justify-between gap-2">
           <p className="text-base font-bold tracking-tight text-foreground">Team member role</p>
-          {/* Help icon — mobile */}
+          {/* Accessibility icon — mobile */}
           <button
             onClick={() => setHelpOpen(v => !v)}
             className="shrink-0 flex size-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/5 hover:text-foreground"
-            aria-label="Help"
+            aria-label="Accessibility"
           >
-            <HelpCircle className="size-4" />
+            <Accessibility className="size-4" />
           </button>
         </div>
         <div className="mt-1 flex items-center gap-2">
