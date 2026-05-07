@@ -13,7 +13,6 @@ import { cn } from "@/lib/utils";
 import { CTAButton } from "@/components/ui/cta-button";
 import { Check, HelpCircle, Link, Pencil, RotateCcw } from "lucide-react";
 import { QuestionFormatWidget } from "@/components/QuestionFormatWidget";
-import { RoleDescriptionPanel } from "@/components/RoleDescriptionPanel";
 import { TextQuestionHeader } from "@/components/TextQuestionHeader";
 import { CameraSetupModal } from "@/components/CameraSetupModal";
 import { VideoQuestionModal } from "@/components/VideoQuestionModal";
@@ -111,6 +110,19 @@ function CandidateTextBubble({ content, isNextVariant }: { content: string; isNe
   );
 }
 
+function ResumeLinkAction({ onCopyLink, copied }: { onCopyLink: () => void; copied: boolean }) {
+  return (
+    <button
+      type="button"
+      onClick={onCopyLink}
+      className="mt-2 inline-flex items-center gap-2 rounded-full border border-border bg-white px-3 py-1.5 text-sm font-semibold text-[#3770E5] shadow-sm transition-colors hover:border-[#3770E5]/30 hover:bg-[#f7faff]"
+    >
+      {copied ? <Check className="size-4" /> : <Link className="size-4" />}
+      {copied ? "Copied link" : "Copy link"}
+    </button>
+  );
+}
+
 
 function newId() {
   return typeof crypto !== "undefined" && crypto.randomUUID
@@ -122,7 +134,6 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
   const total = mockInterview.length;
   const [stepIndex, setStepIndex] = useState(0);
   const [linkCopied, setLinkCopied] = useState(false);
-  const [showRoleDescription, setShowRoleDescription] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const helpRef = useRef<HTMLDivElement>(null);
   const [complete, setComplete] = useState(false);
@@ -413,10 +424,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
         </div>
       </div>
 
-      <div className={cn(
-        "mx-auto flex w-full gap-4 sm:min-h-0 sm:flex-1 sm:px-6 sm:pb-8 sm:pt-10",
-        showRoleDescription ? "max-w-[1200px]" : "max-w-3xl"
-      )}>
+      <div className="mx-auto flex w-full max-w-3xl gap-4 sm:min-h-0 sm:flex-1 sm:px-6 sm:pb-8 sm:pt-10">
         <main className="relative flex min-w-0 flex-col sm:flex-1">
 
           {/* Desktop header */}
@@ -444,12 +452,6 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                 aria-label="Help"
               >
                 <HelpCircle className="size-4" />
-              </button>
-              <button
-                onClick={() => setShowRoleDescription(v => !v)}
-                className="rounded-full border border-border px-3.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-              >
-                {showRoleDescription ? "Hide role description" : "View role description"}
               </button>
             </div>
           </div>
@@ -513,7 +515,10 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                         </>
                       )}
                       {m.widget === "question-format" && (
-                        <QuestionFormatWidget onCopyLink={copyLink} copied={linkCopied} />
+                        <QuestionFormatWidget />
+                      )}
+                      {m.widget === "resume-link" && (
+                        <ResumeLinkAction onCopyLink={copyLink} copied={linkCopied} />
                       )}
                       {m.widget === "company-intro-video" && (
                         <CompanyIntroVideo />
@@ -931,11 +936,6 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
           </div>
         </main>
 
-        {showRoleDescription && (
-          <aside className="hidden lg:flex w-[360px] xl:w-[420px] shrink-0 flex-col">
-            <RoleDescriptionPanel onClose={() => setShowRoleDescription(false)} />
-          </aside>
-        )}
       </div>
 
       <CameraSetupModal

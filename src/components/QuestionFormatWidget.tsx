@@ -2,7 +2,7 @@
 
 import { type ReactNode } from "react";
 import { motion } from "framer-motion";
-import { AlignLeft, Check, Copy, Video, ListChecks } from "lucide-react";
+import { AlignLeft, Video, ListChecks } from "lucide-react";
 
 type Row = {
   count: number;
@@ -36,68 +36,41 @@ const rows: Row[] = [
   },
 ];
 
-export function QuestionFormatWidget({
-  onCopyLink,
-  copied,
-}: {
-  onCopyLink: () => void;
-  copied?: boolean;
-}) {
+export function QuestionFormatWidget() {
   return (
-    <>
-      <motion.div
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.55, duration: 0.4, ease: "easeOut" }}
-        className="mt-3 w-full rounded-[20px] bg-[#f3f4f6]"
-      >
-        <p className="px-[23px] py-3 text-base font-semibold text-[#373737]">
-          Here&apos;s what to expect
-        </p>
-        <div className="flex flex-col gap-4 rounded-[20px] border border-[#e6e6e6] bg-white p-5">
-          {/* Total summary */}
-          <div className="flex flex-col items-center gap-2 rounded-[18px] bg-[#f8f8f8] px-3 py-3">
-            <p className="text-xs font-medium uppercase tracking-wide text-[#7c7c7c]">Total</p>
-            <div className="flex items-center gap-1">
-              <span className="text-base font-medium text-black">9 Questions</span>
-              <span className="text-base font-medium text-[#616161]">&nbsp;(~ 30 minutes)</span>
-            </div>
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.55, duration: 0.4, ease: "easeOut" }}
+      className="mt-3 w-full rounded-[20px] bg-[#f3f4f6]"
+    >
+      <p className="px-[23px] py-3 text-base font-semibold text-[#373737]">
+        Here&apos;s what to expect
+      </p>
+      <div className="flex flex-col gap-4 rounded-[20px] border border-[#e6e6e6] bg-white p-5">
+        {/* Total summary */}
+        <div className="flex flex-col items-center gap-2 rounded-[18px] bg-[#f8f8f8] px-3 py-3">
+          <p className="text-xs font-medium uppercase tracking-wide text-[#7c7c7c]">Total</p>
+          <div className="flex items-center gap-1">
+            <span className="text-base font-medium text-black">9 Questions</span>
+            <span className="text-base font-medium text-[#616161]">&nbsp;(~ 30 minutes)</span>
           </div>
-
-          {/* Question type rows */}
-          {rows.map(({ count, label, icon: Icon, desc }) => (
-            <div key={label} className="flex flex-col gap-2">
-              <div className="flex items-center gap-3">
-                <div className="h-[22px] w-[5px] shrink-0 rounded-full bg-[#3770E5]" />
-                <Icon className="size-4 shrink-0 text-black" strokeWidth={1.5} />
-                <p className="text-sm font-medium text-black">
-                  {count}&nbsp;&nbsp;{label}
-                </p>
-              </div>
-              <p className="pl-4 text-sm leading-relaxed text-black/65">{desc}</p>
-            </div>
-          ))}
         </div>
-      </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7, duration: 0.35, ease: "easeOut" }}
-        className="mt-3 w-full rounded-[18px] border border-[#e6e6e6] bg-white p-4 shadow-sm"
-      >
-        <p className="text-sm leading-relaxed text-black/70">
-          You can pause and come back to this interview at anytime using this web link. It will also be sent to your email inbox.
-        </p>
-        <button
-          type="button"
-          onClick={onCopyLink}
-          className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-[#3770E5] transition-colors hover:text-[#2f63cc]"
-        >
-          {copied ? <Check className="size-4 text-[#3770E5]" /> : <Copy className="size-4" />}
-          {copied ? "Copied link" : "Copy link"}
-        </button>
-      </motion.div>
-    </>
+        {/* Question type rows */}
+        {rows.map(({ count, label, icon: Icon, desc }) => (
+          <div key={label} className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <div className="h-[22px] w-[5px] shrink-0 rounded-full bg-[#3770E5]" />
+              <Icon className="size-4 shrink-0 text-black" strokeWidth={1.5} />
+              <p className="text-sm font-medium text-black">
+                {count}&nbsp;&nbsp;{label}
+              </p>
+            </div>
+            <p className="pl-4 text-sm leading-relaxed text-black/65">{desc}</p>
+          </div>
+        ))}
+      </div>
+    </motion.div>
   );
 }

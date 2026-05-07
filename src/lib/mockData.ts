@@ -45,6 +45,14 @@ export const mockInterview: InterviewStep[] = [
     widget: "question-format",
   },
   {
+    id: "resume-link",
+    type: "next",
+    messages: [
+      "You can pause and come back to this interview at anytime using this web link. It will also be sent to your email inbox.",
+    ],
+    widget: "resume-link",
+  },
+  {
     id: "profile",
     type: "profile",
     messages: [
