@@ -13,8 +13,8 @@ export function CompanyIntroVideo() {
       <div className="aspect-video w-full overflow-hidden bg-black">
         <iframe
           className="h-full w-full"
-          src="https://www.youtube.com/embed/mvJ7w5RTO30"
-          title="Sapia.ai company introduction video"
+          src="https://www.youtube.com/embed/avMiDvYP8IQ"
+          title="Woolworths company introduction video"
           loading="eager"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerPolicy="strict-origin-when-cross-origin"
