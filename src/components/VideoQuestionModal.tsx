@@ -39,17 +39,17 @@ export function VideoQuestionModal({
         {/* Header bar */}
         <div className="flex shrink-0 items-start justify-between px-5 pt-5 pb-3">
           <div className="flex flex-col gap-1">
-            <p className="text-[13px] font-medium text-foreground/40">
+            <p className="text-sm font-medium text-foreground/40">
               {currentIndex !== undefined && total !== undefined
                 ? `Question ${currentIndex} of ${total}`
                 : "Video response"}
             </p>
-            <p className="text-[16px] font-semibold leading-snug text-foreground">
+            <p className="text-base font-semibold leading-snug text-foreground">
               {question}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2 pl-4">
-            <button className="rounded-full border border-[#e5e5e5] px-3 py-1 text-[12px] font-medium text-foreground/50 transition-colors hover:border-foreground/20 hover:text-foreground">
+            <button className="rounded-full border border-[#e5e5e5] px-3 py-1 text-xs font-medium text-foreground/50 transition-colors hover:border-foreground/20 hover:text-foreground">
               I need help
             </button>
             {onClose && (

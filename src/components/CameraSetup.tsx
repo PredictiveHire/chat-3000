@@ -129,12 +129,12 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
             ) : permission === "denied" ? (
               <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
                 <AlertCircle className="size-8 text-red-400" />
-                <p className="text-[14px] font-medium text-foreground/70">Camera access was blocked</p>
+                <p className="text-sm font-medium text-foreground/70">Camera access was blocked</p>
               </div>
             ) : (
               <div className="flex h-full flex-col items-center justify-center gap-3">
                 <div className="size-10 animate-pulse rounded-full bg-foreground/10" />
-                <p className="text-[13px] text-foreground/40">
+                <p className="text-sm text-foreground/40">
                   {permission === "requesting" ? "Requesting access…" : "Initialising camera…"}
                 </p>
               </div>
@@ -173,7 +173,7 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
           {permission === "granted" && testStage === "idle" && (
             <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 backdrop-blur-sm">
               <span className="size-1.5 animate-pulse rounded-full bg-red-400" />
-              <span className="text-[11px] font-medium text-white">Live preview</span>
+              <span className="text-xs font-medium text-white">Live preview</span>
             </div>
           )}
 
@@ -181,14 +181,14 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
           {testStage === "recording" && (
             <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 backdrop-blur-sm">
               <span className="size-1.5 animate-pulse rounded-full bg-red-400" />
-              <span className="text-[11px] font-medium text-white">REC {formatTime(recLeft)}</span>
+              <span className="text-xs font-medium text-white">REC {formatTime(recLeft)}</span>
             </div>
           )}
 
           {/* Preview badge */}
           {testStage === "review" && (
             <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 backdrop-blur-sm">
-              <span className="text-[11px] font-medium text-white">Test preview</span>
+              <span className="text-xs font-medium text-white">Test preview</span>
             </div>
           )}
         </div>
@@ -198,12 +198,12 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
           <div className="flex flex-col divide-y divide-[#f0f0f0]">
             <div className="flex items-center gap-3 px-4 py-3">
               <Camera className="size-4 shrink-0 text-foreground/40" />
-              <p className="flex-1 truncate text-[13px] text-foreground/70">{cameraLabel}</p>
+              <p className="flex-1 truncate text-sm text-foreground/70">{cameraLabel}</p>
               <CheckCircle2 className="size-4 shrink-0 text-green-500" />
             </div>
             <div className="flex items-center gap-3 px-4 py-3">
               <Mic className="size-4 shrink-0 text-foreground/40" />
-              <p className="flex-1 truncate text-[13px] text-foreground/70">{micLabel}</p>
+              <p className="flex-1 truncate text-sm text-foreground/70">{micLabel}</p>
               <CheckCircle2 className="size-4 shrink-0 text-green-500" />
             </div>
           </div>
@@ -212,7 +212,7 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
         {/* Retry when denied */}
         {permission === "denied" && (
           <div className="px-4 py-3">
-            <button onClick={startStream} className="flex items-center gap-2 text-[13px] font-medium text-foreground/60 hover:text-foreground transition-colors">
+            <button onClick={startStream} className="flex items-center gap-2 text-sm font-medium text-foreground/60 hover:text-foreground transition-colors">
               <RefreshCw className="size-3.5" />
               Try again
             </button>
@@ -225,8 +225,8 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
             {testStage === "recording" && (
               <>
                 <div className="flex items-center justify-between">
-                  <p className="text-[12px] text-foreground/50">Recording test…</p>
-                  <p className={cn("text-[12px] font-semibold tabular-nums", recLeft <= 3 ? "text-red-500" : "text-foreground/60")}>
+                  <p className="text-xs text-foreground/50">Recording test…</p>
+                  <p className={cn("text-xs font-semibold tabular-nums", recLeft <= 3 ? "text-red-500" : "text-foreground/60")}>
                     {formatTime(recLeft)}
                   </p>
                 </div>
@@ -240,10 +240,10 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
             )}
             {testStage === "review" && (
               <div className="flex items-center justify-between">
-                <p className="text-[12px] text-foreground/50">Looks good? Play it back above.</p>
+                <p className="text-xs text-foreground/50">Looks good? Play it back above.</p>
                 <button
                   onClick={retakeTest}
-                  className="flex items-center gap-1.5 text-[12px] font-medium text-foreground/50 hover:text-foreground transition-colors"
+                  className="flex items-center gap-1.5 text-xs font-medium text-foreground/50 hover:text-foreground transition-colors"
                 >
                   <RotateCcw className="size-3" />
                   Retake
@@ -256,19 +256,19 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
         {/* Troubleshooting note */}
         <div className="border-t border-[#f0f0f0] px-4 py-4">
           <div className="mb-1.5 flex items-center justify-between gap-3">
-            <p className="text-[11px] font-semibold text-foreground/30">
+            <p className="text-xs font-semibold text-foreground/30">
               If your microphone and camera are not working
             </p>
             <button
               type="button"
               onClick={onHelp}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#f6f0f6] px-2.5 py-1 text-[11px] font-semibold text-foreground/60 transition-[background-color,color,scale] duration-150 ease-out hover:bg-[#f0e4f0] hover:text-foreground active:scale-[0.96]"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#f6f0f6] px-2.5 py-1 text-xs font-semibold text-foreground/60 transition-[background-color,color,scale] duration-150 ease-out hover:bg-[#f0e4f0] hover:text-foreground active:scale-[0.96]"
             >
               <HelpCircle className="size-3" />
               Help
             </button>
           </div>
-          <p className="text-[12px] leading-relaxed text-foreground/50">
+          <p className="text-xs leading-relaxed text-foreground/50">
             Issue may be caused by missing the &quot;Allow&quot; prompt or having restricted device settings. Double-check your system permissions.
           </p>
         </div>

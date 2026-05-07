@@ -62,14 +62,14 @@ function InterviewerText({ content, cursor, textLayout = "heading-last", plain }
         const isHeading = !plain && i === headingIdx;
         const isLast = i === paragraphs.length - 1;
         return isHeading ? (
-          <p key={i} className="text-[18px] font-semibold leading-snug text-foreground">
+          <p key={i} className="text-lg font-semibold leading-snug text-foreground">
             {p}
             {isLast && cursor && (
               <span className="ml-px inline-block h-[1.1em] w-[2px] translate-y-[1px] animate-pulse bg-foreground/60 align-middle" />
             )}
           </p>
         ) : (
-          <p key={i} className="whitespace-pre-wrap text-[14px] leading-relaxed text-foreground/60">
+          <p key={i} className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/60">
             {p}
             {isLast && cursor && (
               <span className="ml-px inline-block h-[1.1em] w-[2px] translate-y-[1px] animate-pulse bg-foreground/60 align-middle" />
@@ -100,7 +100,7 @@ function CandidateTextBubble({ content, isNextVariant }: { content: string; isNe
     <div
       ref={bubbleRef}
       className={cn(
-        "px-4 py-2.5 text-[14px] leading-relaxed break-words",
+        "px-4 py-2.5 text-sm leading-relaxed break-words",
         isNextVariant
           ? cn("bg-[#dce8fc] text-[#1a3a8a]", isMultiline ? "rounded-[10px] rounded-tr-sm" : "rounded-full rounded-tr-md")
           : cn("bg-[#F4F4F4] text-black ring-1 ring-black/5", isMultiline ? "rounded-[10px] rounded-tr-sm" : "rounded-full rounded-tr-md")
@@ -408,7 +408,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
             className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             {linkCopied ? <Check className="size-3 text-green-500" /> : <Link className="size-3" />}
-            {linkCopied ? "Copied!" : "Copy link"}
+            {linkCopied ? "Copied link" : "Copy link"}
           </button>
         </div>
       </div>
@@ -432,7 +432,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                   className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {linkCopied ? <Check className="size-3 text-green-500" /> : <Link className="size-3" />}
-                  {linkCopied ? "Copied!" : "Copy link"}
+                  {linkCopied ? "Copied link" : "Copy link"}
                 </button>
               </div>
             </div>
@@ -496,8 +496,8 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                             <div className={cn("flex items-stretch gap-3", preamble ? "mt-6" : "")}>
                               <div className="w-[6px] shrink-0 rounded-full bg-[#3770E5]" />
                               <div className="flex flex-col gap-1">
-                                <p className="text-[12px] font-medium text-foreground/30">Single choice question</p>
-                                <p className="text-[18px] font-semibold leading-snug text-foreground">
+                                <p className="text-xs font-medium text-foreground/30">Single choice question</p>
+                                <p className="text-lg font-semibold leading-snug text-foreground">
                                   {question}
                                 </p>
                               </div>
@@ -513,7 +513,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                         </>
                       )}
                       {m.widget === "question-format" && (
-                        <QuestionFormatWidget onCopyLink={copyLink} />
+                        <QuestionFormatWidget onCopyLink={copyLink} copied={linkCopied} />
                       )}
                       {m.widget === "company-intro-video" && (
                         <CompanyIntroVideo />
@@ -528,13 +528,13 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                             {preamble && <div className="mt-2" />}
                             <div className="flex flex-col gap-3 w-full">
                               {m.widgetMeta?.currentIndex !== undefined && m.widgetMeta?.total !== undefined && (
-                                <p className="text-[12px] font-medium text-foreground/30">
+                                <p className="text-xs font-medium text-foreground/30">
                                   Video question · {m.widgetMeta.currentIndex}/{m.widgetMeta.total}
                                 </p>
                               )}
                               <div className="flex items-stretch gap-3">
                                 <div className="w-[6px] shrink-0 rounded-full bg-[#3770E5]" />
-                                <p className="flex-1 text-[17px] font-semibold leading-snug text-foreground">
+                                <p className="flex-1 text-lg font-semibold leading-snug text-foreground">
                                   {question}
                                 </p>
                               </div>
@@ -569,7 +569,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                           {m.id === submittedVideoMessageId && videoTriesUsed < 5 && (
                             <button
                               onClick={() => setVideoModalOpen(true)}
-                              className="flex items-center gap-1.5 mr-1 text-[12px] font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
+                              className="flex items-center gap-1.5 mr-1 text-xs font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
                             >
                               <RotateCcw className="size-3" />
                               Re-record ({5 - videoTriesUsed} attempt{5 - videoTriesUsed === 1 ? "" : "s"} left)
@@ -584,7 +584,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                       {!editingMessageId && !isNextVariant && m.id !== profileAcceptedMessageId && !m.videoUrl && (
                         <button
                           onClick={() => startEditing(m.id, m.content)}
-                          className="mr-2 text-[12px] font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
+                          className="mr-2 text-xs font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
                           aria-label="Edit response"
                         >
                           Edit
@@ -649,8 +649,8 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                           <div className={cn("flex items-stretch gap-3", preamble ? "mt-6" : "")}>
                             <div className="w-[6px] shrink-0 rounded-full bg-[#3770E5]" />
                             <div className="flex flex-col gap-1">
-                              <p className="text-[12px] font-medium text-foreground/30">Single choice question</p>
-                              <p className="text-[18px] font-semibold leading-snug text-foreground">
+                              <p className="text-xs font-medium text-foreground/30">Single choice question</p>
+                              <p className="text-lg font-semibold leading-snug text-foreground">
                                 {question}
                                 <span className="ml-px inline-block h-[1.1em] w-[2px] translate-y-[1px] animate-pulse bg-foreground/60 align-middle" />
                               </p>
@@ -861,7 +861,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                   {/* Review header */}
                   <div className="shrink-0 flex items-center gap-3 border-b border-border px-4 py-4 sm:px-6">
                     <div className="flex-1 min-w-0">
-                      <h2 className="text-[15px] font-semibold text-foreground">Review your responses</h2>
+                      <h2 className="text-base font-semibold text-foreground">Review your responses</h2>
                       <p className="text-xs text-muted-foreground mt-0.5">Edit any answer before submitting</p>
                     </div>
                   </div>
@@ -891,7 +891,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                         return (
                           <div key={answer.id} className="flex flex-col gap-2.5 border-b border-border/70 py-4 first:pt-0 last:border-b-0 last:pb-0">
                             <div className="flex items-start justify-between gap-3">
-                              <p className="text-[13px] font-medium text-foreground/50 leading-snug flex-1">
+                              <p className="text-sm font-medium text-foreground/50 leading-snug flex-1">
                                 {questionLabel}
                               </p>
                               {!answer.videoUrl && !isProfileAnswer && (
@@ -901,7 +901,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                                     setEditReturnToReview(true);
                                     startEditing(answer.id, answer.content);
                                   }}
-                                  className="shrink-0 flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-[12px] font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground active:scale-95"
+                                  className="shrink-0 flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground active:scale-95"
                                 >
                                   <Pencil className="size-3" />
                                   Edit

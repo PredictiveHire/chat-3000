@@ -217,14 +217,14 @@ export function VideoQuestion({
         {stage === "recording" && (
           <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 backdrop-blur-sm">
             <span className="size-1.5 animate-pulse rounded-full bg-red-400" />
-            <span className="text-[11px] font-medium text-white">REC {formatTime(recLeft)}</span>
+            <span className="text-xs font-medium text-white">REC {formatTime(recLeft)}</span>
           </div>
         )}
 
         {/* Review badge */}
         {stage === "review" && (
           <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 backdrop-blur-sm">
-            <span className="text-[11px] font-medium text-white">Preview</span>
+            <span className="text-xs font-medium text-white">Preview</span>
           </div>
         )}
       </div>
@@ -242,21 +242,21 @@ export function VideoQuestion({
                 Start recording
               </span>
             </button>
-            <p className="text-[12px] text-foreground/40">
+            <p className="text-xs text-foreground/40">
               {triesUsed + 1}/{MAX_TRIES} attempt{MAX_TRIES > 1 ? "s" : ""}
             </p>
           </div>
         )}
 
         {stage === "countdown" && (
-          <p className="text-center text-[13px] text-foreground/40">Get ready…</p>
+          <p className="text-center text-sm text-foreground/40">Get ready…</p>
         )}
 
         {stage === "recording" && (
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <p className="text-[13px] text-foreground/50">Time remaining</p>
-              <p className={cn("text-[13px] font-semibold tabular-nums", recLeft <= 10 ? "text-red-500" : "text-foreground/70")}>
+              <p className="text-sm text-foreground/50">Time remaining</p>
+              <p className={cn("text-sm font-semibold tabular-nums", recLeft <= 10 ? "text-red-500" : "text-foreground/70")}>
                 {formatTime(recLeft)}
               </p>
             </div>
@@ -283,7 +283,7 @@ export function VideoQuestion({
 
         {stage === "review" && (
           <div className="flex flex-col gap-3">
-            <p className="text-[12px] text-foreground/50 text-center">
+            <p className="text-xs text-foreground/50 text-center">
               Happy with your response? Submit, or re-record{canRetry ? ` (${triesLeft} attempt${triesLeft === 1 ? "" : "s"} left)` : " — no attempts left"}.
             </p>
             <div className="flex gap-2">

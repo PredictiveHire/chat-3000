@@ -29,7 +29,7 @@ export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuesti
     >
       {question && (
         <div className="px-6 py-3">
-          <p className="text-[14px] font-semibold text-[#373737] leading-snug">{question}</p>
+          <p className="text-sm font-semibold text-[#373737] leading-snug">{question}</p>
         </div>
       )}
       {/* White options card — full width, matching ProfileForm / QuestionFormatWidget */}
@@ -59,11 +59,11 @@ export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuesti
                   "flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[8px] transition-colors duration-150",
                   isChosen ? "bg-[#3770E5]" : "bg-[#f2f2f2]",
                 )}>
-                  <span className={cn("text-[13px] font-medium", isChosen ? "text-white" : "text-[#666666]")}>
+                  <span className={cn("text-xs font-medium", isChosen ? "text-white" : "text-[#666666]")}>
                     {i + 1}
                   </span>
                 </div>
-                <p className="text-[18px] font-medium text-black">{opt}</p>
+                <p className="text-lg font-medium text-black">{opt}</p>
               </button>
             </div>
           );

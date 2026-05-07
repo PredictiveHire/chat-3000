@@ -238,7 +238,7 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                 <ArrowLeft className="size-4" />
               </button>
             )}
-            <p className="text-[14px] font-semibold text-[#373737]">{headerLabel[step]}</p>
+            <p className="text-sm font-semibold text-[#373737]">{headerLabel[step]}</p>
           </motion.div>
         </AnimatePresence>
       </motion.div>
@@ -265,8 +265,8 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                   attemptedNext && !isNameValid ? "border-red-400" : "border-[#e5e5e5]",
                 )}>
                   <div className="flex items-center justify-between">
-                    <label className="text-[11px] font-medium text-muted-foreground">Full name</label>
-                    {attemptedNext && !isNameValid && <span className="text-[10px] text-red-500">Required</span>}
+                    <label className="text-xs font-medium text-muted-foreground">Full name</label>
+                    {attemptedNext && !isNameValid && <span className="text-xs text-red-500">Required</span>}
                   </div>
                   <input
                     type="text"
@@ -274,7 +274,7 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                     onChange={e => { setName(e.target.value); setAttemptedNext(false); }}
                     onKeyDown={e => e.key === "Enter" && goTo2()}
                     placeholder="Enter your full name"
-                    className={cn("mt-0.5 w-full bg-transparent text-[12px] placeholder-[#bbb] outline-none", attemptedNext && !isNameValid ? "text-red-500" : "text-black")}
+                    className={cn("mt-0.5 w-full bg-transparent text-sm placeholder-[#bbb] outline-none", attemptedNext && !isNameValid ? "text-red-500" : "text-black")}
                   />
                 </div>
               </div>
@@ -286,9 +286,9 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                   attemptedNext && !isEmailValid ? "border-red-400" : "border-[#e5e5e5]",
                 )}>
                   <div className="flex items-center justify-between">
-                    <label className="text-[11px] font-medium text-muted-foreground">Email address</label>
+                    <label className="text-xs font-medium text-muted-foreground">Email address</label>
                     {attemptedNext && !isEmailValid && (
-                      <span className="text-[10px] text-red-500">{email.length === 0 ? "Required" : "Invalid email"}</span>
+                      <span className="text-xs text-red-500">{email.length === 0 ? "Required" : "Invalid email"}</span>
                     )}
                   </div>
                   <input
@@ -297,7 +297,7 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                     onChange={e => { setEmail(e.target.value); setAttemptedNext(false); }}
                     onKeyDown={e => e.key === "Enter" && goTo2()}
                     placeholder="Enter your email"
-                    className={cn("mt-0.5 w-full bg-transparent text-[12px] placeholder-[#bbb] outline-none", attemptedNext && !isEmailValid ? "text-red-500" : "text-black")}
+                    className={cn("mt-0.5 w-full bg-transparent text-sm placeholder-[#bbb] outline-none", attemptedNext && !isEmailValid ? "text-red-500" : "text-black")}
                   />
                 </div>
               </div>
@@ -309,8 +309,8 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                   attemptedNext && !isLocationValid ? "border-red-400" : "border-[#e5e5e5]",
                 )}>
                   <div className="flex items-center justify-between">
-                    <label className="text-[11px] font-medium text-muted-foreground">Location</label>
-                    {attemptedNext && !isLocationValid && <span className="text-[10px] text-red-500">Required</span>}
+                    <label className="text-xs font-medium text-muted-foreground">Location</label>
+                    {attemptedNext && !isLocationValid && <span className="text-xs text-red-500">Required</span>}
                   </div>
                   <input
                     type="text"
@@ -329,7 +329,7 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                       }
                     }}
                     placeholder="Search countries..."
-                    className={cn("mt-0.5 w-full bg-transparent text-[12px] placeholder-[#bbb] outline-none", attemptedNext && !isLocationValid ? "text-red-500" : "text-black")}
+                    className={cn("mt-0.5 w-full bg-transparent text-sm placeholder-[#bbb] outline-none", attemptedNext && !isLocationValid ? "text-red-500" : "text-black")}
                   />
                 </div>
                 {locationOpen && filteredCountries.length > 0 && (
@@ -345,7 +345,7 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                             if (country.code) setCountryCode(country.code);
                             setLocationOpen(false);
                           }}
-                          className="px-3 py-2 text-left text-[12px] text-black hover:bg-black/5"
+                          className="px-3 py-2 text-left text-sm text-black hover:bg-black/5"
                         >
                           {country.name}
                         </button>
@@ -370,7 +370,7 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                   <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#dce8fc]">
                     <MessageSquare className="size-4 text-[#3770E5]" />
                   </div>
-                  <p className="text-[13px] leading-snug text-foreground/70 pt-1.5">
+                  <p className="text-sm leading-snug text-foreground/70 pt-1.5">
                     Do you consent to receive SMS updates about your application status? This will be optional and only application updates will be sent.
                   </p>
                 </div>
@@ -390,12 +390,12 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                   className="flex flex-col rounded-xl border border-[#e5e5e5] bg-white px-3 py-2.5 transition-colors focus-within:border-[#aaa] focus-within:ring-1 focus-within:ring-black/10"
                   ref={countryCodeRef}
                 >
-                  <label className="text-[11px] font-medium text-muted-foreground">Phone number</label>
+                  <label className="text-xs font-medium text-muted-foreground">Phone number</label>
                   <div className="relative mt-0.5 flex items-center">
                     <button
                       type="button"
                       onClick={() => setCountryCodeOpen(v => !v)}
-                      className="flex shrink-0 items-center gap-1 pr-2 text-[12px] font-medium text-black outline-none transition-colors hover:text-foreground/70"
+                      className="flex shrink-0 items-center gap-1 pr-2 text-sm font-medium text-black outline-none transition-colors hover:text-foreground/70"
                     >
                       {countryCode}
                       <ChevronDown className={cn("size-3 text-muted-foreground transition-transform duration-150", countryCodeOpen && "rotate-180")} />
@@ -413,7 +413,7 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                                 setCountryCodeOpen(false);
                               }}
                               className={cn(
-                                "flex w-full items-center px-4 py-3 text-left text-[12px] font-medium transition-colors duration-100",
+                                "flex w-full items-center px-4 py-3 text-left text-sm font-medium transition-colors duration-100",
                                 countryCode === c.code ? "bg-primary/20 text-foreground" : "text-foreground hover:bg-black/5",
                               )}
                             >
@@ -430,12 +430,12 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                       onKeyDown={e => e.key === "Enter" && goTo4FromPhone()}
                       placeholder="e.g. 400 000 000"
                       autoFocus
-                      className="w-full bg-transparent text-[12px] text-black placeholder-[#bbb] outline-none"
+                      className="w-full bg-transparent text-sm text-black placeholder-[#bbb] outline-none"
                     />
                   </div>
                 </div>
                 {phone.length > 0 && !isPhoneValid && (
-                  <p className="mt-1.5 px-1 text-[11px] text-red-500">Please enter a valid phone number</p>
+                  <p className="mt-1.5 px-1 text-xs text-red-500">Please enter a valid phone number</p>
                 )}
               </div>
               <div className="px-4 pb-3">
@@ -457,13 +457,13 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                     : []),
                 ].map(({ label, value }) => (
                   <div key={label} className="flex items-center justify-between py-2.5">
-                    <span className="text-[11px] font-medium text-muted-foreground">{label}</span>
-                    <span className="max-w-[60%] truncate text-right text-[12px] font-medium text-foreground">{value}</span>
+                    <span className="text-xs font-medium text-muted-foreground">{label}</span>
+                    <span className="max-w-[60%] truncate text-right text-sm font-medium text-foreground">{value}</span>
                   </div>
                 ))}
               </div>
               <div className="px-4 pt-3 pb-1">
-                <p className="text-[12px] leading-snug text-foreground/60">
+                <p className="text-xs leading-snug text-foreground/60">
                   Please review your details carefully — this cannot be modified once you proceed.
                 </p>
               </div>

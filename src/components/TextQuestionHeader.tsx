@@ -12,11 +12,11 @@ export function TextQuestionHeader({ question, currentIndex, total }: TextQuesti
       <div className="w-[6px] shrink-0 rounded-full bg-[#3770E5]" />
       <div className="flex flex-col gap-3">
         {currentIndex !== undefined && total !== undefined && (
-          <p className="text-[12px] font-medium text-foreground/30">
+          <p className="text-xs font-medium text-foreground/30">
             AI assessed text question · {currentIndex}/{total}
           </p>
         )}
-        <p className="flex-1 text-[18px] font-semibold leading-snug text-foreground">
+        <p className="flex-1 text-lg font-semibold leading-snug text-foreground">
           {question}
         </p>
       </div>

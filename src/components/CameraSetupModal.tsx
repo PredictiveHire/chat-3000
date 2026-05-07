@@ -78,7 +78,7 @@ export function CameraSetupModal({ open, onReady, onClose }: CameraSetupModalPro
                     <ArrowLeft className="size-4" />
                   </button>
                 )}
-                <p className="truncate text-[16px] font-semibold text-foreground">
+                <p className="truncate text-base font-semibold text-foreground">
                   {isFaq ? "Camera & microphone help" : "Camera & microphone check"}
                 </p>
               </div>
@@ -113,8 +113,8 @@ function CameraSetupFaq() {
         <div className="divide-y divide-[#f0f0f0]">
           {faqs.map(item => (
             <div key={item.question} className="px-4 py-4">
-              <p className="text-[13px] font-semibold text-foreground/80">{item.question}</p>
-              <p className="mt-1.5 text-[12px] leading-relaxed text-foreground/50">{item.answer}</p>
+              <p className="text-sm font-semibold text-foreground/80">{item.question}</p>
+              <p className="mt-1.5 text-xs leading-relaxed text-foreground/50">{item.answer}</p>
             </div>
           ))}
         </div>

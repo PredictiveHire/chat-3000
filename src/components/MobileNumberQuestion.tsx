@@ -103,18 +103,18 @@ export function MobileNumberQuestion({ onConfirm, disabled, initialValue = "" }:
       >
         <div className="w-full rounded-[20px] bg-[#F4F4F4] shadow-[0_2px_12px_rgba(0,0,0,0.08)]">
           <div className="px-5 py-3">
-            <p className="text-[12px] font-semibold text-[#373737]">Your mobile number</p>
+            <p className="text-xs font-semibold text-[#373737]">Your mobile number</p>
           </div>
           <div className="rounded-[16px] border border-[#e5e5e5] bg-white">
             <div className="px-5 py-4">
-              <label className="text-[12px] font-medium text-muted-foreground">Phone number</label>
+              <label className="text-xs font-medium text-muted-foreground">Phone number</label>
               <div className="mt-1.5 flex items-center">
                 <button
                   type="button"
                   disabled={isLocked}
                   onClick={() => setOpen(!open)}
                   className={cn(
-                    "flex items-center gap-1 shrink-0 pr-2 text-[12px] font-medium text-black outline-none transition-colors hover:text-foreground/70",
+                    "flex items-center gap-1 shrink-0 pr-2 text-xs font-medium text-black outline-none transition-colors hover:text-foreground/70",
                     "disabled:cursor-not-allowed disabled:opacity-50",
                   )}
                   aria-label="Country code"
@@ -141,13 +141,13 @@ export function MobileNumberQuestion({ onConfirm, disabled, initialValue = "" }:
                   }}
                   placeholder="e.g. 400 000 000"
                   className={cn(
-                    "w-full bg-transparent text-[12px] outline-none placeholder-[#bbb] text-black",
+                    "w-full bg-transparent text-xs outline-none placeholder-[#bbb] text-black",
                     "disabled:cursor-not-allowed disabled:opacity-50",
                   )}
                   aria-invalid={Boolean(error)}
                 />
               </div>
-              {error && <p className="mt-1.5 text-[10px] text-destructive">{error}</p>}
+              {error && <p className="mt-1.5 text-xs text-destructive">{error}</p>}
             </div>
             <div className="px-5 pb-4">
               <button
@@ -165,7 +165,7 @@ export function MobileNumberQuestion({ onConfirm, disabled, initialValue = "" }:
                 )}>
                   {smsConsent && <Check className="size-2.5 text-[#3770E5]" strokeWidth={3} />}
                 </span>
-                <span className="text-[12px] leading-snug text-foreground/60">
+                <span className="text-xs leading-snug text-foreground/60">
                   I consent receiving SMS about my application status.
                 </span>
               </button>
@@ -174,7 +174,7 @@ export function MobileNumberQuestion({ onConfirm, disabled, initialValue = "" }:
               <Button
                 type="submit"
                 disabled={isLocked || normalized.length === 0}
-                className="w-full rounded-2xl py-3.5 text-[14px] font-semibold bg-chat-primary text-chat-primary-foreground transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:not-disabled:scale-[0.96] h-auto"
+                className="w-full rounded-2xl py-3.5 text-sm font-semibold bg-chat-primary text-chat-primary-foreground transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:not-disabled:scale-[0.96] h-auto"
                 aria-label="Confirm mobile number"
               >
                 Continue
