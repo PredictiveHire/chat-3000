@@ -188,15 +188,11 @@ export function ReplyBar({
     <div className={cn(
       "flex flex-col",
       !expanded && "animate-fade-up",
-      expanded ? "fixed inset-x-0 bottom-0 top-[76px] z-[300] bg-background/80 backdrop-blur-md p-4 sm:inset-0" : "px-3 pb-3 pt-0"
+      expanded ? "fixed inset-x-0 bottom-0 top-[76px] z-[300] bg-background/80 backdrop-blur-md p-4 sm:inset-0" : "w-full"
     )}>
       <form onSubmit={onSubmit} className={cn("flex flex-col", expanded && "h-full")}>
         <div className={cn(
-          "relative flex flex-col rounded-[20px] bg-[#F4F4F4] shadow-[0_2px_12px_rgba(0,0,0,0.08)]",
-          expanded && "flex-1"
-        )}>
-        <div className={cn(
-          "relative flex flex-col rounded-[16px] border border-[#e5e5e5] bg-white",
+          "relative flex flex-col rounded-[16px] border border-[#e5e5e5] bg-transparent",
           expanded && "flex-1"
         )}>
           <textarea
@@ -284,7 +280,6 @@ export function ReplyBar({
                 </AnimatePresence>
               </div>
             </button>
-        </div>
         </div>
       </form>
       

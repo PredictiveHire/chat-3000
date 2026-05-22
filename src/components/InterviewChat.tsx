@@ -396,13 +396,29 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
     }
   }
 
+  const hasFloatingInput =
+    !reviewMode &&
+    (editingMessageId != null ||
+      inputReady ||
+      (complete && !isStreaming && !submitted) ||
+      submitted);
+
+  const floatingInputPad = (() => {
+    if (!hasFloatingInput) return "";
+    const type = editingMessageId ? editingActiveType : activeType;
+    if (type === "profile") return "pb-[26rem]";
+    if (type === "mcq" || type === "dropdown") return "pb-72";
+    if (type === "text" || type === "phone") return "pb-44";
+    return "pb-28";
+  })();
+
   return (
-    <div className="flex h-full flex-col overflow-y-auto bg-white sm:overflow-hidden sm:bg-background">
+    <div className="flex h-full flex-col overflow-y-auto bg-white sm:overflow-hidden sm:bg-white">
 
       {/* Mobile header */}
       <div className="sticky top-0 z-50 flex shrink-0 flex-col items-start border-b border-[#e5e5e5] bg-white/80 px-5 py-4 backdrop-blur-md sm:hidden">
         <div className="flex w-full items-start justify-between gap-2">
-          <p className="text-base font-bold tracking-tight text-foreground">Team member role</p>
+          <p className="text-base font-bold tracking-tight text-foreground">Team member role with Woolworths Group</p>
           {/* Accessibility icon — mobile */}
           <button
             onClick={() => setHelpOpen(v => !v)}
@@ -424,34 +440,32 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
         </div>
       </div>
 
-      <div className="mx-auto flex w-full max-w-3xl gap-4 sm:min-h-0 sm:flex-1 sm:px-6 sm:pb-8 sm:pt-10">
+      <div className="mx-auto flex w-full max-w-3xl gap-4 sm:min-h-0 sm:flex-1 sm:px-6 sm:pb-8 sm:pt-6">
         <main className="relative flex min-w-0 flex-col sm:flex-1">
 
           {/* Desktop header */}
-          <div className="mb-6 hidden shrink-0 items-center justify-between sm:flex">
-            <div>
-              <h1 className="text-xl font-bold tracking-tight text-foreground">
-                Team member role
-              </h1>
-              <div className="mt-2 flex items-center gap-2">
-                <p className="text-sm text-muted-foreground">You can pause and come back later.</p>
-                <button
-                  onClick={copyLink}
-                  className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {linkCopied ? <Check className="size-3 text-green-500" /> : <Link className="size-3" />}
-                  {linkCopied ? "Copied link" : "Copy link"}
-                </button>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {/* Help icon — desktop */}
+          <div
+            ref={helpRef}
+            className="mb-3 hidden shrink-0 flex-col items-start rounded-2xl border border-[#e5e5e5] bg-white/80 px-5 py-4 backdrop-blur-md sm:flex"
+          >
+            <div className="flex w-full items-start justify-between gap-2">
+              <p className="text-base font-bold tracking-tight text-foreground">Team member role with Woolworths Group</p>
               <button
                 onClick={() => setHelpOpen(v => !v)}
-                className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/5 hover:text-foreground"
-                aria-label="Help"
+                className="shrink-0 flex size-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/5 hover:text-foreground"
+                aria-label="Accessibility"
               >
-                <HelpCircle className="size-4" />
+                <Accessibility className="size-4" />
+              </button>
+            </div>
+            <div className="mt-1 flex items-center gap-2">
+              <p className="text-xs font-normal text-muted-foreground">You can pause and come back later with this link</p>
+              <button
+                onClick={copyLink}
+                className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {linkCopied ? <Check className="size-3 text-green-500" /> : <Link className="size-3" />}
+                {linkCopied ? "Copied link" : "Copy link"}
               </button>
             </div>
           </div>
@@ -459,7 +473,12 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
           <div className="relative flex flex-col min-h-[calc(100dvh-5rem)] sm:min-h-0 sm:flex-1 sm:overflow-hidden sm:rounded-2xl sm:bg-card sm:shadow-[var(--shadow-border)]">
 
             {/* Message list */}
-            <div className="flex-1 space-y-10 px-5 py-8 sm:min-h-0 sm:overflow-y-auto sm:px-6 sm:py-10">
+            <div
+              className={cn(
+                "flex-1 space-y-10 px-5 py-8 sm:min-h-0 sm:overflow-y-auto sm:px-6 sm:pt-6",
+                floatingInputPad || "sm:pb-6",
+              )}
+            >
 
               <AnimatePresence initial={false}>
               {messages.map((m) => {
@@ -673,12 +692,14 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
               <div ref={bottomRef} />
             </div>
 
-            {/* Inputs */}
-            <div className="sticky bottom-0 z-40 bg-white sm:relative sm:z-auto sm:bg-transparent">
+            {/* Inputs — transparent overlay on chat container */}
+            {hasFloatingInput && (
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 sm:px-6">
+            <div className="pointer-events-auto">
             {editingMessageId ? (
-              <div className="animate-fade-up flex flex-col bg-background/95 backdrop-blur-sm">
+              <div className="animate-fade-up flex flex-col">
                 {editingActiveType !== "mcq" && (
-                  <div className="flex items-center gap-2 px-4 py-2.5">
+                  <div className="flex items-center gap-2 py-2.5">
                     <Pencil className="size-3.5 shrink-0 text-muted-foreground" />
                     <p className="flex-1 line-clamp-2 text-xs leading-snug text-muted-foreground">
                       <span className="font-medium text-foreground">Editing: </span>
@@ -698,7 +719,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                   </div>
                 )}
                 {editingActiveType === "mcq" ? (
-                  <div className="relative shrink-0 px-3 pb-3 pt-3">
+                  <div className="relative shrink-0 pt-3">
                     <button
                       onClick={() => handleCancelClick(editingText !== editingOriginalText)}
                       className={cn(
@@ -725,7 +746,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                 ) : editingActiveType === "phone" ? (
                   <MobileNumberQuestion onConfirm={submitEditing} initialValue={editingText} />
                 ) : editingActiveType === "profile" ? (
-                  <div className="shrink-0 px-4 pb-4">
+                  <div className="shrink-0">
                     <ProfileForm
                       key={editingMessageId}
                       initialValues={(() => {
@@ -751,12 +772,12 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
             ) : (
               <>
                 {inputReady && activeType === "next" && (
-                  <div className="animate-fade-up shrink-0 px-4 pb-4 pt-2">
+                  <div className="animate-fade-up shrink-0">
                     <CTAButton onClick={() => advance("__next__")}>Next</CTAButton>
                   </div>
                 )}
                 {inputReady && activeType === "profile" && (
-                  <div className="animate-fade-up-delayed shrink-0 px-4 pb-4">
+                  <div className="animate-fade-up-delayed shrink-0">
                     <ProfileForm
                       onSubmit={d => {
                         const id = newId();
@@ -787,7 +808,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                   </div>
                 )}
                 {inputReady && activeType === "mcq" && (
-                  <div className="animate-fade-up shrink-0 px-4 pb-4">
+                  <div className="animate-fade-up shrink-0">
                     <MCQQuestion
                       question={currentStep.messages[currentStep.messages.length - 1]}
                       options={activeOptions.length ? activeOptions : ["Option A", "Option B", "Option C", "Option D"]}
@@ -813,7 +834,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                   </div>
                 )}
                 {inputReady && activeType === "video-setup" && (
-                  <div className="animate-fade-up shrink-0 px-4 pb-4 pt-2 flex flex-col gap-2">
+                  <div className="animate-fade-up shrink-0 flex flex-col gap-2">
                     <CTAButton onClick={() => setCameraModalOpen(true)}>
                       Test microphone and camera
                     </CTAButton>
@@ -823,17 +844,17 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                   </div>
                 )}
                 {inputReady && activeType === "video" && (
-                  <div className="animate-fade-up shrink-0 px-4 pb-4 pt-2">
+                  <div className="animate-fade-up shrink-0">
                     <CTAButton onClick={() => setVideoModalOpen(true)}>Record your answer</CTAButton>
                   </div>
                 )}
                 {complete && !isStreaming && !submitted && !reviewDone && (
-                  <div className="animate-fade-up shrink-0 px-4 pb-4 pt-2">
+                  <div className="animate-fade-up shrink-0">
                     <CTAButton onClick={() => setReviewMode(true)}>Review responses</CTAButton>
                   </div>
                 )}
                 {complete && !isStreaming && !submitted && reviewDone && (
-                  <div className="animate-fade-up shrink-0 px-4 pb-4 pt-2">
+                  <div className="animate-fade-up shrink-0">
                     <CTAButton onClick={() => {
                       setSubmitted(true);
                       setMessages(prev => [...prev, { id: newId(), role: "candidate" as const, content: "Submit interview" }]);
@@ -843,13 +864,15 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                   </div>
                 )}
                 {submitted && (
-                  <div className="animate-fade-up shrink-0 px-4 pb-4 pt-2">
+                  <div className="animate-fade-up shrink-0">
                     <CTAButton onClick={onComplete}>View your insights report</CTAButton>
                   </div>
                 )}
               </>
             )}
-            </div>{/* end sticky inputs wrapper */}
+            </div>
+            </div>
+            )}
 
             {/* Review overlay — fixed on mobile (below sticky header), absolute on desktop */}
             <AnimatePresence>

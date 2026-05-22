@@ -25,7 +25,7 @@ export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuesti
     <div
       role="radiogroup"
       aria-label="Choose one answer"
-      className="w-full rounded-[20px] bg-[#f2f2f2] shadow-[0_2px_12px_rgba(0,0,0,0.08)]"
+      className="w-full rounded-[20px]"
     >
       {question && (
         <div className="px-6 py-3">

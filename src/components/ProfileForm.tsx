@@ -248,7 +248,7 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
         layout
         transition={{ duration: 0.22, ease: "easeInOut" }}
         className={cn(
-          "relative rounded-[16px] border border-[#e5e5e5] bg-white",
+          "relative rounded-[16px] border border-[#e5e5e5] bg-transparent",
           (locationOpen || countryCodeOpen) ? "overflow-visible" : "overflow-hidden",
         )}
       >

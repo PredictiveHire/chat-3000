@@ -15,9 +15,9 @@ export function CTAButton({ variant = "primary", className, children, ...props }
     <button
       type="button"
       className={cn(
-        "w-full rounded-2xl py-3.5 text-sm font-semibold transition-[opacity,scale] duration-150 ease-out active:scale-[0.96] disabled:pointer-events-none disabled:opacity-50",
+        "w-full rounded-full py-3.5 text-sm font-semibold transition-[opacity,scale] duration-150 ease-out active:scale-[0.96] disabled:pointer-events-none disabled:opacity-50",
         variant === "primary"
-          ? "bg-primary text-primary-foreground hover:opacity-90"
+          ? "bg-[#30814C] text-white hover:opacity-90"
           : "border border-[#e5e5e5] bg-white text-foreground hover:bg-black/5",
         className,
       )}
