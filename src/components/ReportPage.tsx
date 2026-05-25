@@ -172,7 +172,7 @@ export function ReportPage({ onBack }: Props) {
                 <p className="text-[14px] text-black leading-[26px]">
                   In your AI interview, you showed how you think, decide, and handle real situations. We've pulled out a few insights about how you approach work — they're here to help you reflect and grow. They don't change the outcome of your application.
                 </p>
-                <button className="text-[13px] font-semibold text-[#3770E5] underline underline-offset-2">
+                <button className="text-[13px] font-semibold text-[#30814C] underline underline-offset-2">
                   Learn how we turn your interview into insights →
                 </button>
               </div>
@@ -203,7 +203,7 @@ export function ReportPage({ onBack }: Props) {
                       >
                         <div className={cn(
                           "flex size-7 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold",
-                          isEven ? "bg-[#3770E5] text-white" : "bg-[#dce8fc] text-[#1a3a8a]"
+                          isEven ? "bg-[#30814C] text-white" : "bg-[#d1ead9] text-[#1a4a2e]"
                         )}>
                           {i + 1}
                         </div>
@@ -217,10 +217,10 @@ export function ReportPage({ onBack }: Props) {
               {/* Coaching tip */}
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.24px] text-[#3770E5] shrink-0">Coaching tip</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.24px] text-[#30814C] shrink-0">Coaching tip</p>
                   <div className="flex-1 h-px bg-black/10" />
                 </div>
-                <div className="border-l-[3px] border-[#3770E5] pl-6">
+                <div className="border-l-[3px] border-[#30814C] pl-6">
                   <p className="text-[20px] font-light text-black leading-[34px]">
                     Consider how approaching challenges with a proactive mindset can help you make greater progress in reaching your goals.
                   </p>
@@ -229,7 +229,7 @@ export function ReportPage({ onBack }: Props) {
                   <p className="text-[14px] font-medium text-black leading-[34px]">Try this:</p>
                   {TRY_THIS.map((step, i) => (
                     <div key={i} className="flex items-center gap-5">
-                      <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#dce8fc] text-[12px] font-semibold text-[#1a3a8a]">
+                      <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#d1ead9] text-[12px] font-semibold text-[#1a4a2e]">
                         {i + 1}
                       </div>
                       <p className="flex-1 text-[14px] text-black leading-[26px]">{step}</p>
@@ -248,7 +248,7 @@ export function ReportPage({ onBack }: Props) {
                 <p className="text-[14px] font-light text-black leading-[26px]">
                   We're building something new — and your perspective helps shape it for everyone.
                 </p>
-                <button className="rounded-full border border-[#3770E5] px-4 py-1.5 text-[13px] font-semibold text-[#3770E5] hover:bg-[#3770E5] hover:text-white transition-colors">
+                <button className="rounded-full border border-[#30814C] px-4 py-1.5 text-[13px] font-semibold text-[#30814C] hover:bg-[#30814C] hover:text-white transition-colors">
                   Share your thoughts
                 </button>
               </div>

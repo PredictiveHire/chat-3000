@@ -42,11 +42,8 @@ export function QuestionFormatWidget() {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.55, duration: 0.4, ease: "easeOut" }}
-      className="mt-3 w-full rounded-[20px] bg-[#f3f4f6]"
+      className="mt-3 w-full"
     >
-      <p className="px-[23px] py-3 text-base font-semibold text-[#373737]">
-        Here&apos;s what to expect
-      </p>
       <div className="flex flex-col gap-4 rounded-[20px] border border-[#e6e6e6] bg-white p-5">
         {/* Total summary */}
         <div className="flex flex-col items-center gap-2 rounded-[18px] bg-[#f8f8f8] px-3 py-3">
@@ -61,7 +58,7 @@ export function QuestionFormatWidget() {
         {rows.map(({ count, label, icon: Icon, desc }) => (
           <div key={label} className="flex flex-col gap-2">
             <div className="flex items-center gap-3">
-              <div className="h-[22px] w-[5px] shrink-0 rounded-full bg-[#3770E5]" />
+              <div className="h-[22px] w-[5px] shrink-0 rounded-full bg-[#30814C]" />
               <Icon className="size-4 shrink-0 text-black" strokeWidth={1.5} />
               <p className="text-sm font-medium text-black">
                 {count}&nbsp;&nbsp;{label}

@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { Circle, Square, RotateCcw, Send, Play, Pause } from "lucide-react";
+import { Circle, Square, RotateCcw, Send, Play, Pause, Camera, Mic } from "lucide-react";
 
 const MAX_TRIES = 5;
 
-type Stage = "prepare" | "countdown" | "recording" | "review";
+type Stage = "prepare" | "recording" | "review";
 
 type VideoQuestionProps = {
   question: string;
@@ -42,8 +42,7 @@ export function VideoQuestion({
 
   const [stage, setStage] = useState<Stage>("prepare");
   const [recLeft, setRecLeft] = useState(maxSeconds);
-  const [countdown, setCountdown] = useState(3);
-  const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
+const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
   const [triesUsed, setTriesUsed] = useState(initialTriesUsed);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -81,17 +80,7 @@ export function VideoQuestion({
   }, [stage]);
 
   const startCountdown = useCallback(() => {
-    setStage("countdown");
-    setCountdown(3);
-    let c = 3;
-    timerRef.current = setInterval(() => {
-      c--;
-      setCountdown(c);
-      if (c <= 0) {
-        clearInterval(timerRef.current!);
-        startRecording();
-      }
-    }, 1000);
+    startRecording();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const startRecording = useCallback(() => {
@@ -162,8 +151,9 @@ export function VideoQuestion({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Video area */}
-      <div className="relative flex-1 overflow-hidden bg-[#111]">
+      {/* Video area — 16:9 aspect ratio */}
+      <div className="sm:px-4 sm:pt-4">
+      <div className="relative w-full overflow-hidden rounded-none bg-[#111] sm:rounded-2xl" style={{ aspectRatio: "16/9" }}>
         {/* Live camera */}
         {stage !== "review" && (
           <video
@@ -204,12 +194,17 @@ export function VideoQuestion({
           </>
         )}
 
-        {/* Countdown overlay */}
-        {stage === "countdown" && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-            <span className="text-[80px] font-bold text-white tabular-nums leading-none">
-              {countdown}
-            </span>
+        {/* Camera + Mic indicators — live stages */}
+        {stage !== "review" && (
+          <div className="absolute right-3 top-3 flex items-center gap-1.5">
+            <div className="flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 backdrop-blur-sm">
+              <Camera className="size-3 text-[#30814C]" />
+              <span className="text-[10px] font-medium text-white">On</span>
+            </div>
+            <div className="flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 backdrop-blur-sm">
+              <Mic className="size-3 text-[#30814C]" />
+              <span className="text-[10px] font-medium text-white">On</span>
+            </div>
           </div>
         )}
 
@@ -227,6 +222,7 @@ export function VideoQuestion({
             <span className="text-xs font-medium text-white">Preview</span>
           </div>
         )}
+      </div>
       </div>
 
       {/* Controls */}
@@ -248,10 +244,6 @@ export function VideoQuestion({
           </div>
         )}
 
-        {stage === "countdown" && (
-          <p className="text-center text-sm text-foreground/40">Get ready…</p>
-        )}
-
         {stage === "recording" && (
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
@@ -264,7 +256,7 @@ export function VideoQuestion({
               <div
                 className={cn(
                   "h-full rounded-full transition-all duration-1000 ease-linear",
-                  recLeft <= 10 ? "bg-red-400" : "bg-[#3770E5]"
+                  recLeft <= 10 ? "bg-red-400" : "bg-[#30814C]"
                 )}
                 style={{ width: `${recPct}%` }}
               />
@@ -283,7 +275,7 @@ export function VideoQuestion({
 
         {stage === "review" && (
           <div className="flex flex-col gap-3">
-            <p className="text-xs text-foreground/50 text-center">
+            <p className="text-sm text-foreground/60 text-center">
               Happy with your response? Submit, or re-record{canRetry ? ` (${triesLeft} attempt${triesLeft === 1 ? "" : "s"} left)` : " — no attempts left"}.
             </p>
             <div className="flex gap-2">

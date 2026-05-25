@@ -232,7 +232,7 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
                 </div>
                 <div className="h-1 w-full overflow-hidden rounded-full bg-[#f0f0f0]">
                   <div
-                    className={cn("h-full rounded-full transition-all duration-1000 ease-linear", recLeft <= 3 ? "bg-red-400" : "bg-[#3770E5]")}
+                    className={cn("h-full rounded-full transition-all duration-1000 ease-linear", recLeft <= 3 ? "bg-red-400" : "bg-[#30814C]")}
                     style={{ width: `${recPct}%` }}
                   />
                 </div>

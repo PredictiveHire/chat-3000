@@ -160,10 +160,10 @@ export function MobileNumberQuestion({ onConfirm, disabled, initialValue = "" }:
                 <span className={cn(
                   "mt-[1px] flex h-[16px] w-[16px] shrink-0 items-center justify-center rounded-[4px] border transition-colors duration-150",
                   smsConsent
-                    ? "border-[#3770E5] bg-[#dce8fc]"
+                    ? "border-[#30814C] bg-[#d1ead9]"
                     : "border-[#d4d4d4] bg-white",
                 )}>
-                  {smsConsent && <Check className="size-2.5 text-[#3770E5]" strokeWidth={3} />}
+                  {smsConsent && <Check className="size-2.5 text-[#30814C]" strokeWidth={3} />}
                 </span>
                 <span className="text-xs leading-snug text-foreground/60">
                   I consent receiving SMS about my application status.

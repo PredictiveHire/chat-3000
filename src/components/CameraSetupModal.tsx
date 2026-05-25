@@ -59,7 +59,7 @@ export function CameraSetupModal({ open, onReady, onClose }: CameraSetupModalPro
           {/* Sheet / modal */}
           <motion.div
             key="camera-modal-panel"
-            className="relative z-10 w-full max-w-lg overflow-hidden rounded-[28px] bg-background mx-3 mb-3 sm:mx-0 sm:mb-0"
+            className="relative z-10 w-full max-w-3xl overflow-hidden rounded-[28px] bg-background mx-3 mb-3 sm:mx-0 sm:mb-0"
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}

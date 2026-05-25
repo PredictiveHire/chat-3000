@@ -1,5 +1,7 @@
 import type { InterviewStep } from "./types";
 
+export const CANDIDATE_NAME = "Sarah";
+
 export const COUNTRIES = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia",
   "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium",
@@ -81,8 +83,9 @@ export const mockInterview: InterviewStep[] = [
     id: "video-setup",
     type: "video-setup",
     messages: [
-      "Thank you for completing this portion of the interview.\n\nNext up, you will be answering 2 questions on video. Before we begin, let's make sure everything is set up.",
+      "Thank you for completing this portion of the interview.\n\nNext up, you'll answer 2 video questions. Before we begin, here's what to expect:",
     ],
+    widget: "video-setup-tips",
   },
   {
     id: "video-q1",

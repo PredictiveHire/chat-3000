@@ -192,7 +192,7 @@ export function ReplyBar({
     )}>
       <form onSubmit={onSubmit} className={cn("flex flex-col", expanded && "h-full")}>
         <div className={cn(
-          "relative flex flex-col rounded-[16px] border border-[#e5e5e5] bg-transparent",
+          "relative flex flex-col rounded-[16px] border border-[#e5e5e5] bg-white",
           expanded && "flex-1"
         )}>
           <textarea

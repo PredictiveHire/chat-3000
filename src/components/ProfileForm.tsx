@@ -16,6 +16,8 @@ type ProfileData = {
 type ProfileFormProps = {
   onSubmit: (data: ProfileData) => void;
   initialValues?: Partial<ProfileData>;
+  /** Full width within the chat card — no side inset */
+  edgeToEdge?: boolean;
 };
 
 type CountryOption = {
@@ -46,7 +48,7 @@ const variants = {
 // Steps: 1 = name+email+location, 2 = SMS consent, 3 = phone (conditional), 4 = review
 type Step = 1 | 2 | 3 | 4;
 
-export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
+export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileFormProps) {
   // ── Step 1 fields ──────────────────────────────────────────────
   const [name, setName]   = useState(initialValues?.name  ?? "");
   const [email, setEmail] = useState(initialValues?.email ?? "");
@@ -175,7 +177,10 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
     }
   };
 
+  const [attemptedPhone, setAttemptedPhone] = useState(false);
+
   const goTo4FromPhone = () => {
+    setAttemptedPhone(true);
     if (!isPhoneValid) return;
     nav(4, 1);
   };
@@ -212,7 +217,10 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
       layout
       transition={{ duration: 0.22, ease: "easeInOut" }}
       className={cn(
-        "w-full rounded-[20px] bg-[#F4F4F4] shadow-[0_2px_12px_rgba(0,0,0,0.08)]",
+        "w-full bg-white",
+        edgeToEdge
+          ? "rounded-t-[20px] rounded-b-2xl shadow-[0_-2px_12px_rgba(0,0,0,0.06)]"
+          : "rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.08)]",
         (locationOpen || countryCodeOpen) ? "overflow-visible" : "overflow-hidden",
       )}
     >
@@ -248,7 +256,7 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
         layout
         transition={{ duration: 0.22, ease: "easeInOut" }}
         className={cn(
-          "relative rounded-[16px] border border-[#e5e5e5] bg-transparent",
+          "relative mx-4 mb-4 rounded-[16px] border border-[#e5e5e5] bg-white",
           (locationOpen || countryCodeOpen) ? "overflow-visible" : "overflow-hidden",
         )}
       >
@@ -367,8 +375,8 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
             <motion.div key="s2" custom={dir} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.22, ease: "easeInOut" }} className="w-full">
               <div className="px-4 py-5 flex flex-col gap-4">
                 <div className="flex items-start gap-3">
-                  <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#dce8fc]">
-                    <MessageSquare className="size-4 text-[#3770E5]" />
+                  <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#d1ead9]">
+                    <MessageSquare className="size-4 text-[#30814C]" />
                   </div>
                   <p className="text-sm leading-snug text-foreground/70 pt-1.5">
                     Do you consent to receive SMS updates about your application status? This will be optional and only application updates will be sent.
@@ -426,7 +434,7 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                     <input
                       type="tel"
                       value={phone}
-                      onChange={e => setPhone(e.target.value)}
+                      onChange={e => { setPhone(e.target.value); setAttemptedPhone(false); }}
                       onKeyDown={e => e.key === "Enter" && goTo4FromPhone()}
                       placeholder="e.g. 400 000 000"
                       autoFocus
@@ -434,7 +442,7 @@ export function ProfileForm({ onSubmit, initialValues }: ProfileFormProps) {
                     />
                   </div>
                 </div>
-                {phone.length > 0 && !isPhoneValid && (
+                {attemptedPhone && !isPhoneValid && (
                   <p className="mt-1.5 px-1 text-xs text-red-500">Please enter a valid phone number</p>
                 )}
               </div>
