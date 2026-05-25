@@ -25,18 +25,9 @@ export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuesti
     <div
       role="radiogroup"
       aria-label="Choose one answer"
-      className="w-full rounded-[20px]"
+      className="w-full"
     >
-      {question && (
-        <div className="px-6 py-3">
-          <p className="text-sm font-semibold text-[#373737] leading-snug">{question}</p>
-        </div>
-      )}
-      {/* White options card — full width, matching ProfileForm / QuestionFormatWidget */}
-      <div className={cn(
-        "overflow-hidden rounded-[16px] border border-[#e5e5e5] bg-white",
-        !question && "mt-0",
-      )}>
+      <div className="overflow-hidden rounded-[16px] border border-[#e5e5e5] bg-white">
         {options.map((opt, i) => {
           const isChosen = selected === opt;
           return (
@@ -57,7 +48,7 @@ export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuesti
               >
                 <div className={cn(
                   "flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[8px] transition-colors duration-150",
-                  isChosen ? "bg-[#3770E5]" : "bg-[#f2f2f2]",
+                  isChosen ? "bg-[#30814C]" : "bg-[#f2f2f2]",
                 )}>
                   <span className={cn("text-xs font-medium", isChosen ? "text-white" : "text-[#666666]")}>
                     {i + 1}

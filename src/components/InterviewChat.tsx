@@ -17,8 +17,9 @@ import { TextQuestionHeader } from "@/components/TextQuestionHeader";
 import { CameraSetupModal } from "@/components/CameraSetupModal";
 import { VideoQuestionModal } from "@/components/VideoQuestionModal";
 import { CompanyIntroVideo } from "@/components/CompanyIntroVideo";
+import { VideoSetupTipsWidget } from "@/components/VideoSetupTipsWidget";
 
-const STREAM_CHAR_MS = 10;
+const STREAM_CHAR_MS = 22;
 const PRE_STREAM_DELAY_MS = 900;
 const INTER_PARAGRAPH_PAUSE_MS = 620;
 
@@ -35,14 +36,6 @@ function IntroBrandMedia() {
           className="block h-auto max-w-full"
         />
       </div>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/woolworths-logo.png"
-        alt="Woolworths"
-        width={130}
-        height={36}
-        className="mb-4 block h-auto max-w-full"
-      />
     </>
   );
 }
@@ -61,14 +54,14 @@ function InterviewerText({ content, cursor, textLayout = "heading-last", plain }
         const isHeading = !plain && i === headingIdx;
         const isLast = i === paragraphs.length - 1;
         return isHeading ? (
-          <p key={i} className="text-lg font-semibold leading-snug text-foreground">
+          <p key={i} className="text-xl font-semibold leading-snug text-foreground">
             {p}
             {isLast && cursor && (
               <span className="ml-px inline-block h-[1.1em] w-[2px] translate-y-[1px] animate-pulse bg-foreground/60 align-middle" />
             )}
           </p>
         ) : (
-          <p key={i} className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/60">
+          <p key={i} className="whitespace-pre-wrap text-base leading-relaxed text-foreground/60">
             {p}
             {isLast && cursor && (
               <span className="ml-px inline-block h-[1.1em] w-[2px] translate-y-[1px] animate-pulse bg-foreground/60 align-middle" />
@@ -101,7 +94,7 @@ function CandidateTextBubble({ content, isNextVariant }: { content: string; isNe
       className={cn(
         "px-4 py-2.5 text-sm leading-relaxed break-words",
         isNextVariant
-          ? cn("bg-[#dce8fc] text-[#1a3a8a]", isMultiline ? "rounded-[10px] rounded-tr-sm" : "rounded-full rounded-tr-md")
+          ? cn("bg-[#d1ead9] text-[#1a4a2e]", isMultiline ? "rounded-[10px] rounded-tr-sm" : "rounded-full rounded-tr-md")
           : cn("bg-[#F4F4F4] text-black ring-1 ring-black/5", isMultiline ? "rounded-[10px] rounded-tr-sm" : "rounded-full rounded-tr-md")
       )}
     >
@@ -115,7 +108,7 @@ function ResumeLinkAction({ onCopyLink, copied }: { onCopyLink: () => void; copi
     <button
       type="button"
       onClick={onCopyLink}
-      className="mt-2 inline-flex items-center gap-2 rounded-full border border-border bg-white px-3 py-1.5 text-sm font-semibold text-[#3770E5] shadow-sm transition-colors hover:border-[#3770E5]/30 hover:bg-[#f7faff]"
+      className="mt-2 inline-flex items-center gap-2 rounded-full border border-border bg-white px-3 py-1.5 text-sm font-semibold text-[#30814C] shadow-sm transition-colors hover:border-[#30814C]/30 hover:bg-[#f0f8f3]"
     >
       {copied ? <Check className="size-4" /> : <Link className="size-4" />}
       {copied ? "Copied link" : "Copy link"}
@@ -130,7 +123,7 @@ function newId() {
     : Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
-export function InterviewChat({ onComplete }: { onComplete: () => void }) {
+export function InterviewChat({ onComplete, started = true }: { onComplete: () => void; started?: boolean }) {
   const total = mockInterview.length;
   const [stepIndex, setStepIndex] = useState(0);
   const [linkCopied, setLinkCopied] = useState(false);
@@ -193,11 +186,9 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
     const preDelay = isIntro ? PRE_STREAM_DELAY_MS + IMAGE_FADE_MS : PRE_STREAM_DELAY_MS;
 
     if (isIntro) {
-      // Trigger image fade-in immediately
+      // Delay image until the header has slid in
       setIntroImageVisible(false);
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => setIntroImageVisible(true));
-      });
+      setTimeout(() => setIntroImageVisible(true), 450);
     }
 
     const paragraphs = text.split("\n\n");
@@ -240,8 +231,9 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
     }, preDelay);
   }, []);
 
-  // Seed first question on mount — cleanup handles StrictMode double-invoke
+  // Seed first question once the loading screen has fully exited — cleanup handles StrictMode double-invoke
   useEffect(() => {
+    if (!started) return;
     const first = mockInterview[0];
     streamMessage(first.messages.join("\n\n"), undefined, first.widget, first.textLayout, undefined, first.type);
 
@@ -250,7 +242,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
       if (streamRef.current) { clearInterval(streamRef.current); streamRef.current = null; }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [started]);
 
   // Scroll to bottom on new content
   useEffect(() => {
@@ -412,11 +404,20 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
     return "pb-28";
   })();
 
+  const isProfileInput =
+    (editingMessageId != null && editingActiveType === "profile") ||
+    (inputReady && activeType === "profile");
+
   return (
-    <div className="flex h-full flex-col overflow-y-auto bg-white sm:overflow-hidden sm:bg-white">
+    <div className="flex h-full flex-col overflow-y-auto bg-white sm:bg-white">
 
       {/* Mobile header */}
-      <div className="sticky top-0 z-50 flex shrink-0 flex-col items-start border-b border-[#e5e5e5] bg-white/80 px-5 py-4 backdrop-blur-md sm:hidden">
+      <motion.div
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: started ? 1 : 0, y: started ? 0 : -16 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className="sticky top-0 z-50 flex shrink-0 flex-col items-start border-b border-[#e5e5e5] bg-white/80 px-5 py-4 backdrop-blur-md sm:hidden"
+      >
         <div className="flex w-full items-start justify-between gap-2">
           <p className="text-base font-bold tracking-tight text-foreground">Team member role with Woolworths Group</p>
           {/* Accessibility icon — mobile */}
@@ -438,44 +439,47 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
             {linkCopied ? "Copied link" : "Copy link"}
           </button>
         </div>
-      </div>
+      </motion.div>
 
       <div className="mx-auto flex w-full max-w-3xl gap-4 sm:min-h-0 sm:flex-1 sm:px-6 sm:pb-8 sm:pt-6">
         <main className="relative flex min-w-0 flex-col sm:flex-1">
 
-          {/* Desktop header */}
-          <div
+          {/* Desktop floating pill header — sits over the chat card */}
+          <motion.div
             ref={helpRef}
-            className="mb-3 hidden shrink-0 flex-col items-start rounded-2xl border border-[#e5e5e5] bg-white/80 px-5 py-4 backdrop-blur-md sm:flex"
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: started ? 1 : 0, y: started ? 0 : -12 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-x-4 top-2 z-10 hidden sm:flex items-center justify-between rounded-[999px] border border-[#d6d6d6] bg-white/70 backdrop-blur-[8px] px-5 py-2.5"
           >
-            <div className="flex w-full items-start justify-between gap-2">
-              <p className="text-base font-bold tracking-tight text-foreground">Team member role with Woolworths Group</p>
-              <button
-                onClick={() => setHelpOpen(v => !v)}
-                className="shrink-0 flex size-7 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-black/5 hover:text-foreground"
-                aria-label="Accessibility"
-              >
-                <Accessibility className="size-4" />
-              </button>
+            <div className="flex min-w-0 flex-col gap-1">
+              <p className="text-[13px] font-semibold leading-snug text-black">Team member role with Woolworths Group</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-[11px] text-[#858585]">You can pause and come back later with this link</p>
+                <button
+                  onClick={copyLink}
+                  className="flex shrink-0 items-center gap-1 text-[11px] font-medium text-[#858585] transition-colors hover:text-foreground"
+                >
+                  {linkCopied ? <Check className="size-2.5 text-green-500" /> : <Link className="size-2.5" />}
+                  {linkCopied ? "Copied" : "Copy link"}
+                </button>
+              </div>
             </div>
-            <div className="mt-1 flex items-center gap-2">
-              <p className="text-xs font-normal text-muted-foreground">You can pause and come back later with this link</p>
-              <button
-                onClick={copyLink}
-                className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                {linkCopied ? <Check className="size-3 text-green-500" /> : <Link className="size-3" />}
-                {linkCopied ? "Copied link" : "Copy link"}
-              </button>
-            </div>
-          </div>
+            <button
+              onClick={() => setHelpOpen(v => !v)}
+              className="ml-3 flex size-8 shrink-0 items-center justify-center rounded-full text-[#858585] transition-colors hover:bg-black/5 hover:text-foreground"
+              aria-label="Accessibility"
+            >
+              <Accessibility className="size-3.5" />
+            </button>
+          </motion.div>
 
           <div className="relative flex flex-col min-h-[calc(100dvh-5rem)] sm:min-h-0 sm:flex-1 sm:overflow-hidden sm:rounded-2xl sm:bg-card sm:shadow-[var(--shadow-border)]">
 
             {/* Message list */}
             <div
               className={cn(
-                "flex-1 space-y-10 px-5 py-8 sm:min-h-0 sm:overflow-y-auto sm:px-6 sm:pt-6",
+                "flex-1 space-y-10 px-5 py-8 sm:min-h-0 sm:overflow-y-auto sm:px-6 sm:pt-24",
                 floatingInputPad || "sm:pb-6",
               )}
             >
@@ -515,7 +519,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                           <>
                             {preamble && <InterviewerText content={preamble} plain />}
                             <div className={cn("flex items-stretch gap-3", preamble ? "mt-6" : "")}>
-                              <div className="w-[6px] shrink-0 rounded-full bg-[#3770E5]" />
+                              <div className="w-[6px] shrink-0 rounded-full bg-[#30814C]" />
                               <div className="flex flex-col gap-1">
                                 <p className="text-xs font-medium text-foreground/30">Single choice question</p>
                                 <p className="text-lg font-semibold leading-snug text-foreground">
@@ -535,6 +539,9 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                       )}
                       {m.widget === "question-format" && (
                         <QuestionFormatWidget />
+                      )}
+                      {m.widget === "video-setup-tips" && (
+                        <VideoSetupTipsWidget />
                       )}
                       {m.widget === "resume-link" && (
                         <ResumeLinkAction onCopyLink={copyLink} copied={linkCopied} />
@@ -557,7 +564,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                                 </p>
                               )}
                               <div className="flex items-stretch gap-3">
-                                <div className="w-[6px] shrink-0 rounded-full bg-[#3770E5]" />
+                                <div className="w-[6px] shrink-0 rounded-full bg-[#30814C]" />
                                 <p className="flex-1 text-lg font-semibold leading-snug text-foreground">
                                   {question}
                                 </p>
@@ -671,7 +678,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                         <>
                           {preamble && <InterviewerText content={preamble} plain />}
                           <div className={cn("flex items-stretch gap-3", preamble ? "mt-6" : "")}>
-                            <div className="w-[6px] shrink-0 rounded-full bg-[#3770E5]" />
+                            <div className="w-[6px] shrink-0 rounded-full bg-[#30814C]" />
                             <div className="flex flex-col gap-1">
                               <p className="text-xs font-medium text-foreground/30">Single choice question</p>
                               <p className="text-lg font-semibold leading-snug text-foreground">
@@ -694,7 +701,12 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
 
             {/* Inputs — transparent overlay on chat container */}
             {hasFloatingInput && (
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 sm:px-6">
+            <div
+              className={cn(
+                "pointer-events-none fixed inset-x-0 bottom-0 z-40 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 sm:absolute",
+                isProfileInput ? "px-0" : "px-5 sm:px-6",
+              )}
+            >
             <div className="pointer-events-auto">
             {editingMessageId ? (
               <div className="animate-fade-up flex flex-col">
@@ -748,6 +760,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                 ) : editingActiveType === "profile" ? (
                   <div className="shrink-0">
                     <ProfileForm
+                      edgeToEdge
                       key={editingMessageId}
                       initialValues={(() => {
                         const [name = "", email = "", location = "", phone = ""] = editingText.split(" · ");
@@ -779,6 +792,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                 {inputReady && activeType === "profile" && (
                   <div className="animate-fade-up-delayed shrink-0">
                     <ProfileForm
+                      edgeToEdge
                       onSubmit={d => {
                         const id = newId();
                         setProfileAcceptedMessageId(id);
@@ -839,7 +853,7 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                       Test microphone and camera
                     </CTAButton>
                     <CTAButton variant="secondary" onClick={() => advance("__next__")}>
-                      Skip
+                      Continue
                     </CTAButton>
                   </div>
                 )}
@@ -854,7 +868,8 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
                   </div>
                 )}
                 {complete && !isStreaming && !submitted && reviewDone && (
-                  <div className="animate-fade-up shrink-0">
+                  <div className="animate-fade-up shrink-0 flex flex-col gap-2">
+                    <CTAButton variant="secondary" onClick={() => setReviewMode(true)}>Review responses</CTAButton>
                     <CTAButton onClick={() => {
                       setSubmitted(true);
                       setMessages(prev => [...prev, { id: newId(), role: "candidate" as const, content: "Submit interview" }]);
@@ -874,86 +889,113 @@ export function InterviewChat({ onComplete }: { onComplete: () => void }) {
             </div>
             )}
 
-            {/* Review overlay — fixed on mobile (below sticky header), absolute on desktop */}
+            {/* Review overlay */}
             <AnimatePresence>
               {reviewMode && (
-                <motion.div
-                  key="review-overlay"
-                  initial={{ y: "100%" }}
-                  animate={{ y: 0 }}
-                  exit={{ y: "100%" }}
-                  transition={{ type: "spring", stiffness: 340, damping: 34, mass: 0.9 }}
-                  className="fixed inset-0 z-[60] flex flex-col bg-white sm:absolute sm:inset-0 sm:z-50 sm:rounded-2xl sm:bg-card"
-                  style={{ WebkitOverflowScrolling: "touch" }}
-                >
-                  {/* Review header */}
-                  <div className="shrink-0 flex items-center gap-3 border-b border-border px-4 py-4 sm:px-6">
-                    <div className="flex-1 min-w-0">
-                      <h2 className="text-base font-semibold text-foreground">Review your responses</h2>
-                      <p className="text-xs text-muted-foreground mt-0.5">Edit any answer before submitting</p>
-                    </div>
-                  </div>
+                <>
+                  {/* Backdrop */}
+                  <motion.div
+                    key="review-backdrop"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="fixed inset-0 z-[59] bg-black/40 backdrop-blur-sm"
+                    onClick={() => { setReviewMode(false); setReviewDone(true); }}
+                  />
 
-                  {/* Review list */}
-                  <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5 space-y-3">
-                    {(() => {
-                      const pairs: { question: string; answer: ChatMessage; stepType?: QuestionType }[] = [];
-                      let cCount = 0;
-                      for (let i = 0; i < messages.length; i++) {
-                        const m = messages[i];
-                        if (m.role === "candidate" && m.variant !== "next") {
-                          let question = "";
-                          for (let j = i - 1; j >= 0; j--) {
-                            if (messages[j].role === "interviewer") { question = messages[j].content; break; }
+                  {/* Modal */}
+                  <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center">
+                    <motion.div
+                      key="review-overlay"
+                      initial={{ y: 40, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: 40, opacity: 0 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.8 }}
+                      className="relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-[28px] bg-white mx-3 mb-3 sm:mx-0 sm:mb-0 sm:max-h-[80vh] sm:max-w-3xl"
+                    >
+                      {/* Review header */}
+                      <div className="shrink-0 flex items-center gap-3 border-b border-[#f0f0f0] bg-[#fafaf8] px-4 py-4 sm:px-6">
+                        <div className="flex-1 min-w-0">
+                          <h2 className="text-base font-semibold text-foreground">Review your responses</h2>
+                          <p className="text-xs text-muted-foreground mt-0.5">Edit any answer before submitting</p>
+                        </div>
+                      </div>
+
+                      {/* Review list */}
+                      <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5 space-y-3">
+                        {(() => {
+                          const pairs: { question: string; answer: ChatMessage; stepType?: QuestionType }[] = [];
+                          let cCount = 0;
+                          for (let i = 0; i < messages.length; i++) {
+                            const m = messages[i];
+                            if (m.role === "candidate" && m.variant !== "next") {
+                              let question = "";
+                              for (let j = i - 1; j >= 0; j--) {
+                                if (messages[j].role === "interviewer") { question = messages[j].content; break; }
+                              }
+                              const step = mockInterview[cCount];
+                              pairs.push({ question, answer: m, stepType: step?.type });
+                              cCount++;
+                            } else if (m.role === "candidate" && m.variant === "next") {
+                              cCount++;
+                            }
                           }
-                          const step = mockInterview[cCount];
-                          pairs.push({ question, answer: m, stepType: step?.type });
-                          cCount++;
-                        } else if (m.role === "candidate" && m.variant === "next") {
-                          cCount++;
-                        }
-                      }
-                      return pairs.map(({ question, answer }) => {
-                        const questionLabel = question.split("\n\n").at(-1) ?? question;
-                        const isProfileAnswer = answer.id === profileAcceptedMessageId;
-                        return (
-                          <div key={answer.id} className="flex flex-col gap-2.5 border-b border-border/70 py-4 first:pt-0 last:border-b-0 last:pb-0">
-                            <div className="flex items-start justify-between gap-3">
-                              <p className="text-sm font-medium text-foreground/50 leading-snug flex-1">
-                                {questionLabel}
-                              </p>
-                              {!answer.videoUrl && !isProfileAnswer && (
-                                <button
-                                  onClick={() => {
-                                    setReviewMode(false);
-                                    setEditReturnToReview(true);
-                                    startEditing(answer.id, answer.content);
-                                  }}
-                                  className="shrink-0 flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground active:scale-95"
-                                >
-                                  <Pencil className="size-3" />
-                                  Edit
-                                </button>
-                              )}
-                            </div>
-                            {answer.videoUrl ? (
-                              <div className="overflow-hidden rounded-xl border border-[#e5e5e5] bg-black w-full">
-                                <video src={answer.videoUrl} controls playsInline className="aspect-video w-full object-cover" />
-                              </div>
-                            ) : (
-                              <InterviewerText content={isProfileAnswer ? answer.content.replace(/ · /g, "\n\n") : answer.content} plain />
-                            )}
-                          </div>
-                        );
-                      });
-                    })()}
-                  </div>
+                          return pairs.map(({ question, answer }, idx) => {
+                            const questionLabel = question.split("\n\n").at(-1) ?? question;
+                            const isProfileAnswer = answer.id === profileAcceptedMessageId;
+                            return (
+                              <div key={answer.id} className="overflow-hidden rounded-2xl border border-[#e8e8e8] bg-white shadow-[0_1px_6px_rgba(0,0,0,0.05)]">
+                                {/* Card header: question */}
+                                <div className="flex items-start justify-between gap-3 px-4 pt-4 pb-3">
+                                  <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                                    <p className="text-[10px] font-semibold uppercase tracking-widest text-foreground/25">
+                                      {isProfileAnswer ? "Your details" : `Question ${idx + 1}`}
+                                    </p>
+                                    <div className="border-l-2 border-[#30814C] pl-3">
+                                      <p className="text-sm font-medium leading-snug text-foreground/70">
+                                        {questionLabel}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  {!answer.videoUrl && !isProfileAnswer && (
+                                    <button
+                                      onClick={() => {
+                                        setReviewMode(false);
+                                        setEditReturnToReview(true);
+                                        startEditing(answer.id, answer.content);
+                                      }}
+                                      className="shrink-0 flex items-center gap-1.5 rounded-full border border-[#e5e5e5] bg-[#fafafa] px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground active:scale-95"
+                                    >
+                                      <Pencil className="size-3" />
+                                      Edit
+                                    </button>
+                                  )}
+                                </div>
 
-                  {/* Review footer */}
-                  <div className="shrink-0 border-t border-border bg-white px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3 sm:px-6 sm:pb-5 sm:pt-4">
-                    <CTAButton onClick={() => { setReviewMode(false); setReviewDone(true); }}>Done</CTAButton>
+                                {/* Card body: answer */}
+                                <div className="border-t border-[#f0f0f0] bg-[#fafaf8] px-4 py-3">
+                                  {answer.videoUrl ? (
+                                    <div className="overflow-hidden rounded-xl bg-black w-full">
+                                      <video src={answer.videoUrl} controls playsInline className="aspect-video w-full object-cover" />
+                                    </div>
+                                  ) : (
+                                    <InterviewerText content={isProfileAnswer ? answer.content.replace(/ · /g, "\n\n") : answer.content} plain />
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
+
+                      {/* Review footer */}
+                      <div className="shrink-0 border-t border-border bg-white px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3 sm:px-6 sm:pb-5 sm:pt-4">
+                        <CTAButton onClick={() => { setReviewMode(false); setReviewDone(true); }}>Done</CTAButton>
+                      </div>
+                    </motion.div>
                   </div>
-                </motion.div>
+                </>
               )}
             </AnimatePresence>
           </div>

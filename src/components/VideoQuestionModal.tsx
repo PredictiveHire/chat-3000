@@ -15,6 +15,21 @@ type VideoQuestionModalProps = {
   onClose?: () => void;
 };
 
+const tips = [
+  {
+    title: "Try the STAR structure",
+    body: "Situation, Task, Action, Result.",
+  },
+  {
+    title: "5 attempts available",
+    body: "Re-record until you're happy with your answer.",
+  },
+  {
+    title: "2 minute limit",
+    body: "A countdown timer will keep you on track.",
+  },
+];
+
 export function VideoQuestionModal({
   open,
   question,
@@ -27,7 +42,7 @@ export function VideoQuestionModal({
 }: VideoQuestionModalProps) {
   return (
     <>
-      {/* Backdrop — desktop only, animated in/out */}
+      {/* Backdrop — desktop only */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -48,7 +63,7 @@ export function VideoQuestionModal({
         aria-hidden={!open}
       >
         <motion.div
-          className="pointer-events-auto flex h-full w-full flex-col bg-background sm:h-[580px] sm:max-w-lg sm:overflow-hidden sm:rounded-[28px]"
+          className="pointer-events-auto flex h-full w-full flex-col bg-background sm:max-w-4xl sm:overflow-hidden sm:rounded-[28px] sm:flex-row sm:h-auto"
           initial={false}
           animate={{
             opacity: open ? 1 : 0,
@@ -57,36 +72,88 @@ export function VideoQuestionModal({
           }}
           transition={{ type: "spring", stiffness: 380, damping: 32, mass: 0.9 }}
         >
-          {/* Header bar */}
-          <div className="flex shrink-0 items-start justify-between px-5 pb-3 pt-5">
-            <div className="flex flex-col gap-1">
-              <p className="text-sm font-medium text-foreground/40">
-                {currentIndex !== undefined && total !== undefined
-                  ? `Question ${currentIndex} of ${total}`
-                  : "Video response"}
-              </p>
-              <p className="text-base font-semibold leading-snug text-foreground">
-                {question}
-              </p>
+          {/* ── Left panel (desktop only) ── */}
+          <div className="hidden sm:flex sm:w-[42%] sm:shrink-0 flex-col justify-between border-r border-[#f0f0f0] bg-white p-6">
+            {/* Top: label + question */}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-widest text-foreground/30">
+                  {currentIndex !== undefined && total !== undefined
+                    ? `Question ${currentIndex} of ${total}`
+                    : "Video response"}
+                </p>
+                {onClose && (
+                  <button
+                    onClick={onClose}
+                    className="flex size-7 items-center justify-center rounded-full text-foreground/30 transition-colors hover:bg-black/5 hover:text-foreground"
+                    aria-label="Minimise"
+                  >
+                    <Minus className="size-4" />
+                  </button>
+                )}
+              </div>
+              <div className="border-l-2 border-[#30814C] pl-4">
+                <p className="text-xl font-semibold leading-snug text-foreground">
+                  {question}
+                </p>
+              </div>
             </div>
-            <div className="flex shrink-0 items-center gap-2 pl-4">
-              <button className="rounded-full border border-[#e5e5e5] px-3 py-1 text-xs font-medium text-foreground/50 transition-colors hover:border-foreground/20 hover:text-foreground">
-                I need help
-              </button>
-              {onClose && (
-                <button
-                  onClick={onClose}
-                  className="flex size-8 items-center justify-center rounded-full text-foreground/40 transition-colors hover:bg-black/5 hover:text-foreground"
-                  aria-label="Minimise"
-                >
-                  <Minus className="size-4" />
-                </button>
-              )}
+
+            {/* Bottom: tips */}
+            <div className="flex flex-col gap-4 pt-6">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-foreground/25">
+                Tips
+              </p>
+              <div className="flex flex-col gap-4">
+                {tips.map(({ title, body }) => (
+                  <div key={title} className="flex flex-col gap-0.5">
+                    <p className="text-xs font-semibold text-foreground">{title}</p>
+                    <p className="text-xs leading-relaxed text-foreground/50">{body}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Content — fills remaining height */}
+          {/* ── Right panel: camera + controls ── */}
           <div className="flex min-h-0 flex-1 flex-col">
+            {/* Mobile header */}
+            <div className="flex shrink-0 flex-col px-5 pt-5 sm:hidden">
+              <div className="flex items-start justify-between pb-3">
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm font-medium text-foreground/40">
+                    {currentIndex !== undefined && total !== undefined
+                      ? `Question ${currentIndex} of ${total}`
+                      : "Video response"}
+                  </p>
+                  <p className="text-base font-semibold leading-snug text-foreground">
+                    {question}
+                  </p>
+                </div>
+                {onClose && (
+                  <button
+                    onClick={onClose}
+                    className="ml-4 flex size-8 shrink-0 items-center justify-center rounded-full text-foreground/40 transition-colors hover:bg-black/5 hover:text-foreground"
+                    aria-label="Minimise"
+                  >
+                    <Minus className="size-4" />
+                  </button>
+                )}
+              </div>
+              {/* Mobile tips */}
+              <div className="mb-3 flex flex-col gap-3 border-t border-[#f0f0f0] pt-3">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-foreground/25">Tips</p>
+                <div className="flex flex-col gap-3">
+                  {tips.map(({ title, body }) => (
+                    <div key={title} className="flex flex-col gap-0.5">
+                      <p className="text-xs font-semibold text-foreground">{title}</p>
+                      <p className="text-xs leading-relaxed text-foreground/50">{body}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             <VideoQuestion
               question={question}
               currentIndex={currentIndex}
