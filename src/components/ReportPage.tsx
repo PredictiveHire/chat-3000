@@ -115,7 +115,7 @@ export function ReportPage({ onBack }: Props) {
 
       <div className={cn(
         "mx-auto flex min-h-0 w-full flex-1 gap-4 sm:px-4 sm:pb-6 sm:pt-8",
-        showCoach ? "max-w-[1200px]" : "max-w-3xl"
+        showCoach ? "max-w-[1200px]" : "max-w-4xl"
       )}>
         <main className="relative flex min-w-0 flex-1 flex-col">
 

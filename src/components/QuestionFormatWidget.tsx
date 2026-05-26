@@ -60,11 +60,11 @@ export function QuestionFormatWidget() {
             <div className="flex items-center gap-3">
               <div className="h-[22px] w-[5px] shrink-0 rounded-full bg-[#30814C]" />
               <Icon className="size-4 shrink-0 text-black" strokeWidth={1.5} />
-              <p className="text-sm font-medium text-black">
+              <p className="text-base font-medium text-black">
                 {count}&nbsp;&nbsp;{label}
               </p>
             </div>
-            <p className="pl-4 text-sm leading-relaxed text-black/65">{desc}</p>
+            <p className="pl-4 text-base leading-relaxed text-black/65">{desc}</p>
           </div>
         ))}
       </div>

@@ -32,6 +32,21 @@ export function LoadingScreen({ name }: LoadingScreenProps) {
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center bg-white px-10">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="mb-6 w-full max-w-xs overflow-hidden rounded-2xl"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/woolworths-team.png"
+          alt="Woolworths team members"
+          width={1024}
+          height={683}
+          className="block h-auto w-full"
+        />
+      </motion.div>
       <div className="flex flex-col items-center gap-1 text-center">
         {name && (
           <motion.p

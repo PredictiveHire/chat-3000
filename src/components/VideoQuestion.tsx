@@ -14,6 +14,7 @@ type VideoQuestionProps = {
   total?: number;
   maxSeconds?: number;
   initialTriesUsed?: number;
+  portrait?: boolean;
   onTriesUsedChange?: (triesUsed: number) => void;
   onSubmit: (value: string, videoUrl?: string) => void;
 };
@@ -30,6 +31,7 @@ export function VideoQuestion({
   total,
   maxSeconds = 120,
   initialTriesUsed = 0,
+  portrait = false,
   onTriesUsedChange,
   onSubmit,
 }: VideoQuestionProps) {
@@ -151,9 +153,9 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
 
   return (
     <div className="flex flex-col h-full">
-      {/* Video area — 16:9 aspect ratio */}
-      <div className="sm:px-4 sm:pt-4">
-      <div className="relative w-full overflow-hidden rounded-none bg-[#111] sm:rounded-2xl" style={{ aspectRatio: "16/9" }}>
+      {/* Video area */}
+      <div className={cn("sm:px-4 sm:pt-4", portrait && "px-4 pt-2")}>
+      <div className={cn("relative w-full overflow-hidden bg-[#111]", portrait ? "rounded-2xl" : "rounded-none sm:rounded-2xl")} style={{ aspectRatio: portrait ? "3/4" : "16/9" }}>
         {/* Live camera */}
         {stage !== "review" && (
           <video
@@ -226,7 +228,12 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
       </div>
 
       {/* Controls */}
-      <div className="shrink-0 bg-background px-4 pb-5 pt-4">
+      <div className={cn(
+        "shrink-0 px-4 pt-4",
+        portrait
+          ? "fixed inset-x-0 bottom-0 bg-[#F7F7F5] pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:relative sm:inset-x-auto sm:bottom-auto sm:bg-background sm:pb-5"
+          : "bg-background pb-5"
+      )}>
         {stage === "prepare" && (
           <div className="flex flex-col items-center gap-2">
             <button

@@ -18,26 +18,22 @@ import { CameraSetupModal } from "@/components/CameraSetupModal";
 import { VideoQuestionModal } from "@/components/VideoQuestionModal";
 import { CompanyIntroVideo } from "@/components/CompanyIntroVideo";
 import { VideoSetupTipsWidget } from "@/components/VideoSetupTipsWidget";
+import { DemographicForm } from "@/components/DemographicForm";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 
-const STREAM_CHAR_MS = 22;
+const STREAM_WORD_MS = 80;
 const PRE_STREAM_DELAY_MS = 900;
 const INTER_PARAGRAPH_PAUSE_MS = 620;
+const LOADING_PHRASE_MS = 1100;
 
-function IntroBrandMedia() {
-  return (
-    <>
-      <div className="mb-4 overflow-hidden rounded-2xl">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/woolworths-team.png"
-          alt="Woolworths team members"
-          width={1024}
-          height={683}
-          className="block h-auto max-w-full"
-        />
-      </div>
-    </>
-  );
+function getLoadingPhrases(widget?: MessageWidget, stepType?: QuestionType): string[] {
+  if (stepType === "video-setup") {
+    return ["Reading your response…", "Thinking about that…", "Getting your video ready…"];
+  }
+  if (stepType === "video" || widget === "video-question") {
+    return ["Reading your response…", "Thinking about that…", "Preparing your video question…"];
+  }
+  return ["Reading your response…", "Thinking about that…", "Picking the next question…"];
 }
 
 function InterviewerText({ content, cursor, textLayout = "heading-last", plain }: {
@@ -48,6 +44,31 @@ function InterviewerText({ content, cursor, textLayout = "heading-last", plain }
 }) {
   const paragraphs = content.split("\n\n");
   const headingIdx = textLayout === "heading-first" ? 0 : paragraphs.length - 1;
+
+  const renderParagraphContent = (p: string, isLast: boolean) => {
+    const cursorEl = isLast && cursor ? (
+      <span className="ml-px inline-block h-[1.1em] w-[2px] translate-y-[1px] animate-pulse bg-foreground/60 align-middle" />
+    ) : null;
+
+    if (!cursor || !isLast) return <>{p}{cursorEl}</>;
+
+    const lastSpaceIdx = p.lastIndexOf(' ');
+    if (lastSpaceIdx < 0) {
+      const wordCount = p.trim() ? 1 : 0;
+      return <><span key={wordCount} className="animate-word-in">{p}</span>{cursorEl}</>;
+    }
+    const stableText = p.slice(0, lastSpaceIdx + 1);
+    const lastWord = p.slice(lastSpaceIdx + 1);
+    const wordCount = p.split(' ').filter(Boolean).length;
+    return (
+      <>
+        {stableText}
+        <span key={wordCount} className="animate-word-in">{lastWord}</span>
+        {cursorEl}
+      </>
+    );
+  };
+
   return (
     <div className="space-y-4 py-2">
       {paragraphs.map((p, i) => {
@@ -55,17 +76,11 @@ function InterviewerText({ content, cursor, textLayout = "heading-last", plain }
         const isLast = i === paragraphs.length - 1;
         return isHeading ? (
           <p key={i} className="text-xl font-semibold leading-snug text-foreground">
-            {p}
-            {isLast && cursor && (
-              <span className="ml-px inline-block h-[1.1em] w-[2px] translate-y-[1px] animate-pulse bg-foreground/60 align-middle" />
-            )}
+            {renderParagraphContent(p, isLast)}
           </p>
         ) : (
           <p key={i} className="whitespace-pre-wrap text-base leading-relaxed text-foreground/60">
-            {p}
-            {isLast && cursor && (
-              <span className="ml-px inline-block h-[1.1em] w-[2px] translate-y-[1px] animate-pulse bg-foreground/60 align-middle" />
-            )}
+            {renderParagraphContent(p, isLast)}
           </p>
         );
       })}
@@ -95,7 +110,7 @@ function CandidateTextBubble({ content, isNextVariant }: { content: string; isNe
         "px-4 py-2.5 text-sm leading-relaxed break-words",
         isNextVariant
           ? cn("bg-[#d1ead9] text-[#1a4a2e]", isMultiline ? "rounded-[10px] rounded-tr-sm" : "rounded-full rounded-tr-md")
-          : cn("bg-[#F4F4F4] text-black ring-1 ring-black/5", isMultiline ? "rounded-[10px] rounded-tr-sm" : "rounded-full rounded-tr-md")
+          : cn("bg-[#F4F4F4] text-black border border-black/[0.06]", isMultiline ? "rounded-[10px] rounded-tr-sm" : "rounded-full rounded-tr-md")
       )}
     >
       <p className="whitespace-pre-wrap">{content}</p>
@@ -147,6 +162,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
   const [reviewMode, setReviewMode] = useState(false);
   const [reviewDone, setReviewDone] = useState(false);
   const [editReturnToReview, setEditReturnToReview] = useState(false);
+  const [postPhase, setPostPhase] = useState<"idle" | "demographic" | "feedback" | "done">("idle");
 
   // Streaming
   const [streamingText, setStreamingText] = useState("");
@@ -155,12 +171,13 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
   const [streamingWidget, setStreamingWidget] = useState<MessageWidget | undefined>(undefined);
   const [isStreaming, setIsStreaming] = useState(false);
   const [isPreStreaming, setIsPreStreaming] = useState(false);
-  // For intro step: image fades in first, then text streams
-  const [introImageVisible, setIntroImageVisible] = useState(false);
+  const [preStreamPhrase, setPreStreamPhrase] = useState<string | null>(null);
   const streamRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const preStreamRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const preStreamTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const isFirstStreamRef = useRef(true);
 
   const bottomRef = useRef<HTMLDivElement>(null);
+  const msgListRef = useRef<HTMLDivElement>(null);
 
   const copyLink = useCallback(() => {
     navigator.clipboard.writeText(window.location.href).then(() => {
@@ -172,35 +189,33 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
   // Stream paragraph-by-paragraph: fast within each paragraph, pause between them
   const streamMessage = useCallback((text: string, onDone?: () => void, widget?: MessageWidget, textLayout?: TextLayout, widgetMeta?: Record<string, number | string>, stepType?: QuestionType) => {
     if (streamRef.current) clearInterval(streamRef.current);
-    if (preStreamRef.current) clearTimeout(preStreamRef.current);
+    preStreamTimersRef.current.forEach(clearTimeout);
+    preStreamTimersRef.current = [];
+
+    const isFirst = isFirstStreamRef.current;
+    isFirstStreamRef.current = false;
+
     setIsStreaming(true);
     setIsPreStreaming(true);
     setStreamingText("");
+    setPreStreamPhrase(null);
     setStreamingLayout(textLayout ?? "heading-last");
     setStreamingStepType(stepType ?? null);
     setStreamingWidget(widget);
-
-    const isIntro = widget === "company-intro-video";
-    // For the intro step, show image first then delay text stream further
-    const IMAGE_FADE_MS = 700;
-    const preDelay = isIntro ? PRE_STREAM_DELAY_MS + IMAGE_FADE_MS : PRE_STREAM_DELAY_MS;
-
-    if (isIntro) {
-      // Delay image until the header has slid in
-      setIntroImageVisible(false);
-      setTimeout(() => setIntroImageVisible(true), 450);
-    }
 
     const paragraphs = text.split("\n\n");
 
     const streamParagraph = (paraIndex: number, alreadyStreamed: string) => {
       const para = paragraphs[paraIndex];
       const prefix = alreadyStreamed ? alreadyStreamed + "\n\n" : "";
-      let i = 0;
+      const words = para.split(' ');
+      let wordIdx = 0;
+      let currentText = "";
       streamRef.current = setInterval(() => {
-        i++;
-        setStreamingText(prefix + para.slice(0, i));
-        if (i >= para.length) {
+        currentText += (wordIdx > 0 ? ' ' : '') + (words[wordIdx] ?? '');
+        wordIdx++;
+        setStreamingText(prefix + currentText);
+        if (wordIdx >= words.length) {
           clearInterval(streamRef.current!);
           streamRef.current = null;
           const streamed = prefix + para;
@@ -216,19 +231,33 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
             setIsStreaming(false);
             onDone?.();
           } else {
-            // Pause before next paragraph
-            preStreamRef.current = setTimeout(() => {
-              streamParagraph(paraIndex + 1, streamed);
-            }, INTER_PARAGRAPH_PAUSE_MS);
+            const t = setTimeout(() => streamParagraph(paraIndex + 1, streamed), INTER_PARAGRAPH_PAUSE_MS);
+            preStreamTimersRef.current.push(t);
           }
         }
-      }, STREAM_CHAR_MS);
+      }, STREAM_WORD_MS);
     };
 
-    preStreamRef.current = setTimeout(() => {
-      setIsPreStreaming(false);
-      streamParagraph(0, "");
-    }, preDelay);
+    const phrases = isFirst ? [] : getLoadingPhrases(widget, stepType);
+    if (phrases.length > 0) {
+      setPreStreamPhrase(phrases[0]);
+      phrases.slice(1).forEach((phrase, i) => {
+        const t = setTimeout(() => setPreStreamPhrase(phrase), (i + 1) * LOADING_PHRASE_MS);
+        preStreamTimersRef.current.push(t);
+      });
+      const startStreaming = setTimeout(() => {
+        setIsPreStreaming(false);
+        setPreStreamPhrase(null);
+        streamParagraph(0, "");
+      }, phrases.length * LOADING_PHRASE_MS);
+      preStreamTimersRef.current.push(startStreaming);
+    } else {
+      const startStreaming = setTimeout(() => {
+        setIsPreStreaming(false);
+        streamParagraph(0, "");
+      }, PRE_STREAM_DELAY_MS);
+      preStreamTimersRef.current.push(startStreaming);
+    }
   }, []);
 
   // Seed first question once the loading screen has fully exited — cleanup handles StrictMode double-invoke
@@ -238,16 +267,34 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
     streamMessage(first.messages.join("\n\n"), undefined, first.widget, first.textLayout, undefined, first.type);
 
     return () => {
-      if (preStreamRef.current) { clearTimeout(preStreamRef.current); preStreamRef.current = null; }
+      preStreamTimersRef.current.forEach(clearTimeout);
+      preStreamTimersRef.current = [];
       if (streamRef.current) { clearInterval(streamRef.current); streamRef.current = null; }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [started]);
 
-  // Scroll to bottom on new content
+  // Scroll to bottom when committed messages update
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, streamingText]);
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages]);
+
+  // Follow streaming text as it generates
+  useEffect(() => {
+    if (streamingText) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [streamingText]);
+
+  // When pre-streaming starts, scroll the last candidate bubble to the top of the viewport
+  useEffect(() => {
+    if (!isPreStreaming) return;
+    const msgList = msgListRef.current;
+    if (!msgList) return;
+    const candidates = msgList.querySelectorAll('[data-role="candidate"]');
+    const last = candidates[candidates.length - 1] as HTMLElement | undefined;
+    last?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [isPreStreaming]);
 
   // Close help dropdown on outside click
   useEffect(() => {
@@ -393,10 +440,14 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
     (editingMessageId != null ||
       inputReady ||
       (complete && !isStreaming && !submitted) ||
-      submitted);
+      (submitted && !isStreaming && postPhase !== "done") ||
+      (submitted && postPhase === "done" && !isStreaming));
 
   const floatingInputPad = (() => {
     if (!hasFloatingInput) return "";
+    if (submitted && postPhase === "demographic") return "pb-[36rem]";
+    if (submitted && postPhase === "feedback") return "pb-[28rem]";
+    if (submitted && postPhase === "done") return "pb-28";
     const type = editingMessageId ? editingActiveType : activeType;
     if (type === "profile") return "pb-[26rem]";
     if (type === "mcq" || type === "dropdown") return "pb-72";
@@ -441,45 +492,48 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
         </div>
       </motion.div>
 
-      <div className="mx-auto flex w-full max-w-3xl gap-4 sm:min-h-0 sm:flex-1 sm:px-6 sm:pb-8 sm:pt-6">
+      <div className="mx-auto flex w-full max-w-4xl gap-4 sm:min-h-0 sm:flex-1 sm:px-8 sm:pb-8 sm:pt-6">
         <main className="relative flex min-w-0 flex-col sm:flex-1">
-
-          {/* Desktop floating pill header — sits over the chat card */}
-          <motion.div
-            ref={helpRef}
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: started ? 1 : 0, y: started ? 0 : -12 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-x-4 top-2 z-10 hidden sm:flex items-center justify-between rounded-[999px] border border-[#d6d6d6] bg-white/70 backdrop-blur-[8px] px-5 py-2.5"
-          >
-            <div className="flex min-w-0 flex-col gap-1">
-              <p className="text-[13px] font-semibold leading-snug text-black">Team member role with Woolworths Group</p>
-              <div className="flex items-center gap-1.5">
-                <p className="text-[11px] text-[#858585]">You can pause and come back later with this link</p>
-                <button
-                  onClick={copyLink}
-                  className="flex shrink-0 items-center gap-1 text-[11px] font-medium text-[#858585] transition-colors hover:text-foreground"
-                >
-                  {linkCopied ? <Check className="size-2.5 text-green-500" /> : <Link className="size-2.5" />}
-                  {linkCopied ? "Copied" : "Copy link"}
-                </button>
-              </div>
-            </div>
-            <button
-              onClick={() => setHelpOpen(v => !v)}
-              className="ml-3 flex size-8 shrink-0 items-center justify-center rounded-full text-[#858585] transition-colors hover:bg-black/5 hover:text-foreground"
-              aria-label="Accessibility"
-            >
-              <Accessibility className="size-3.5" />
-            </button>
-          </motion.div>
 
           <div className="relative flex flex-col min-h-[calc(100dvh-5rem)] sm:min-h-0 sm:flex-1 sm:overflow-hidden sm:rounded-2xl sm:bg-card sm:shadow-[var(--shadow-border)]">
 
+            {/* Desktop pill header — proper flex sibling so the scroll area starts below it */}
+            <motion.div
+              ref={helpRef}
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: started ? 1 : 0, y: started ? 0 : -8 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className="shrink-0 hidden sm:flex px-4 pt-3 pb-2"
+            >
+              <div className="flex w-full items-center justify-between rounded-[999px] border border-[#d6d6d6] bg-white px-5 py-2.5">
+                <div className="flex min-w-0 flex-col gap-1">
+                  <p className="text-[15px] font-semibold leading-snug text-black">Team member role with Woolworths Group</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-[13px] text-[#858585]">You can pause and come back later with this link</p>
+                    <button
+                      onClick={copyLink}
+                      className="flex shrink-0 items-center gap-1 text-[13px] font-medium text-[#858585] transition-colors hover:text-foreground"
+                    >
+                      {linkCopied ? <Check className="size-3 text-green-500" /> : <Link className="size-3" />}
+                      {linkCopied ? "Copied" : "Copy link"}
+                    </button>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setHelpOpen(v => !v)}
+                  className="ml-3 flex size-8 shrink-0 items-center justify-center rounded-full text-[#858585] transition-colors hover:bg-black/5 hover:text-foreground"
+                  aria-label="Accessibility"
+                >
+                  <Accessibility className="size-3.5" />
+                </button>
+              </div>
+            </motion.div>
+
             {/* Message list */}
             <div
+              ref={msgListRef}
               className={cn(
-                "flex-1 space-y-10 px-5 py-8 sm:min-h-0 sm:overflow-y-auto sm:px-6 sm:pt-24",
+                "flex-1 space-y-10 px-5 py-8 sm:min-h-0 sm:overflow-y-auto sm:px-6 sm:py-8",
                 floatingInputPad || "sm:pb-6",
               )}
             >
@@ -521,8 +575,8 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                             <div className={cn("flex items-stretch gap-3", preamble ? "mt-6" : "")}>
                               <div className="w-[6px] shrink-0 rounded-full bg-[#30814C]" />
                               <div className="flex flex-col gap-1">
-                                <p className="text-xs font-medium text-foreground/30">Single choice question</p>
-                                <p className="text-lg font-semibold leading-snug text-foreground">
+                                <p className="text-xs font-medium text-foreground/60">Single choice question</p>
+                                <p className="text-xl font-semibold leading-snug text-foreground">
                                   {question}
                                 </p>
                               </div>
@@ -530,12 +584,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                           </>
                         );
                       })() : m.widget === "video-question" ? null : (
-                        <>
-                          {m.widget === "company-intro-video" && (
-                            <IntroBrandMedia />
-                          )}
-                          <InterviewerText content={m.content} textLayout={m.textLayout} />
-                        </>
+                        <InterviewerText content={m.content} textLayout={m.textLayout} />
                       )}
                       {m.widget === "question-format" && (
                         <QuestionFormatWidget />
@@ -559,13 +608,13 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                             {preamble && <div className="mt-2" />}
                             <div className="flex flex-col gap-3 w-full">
                               {m.widgetMeta?.currentIndex !== undefined && m.widgetMeta?.total !== undefined && (
-                                <p className="text-xs font-medium text-foreground/30">
+                                <p className="text-xs font-medium text-foreground/60">
                                   Video question · {m.widgetMeta.currentIndex}/{m.widgetMeta.total}
                                 </p>
                               )}
                               <div className="flex items-stretch gap-3">
                                 <div className="w-[6px] shrink-0 rounded-full bg-[#30814C]" />
-                                <p className="flex-1 text-lg font-semibold leading-snug text-foreground">
+                                <p className="flex-1 text-xl font-semibold leading-snug text-foreground">
                                   {question}
                                 </p>
                               </div>
@@ -581,20 +630,21 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                 return (
                   <motion.div
                     key={m.id}
+                    data-role="candidate"
                     initial={{ y: 32, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ type: "spring", stiffness: 480, damping: 30, mass: 0.8 }}
                     className="group flex flex-col items-end"
                   >
-                    <div className="flex flex-col items-end gap-1">
+                    <div className={cn("flex flex-col items-end gap-1", m.id === profileAcceptedMessageId && "w-full")}>
                       {m.videoUrl ? (
                         <div className="flex flex-col items-end gap-1.5">
-                          <div className="overflow-hidden rounded-[16px] rounded-tr-sm border border-[#e5e5e5] bg-black w-[260px] sm:w-[300px]">
+                          <div className="overflow-hidden rounded-[16px] rounded-tr-sm border border-[#e5e5e5] bg-black w-[260px] sm:w-full">
                             <video
                               src={m.videoUrl}
                               controls
                               playsInline
-                              className="aspect-video w-full object-cover"
+                              className="w-full object-cover aspect-[3/4] sm:aspect-video"
                             />
                           </div>
                           {m.id === submittedVideoMessageId && videoTriesUsed < 5 && (
@@ -607,12 +657,24 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                             </button>
                           )}
                         </div>
+                      ) : m.id === profileAcceptedMessageId ? (
+                        <div className="flex w-full flex-col items-end gap-1.5">
+                          {(() => {
+                            const labels = ["Name", "Email", "Location", "Phone"];
+                            return m.content.split(" · ").map((detail, i) => (
+                              <div key={i} className="flex max-w-full min-w-0 items-center gap-2.5 rounded-2xl rounded-tr-sm border border-black/[0.06] bg-[#F4F4F4] px-4 py-2.5">
+                                <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wider text-foreground/30">{labels[i] ?? ""}</span>
+                                <span className="min-w-0 truncate text-sm text-foreground">{detail}</span>
+                              </div>
+                            ));
+                          })()}
+                        </div>
                       ) : (
                         <div>
                           <CandidateTextBubble content={m.content} isNextVariant={isNextVariant} />
                         </div>
                       )}
-                      {!editingMessageId && !isNextVariant && m.id !== profileAcceptedMessageId && !m.videoUrl && (
+                      {!submitted && !editingMessageId && !isNextVariant && m.id !== profileAcceptedMessageId && !m.videoUrl && (
                         <button
                           onClick={() => startEditing(m.id, m.content)}
                           className="mr-2 text-xs font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
@@ -628,39 +690,47 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
               </AnimatePresence>
 
               <AnimatePresence mode="wait">
-                {/* Pre-stream typing indicator */}
-                {streamingWidget === "company-intro-video" && (isPreStreaming || streamingText) ? (
+                {/* Pre-stream loading indicator */}
+                {isPreStreaming ? (
                   <motion.div
-                    key="intro-streaming"
-                    className="flex flex-col items-start"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: introImageVisible ? 1 : 0, y: introImageVisible ? 0 : 8 }}
-                    exit={{ opacity: 0, y: -4 }}
-                    transition={{ duration: 0.55, ease: "easeOut" }}
-                  >
-                    <IntroBrandMedia />
-                    {streamingText && (
-                      <InterviewerText content={streamingText} cursor textLayout={streamingLayout} />
-                    )}
-                  </motion.div>
-                ) : isPreStreaming ? (
-                  <motion.div
-                    key="pre-stream-dots"
+                    key="pre-stream-loading"
                     className="flex flex-col items-start"
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
                     transition={{ duration: 0.18 }}
                   >
-                    <span className="inline-flex gap-[4px] translate-y-[2px] py-2">
-                      {[0, 1, 2].map(i => (
-                        <span
-                          key={i}
-                          className="inline-block size-[6px] rounded-full bg-foreground/40"
-                          style={{ animation: `pulse 1.1s ease-in-out ${i * 0.18}s infinite` }}
-                        />
-                      ))}
-                    </span>
+                    <AnimatePresence mode="wait">
+                      {preStreamPhrase ? (
+                        <motion.p
+                          key={preStreamPhrase}
+                          initial={{ opacity: 0, y: 3 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -3 }}
+                          transition={{ duration: 0.2, ease: "easeOut" }}
+                          className="py-2 text-sm text-foreground/40"
+                        >
+                          {preStreamPhrase}
+                        </motion.p>
+                      ) : (
+                        <motion.span
+                          key="dots"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.15 }}
+                          className="inline-flex gap-[4px] translate-y-[2px] py-2"
+                        >
+                          {[0, 1, 2].map(i => (
+                            <span
+                              key={i}
+                              className="inline-block size-[6px] rounded-full bg-foreground/40"
+                              style={{ animation: `pulse 1.1s ease-in-out ${i * 0.18}s infinite` }}
+                            />
+                          ))}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
                 ) : streamingText ? (
                   <motion.div
@@ -703,8 +773,8 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
             {hasFloatingInput && (
             <div
               className={cn(
-                "pointer-events-none fixed inset-x-0 bottom-0 z-40 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 sm:absolute",
-                isProfileInput ? "px-0" : "px-5 sm:px-6",
+                "pointer-events-none fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-white via-white to-transparent pb-[max(1rem,env(safe-area-inset-bottom))] pt-10 sm:absolute",
+                isProfileInput ? "px-0 sm:px-5 sm:pb-4" : "px-5 sm:px-6",
               )}
             >
             <div className="pointer-events-auto">
@@ -873,12 +943,52 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                     <CTAButton onClick={() => {
                       setSubmitted(true);
                       setMessages(prev => [...prev, { id: newId(), role: "candidate" as const, content: "Submit interview" }]);
+                      streamMessage(
+                        "Your interview has been submitted — great work!\n\nBefore you go, we have a couple of optional questions to help us with diversity and inclusion. All answers are voluntary.",
+                        () => setPostPhase("demographic"),
+                      );
                     }}>
                       Submit interview
                     </CTAButton>
                   </div>
                 )}
-                {submitted && (
+                {submitted && !isStreaming && postPhase === "demographic" && (
+                  <div className="animate-fade-up shrink-0">
+                    <DemographicForm onSubmit={(answers) => {
+                      const filled = Object.values(answers).filter(Boolean);
+                      setMessages(prev => [...prev, {
+                        id: newId(),
+                        role: "candidate" as const,
+                        content: filled.length ? filled.join(" · ") : "Skipped",
+                      }]);
+                      streamMessage(
+                        "Thank you! Last thing — how was your experience with this interview today?",
+                        () => setPostPhase("feedback"),
+                      );
+                    }} />
+                  </div>
+                )}
+                {submitted && !isStreaming && postPhase === "feedback" && (
+                  <div className="animate-fade-up shrink-0">
+                    <FeedbackWidget
+                      onSubmit={(rating, comment) => {
+                        const content = `${"★".repeat(rating)}${"☆".repeat(5 - rating)}${comment ? ` — ${comment}` : ""}`;
+                        setMessages(prev => [...prev, { id: newId(), role: "candidate" as const, content }]);
+                        streamMessage(
+                          "All done — thank you so much for your time. We'll be in touch soon!",
+                          () => setPostPhase("done"),
+                        );
+                      }}
+                      onSkip={() => {
+                        streamMessage(
+                          "All done — thank you so much for your time. We'll be in touch soon!",
+                          () => setPostPhase("done"),
+                        );
+                      }}
+                    />
+                  </div>
+                )}
+                {submitted && !isStreaming && postPhase === "done" && (
                   <div className="animate-fade-up shrink-0">
                     <CTAButton onClick={onComplete}>View your insights report</CTAButton>
                   </div>
@@ -912,7 +1022,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: 40, opacity: 0 }}
                       transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.8 }}
-                      className="relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-[28px] bg-white mx-3 mb-3 sm:mx-0 sm:mb-0 sm:max-h-[80vh] sm:max-w-3xl"
+                      className="relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-[28px] bg-white mx-3 mb-3 sm:mx-0 sm:mb-0 sm:max-h-[80vh] sm:max-w-4xl"
                     >
                       {/* Review header */}
                       <div className="shrink-0 flex items-center gap-3 border-b border-[#f0f0f0] bg-[#fafaf8] px-4 py-4 sm:px-6">
@@ -929,7 +1039,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                           let cCount = 0;
                           for (let i = 0; i < messages.length; i++) {
                             const m = messages[i];
-                            if (m.role === "candidate" && m.variant !== "next") {
+                            if (m.role === "candidate" && m.variant !== "next" && m.id !== profileAcceptedMessageId) {
                               let question = "";
                               for (let j = i - 1; j >= 0; j--) {
                                 if (messages[j].role === "interviewer") { question = messages[j].content; break; }
@@ -937,7 +1047,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                               const step = mockInterview[cCount];
                               pairs.push({ question, answer: m, stepType: step?.type });
                               cCount++;
-                            } else if (m.role === "candidate" && m.variant === "next") {
+                            } else if (m.role === "candidate" && (m.variant === "next" || m.id === profileAcceptedMessageId)) {
                               cCount++;
                             }
                           }

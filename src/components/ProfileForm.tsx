@@ -256,7 +256,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
         layout
         transition={{ duration: 0.22, ease: "easeInOut" }}
         className={cn(
-          "relative mx-4 mb-4 rounded-[16px] border border-[#e5e5e5] bg-white",
+          "relative mx-4 mb-4 rounded-[16px] bg-white",
           (locationOpen || countryCodeOpen) ? "overflow-visible" : "overflow-hidden",
         )}
       >

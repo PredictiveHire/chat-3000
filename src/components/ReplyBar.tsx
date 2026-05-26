@@ -188,7 +188,7 @@ export function ReplyBar({
     <div className={cn(
       "flex flex-col",
       !expanded && "animate-fade-up",
-      expanded ? "fixed inset-x-0 bottom-0 top-[76px] z-[300] bg-background/80 backdrop-blur-md p-4 sm:inset-0" : "w-full"
+      expanded ? "fixed inset-0 z-[300] bg-background/80 backdrop-blur-md p-4" : "w-full"
     )}>
       <form onSubmit={onSubmit} className={cn("flex flex-col", expanded && "h-full")}>
         <div className={cn(
@@ -214,9 +214,9 @@ export function ReplyBar({
 
           <div className={cn(
             "flex items-center",
-            expanded ? "justify-end p-3" : "justify-between px-3 pb-2 pt-1"
+            expanded ? "justify-between p-3" : "justify-between px-3 pb-2 pt-1"
           )}>
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
               <Button
                 type="button"
                 variant="ghost"
@@ -227,6 +227,7 @@ export function ReplyBar({
               >
                 <List className="size-4" />
               </Button>
+              {expanded && <WordCount text={text} min={50} />}
             </div>
             <Button
               type="submit"
@@ -291,6 +292,11 @@ export function ReplyBar({
           </p>
           <WordCount text={text} min={50} />
         </div>
+      )}
+      {expanded && (
+        <p className="mt-2 text-xs text-muted-foreground px-1">
+          We encourage a minimum of 50 words so we can better evaluate your experience
+        </p>
       )}
     </div>
   );

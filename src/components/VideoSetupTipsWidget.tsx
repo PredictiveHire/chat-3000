@@ -1,9 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Clock, RotateCcw, Wifi, UserCheck } from "lucide-react";
+import { Clock, RotateCcw, Wifi, UserCheck, Star } from "lucide-react";
 
 const tips = [
+  {
+    icon: Star,
+    title: "Use the STAR method",
+    body: "Structure your answers as Situation, Task, Action, Result — it helps tell a clear, compelling story.",
+  },
   {
     icon: Clock,
     title: "Recording time",
