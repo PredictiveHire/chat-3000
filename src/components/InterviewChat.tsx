@@ -28,12 +28,18 @@ const LOADING_PHRASE_MS = 1100;
 
 function getLoadingPhrases(widget?: MessageWidget, stepType?: QuestionType): string[] {
   if (stepType === "video-setup") {
-    return ["Reading your response…", "Thinking about that…", "Getting your video ready…"];
+    return ["Reading your response…", "Almost there…", "Getting your camera setup ready…"];
   }
   if (stepType === "video" || widget === "video-question") {
-    return ["Reading your response…", "Thinking about that…", "Preparing your video question…"];
+    return ["Reading your response…", "Reviewing that…", "Preparing your video question…"];
   }
-  return ["Reading your response…", "Thinking about that…", "Picking the next question…"];
+  if (stepType === "mcq") {
+    return ["Reading your response…", "Thinking about that…", "Preparing a quick question…"];
+  }
+  if (widget === "question-format" || widget === "company-intro-video") {
+    return ["Got it…", "Setting things up…"];
+  }
+  return ["Reading your response…", "Thinking about that…", "Generating the next question…"];
 }
 
 function InterviewerText({ content, cursor, textLayout = "heading-last", plain }: {
@@ -88,20 +94,30 @@ function InterviewerText({ content, cursor, textLayout = "heading-last", plain }
   );
 }
 
+const LINE_HEIGHT_PX = 20; // text-sm leading-relaxed ≈ 20 px
+const MAX_LINES = 8;
+const MAX_HEIGHT_PX = LINE_HEIGHT_PX * MAX_LINES;
+
 function CandidateTextBubble({ content, isNextVariant }: { content: string; isNextVariant: boolean }) {
   const [isMultiline, setIsMultiline] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const bubbleRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
-    if (!bubbleRef.current) return;
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setIsMultiline(entry.contentRect.height > 24);
-      }
+    const el = bubbleRef.current;
+    const txt = textRef.current;
+    if (!el || !txt) return;
+    const observer = new ResizeObserver(() => {
+      setIsMultiline(el.getBoundingClientRect().height > 24);
+      setOverflows(txt.scrollHeight > MAX_HEIGHT_PX);
     });
-    observer.observe(bubbleRef.current);
+    observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [content]);
+
+  const collapsed = overflows && !expanded;
 
   return (
     <div
@@ -113,7 +129,26 @@ function CandidateTextBubble({ content, isNextVariant }: { content: string; isNe
           : cn("bg-[#F4F4F4] text-black border border-black/[0.06]", isMultiline ? "rounded-[10px] rounded-tr-sm" : "rounded-full rounded-tr-md")
       )}
     >
-      <p className="whitespace-pre-wrap">{content}</p>
+      <div
+        className="relative overflow-hidden transition-[max-height] duration-300 ease-in-out"
+        style={{ maxHeight: collapsed ? MAX_HEIGHT_PX : (textRef.current?.scrollHeight ?? 9999) }}
+      >
+        <p ref={textRef} className="whitespace-pre-wrap">{content}</p>
+        {collapsed && (
+          <div
+            className="absolute bottom-0 inset-x-0 h-8 pointer-events-none bg-gradient-to-t to-transparent"
+            style={{ backgroundImage: `linear-gradient(to top, ${isNextVariant ? "#d1ead9" : "#F4F4F4"}, transparent)` }}
+          />
+        )}
+      </div>
+      {overflows && (
+        <button
+          onClick={() => setExpanded(v => !v)}
+          className="mt-1.5 text-xs font-medium text-foreground/50 hover:text-foreground/80 transition-colors"
+        >
+          {expanded ? "Show less" : "Show more"}
+        </button>
+      )}
     </div>
   );
 }
@@ -172,12 +207,33 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
   const [isStreaming, setIsStreaming] = useState(false);
   const [isPreStreaming, setIsPreStreaming] = useState(false);
   const [preStreamPhrase, setPreStreamPhrase] = useState<string | null>(null);
+  const [exchangeMinHeight, setExchangeMinHeight] = useState<number | null>(null);
   const streamRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const preStreamTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const isFirstStreamRef = useRef(true);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const msgListRef = useRef<HTMLDivElement>(null);
+  const outerScrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    const msgList = msgListRef.current;
+    if (msgList && getComputedStyle(msgList).overflowY === "auto") {
+      msgList.scrollTo({ top: msgList.scrollHeight, behavior });
+    } else {
+      outerScrollRef.current?.scrollTo({ top: outerScrollRef.current.scrollHeight, behavior });
+    }
+  }, []);
+
+  // Returns the visible height of the scrollable chat region.
+  const getScrollContainerHeight = useCallback((): number => {
+    const msgList = msgListRef.current;
+    const outer = outerScrollRef.current;
+    if (msgList && getComputedStyle(msgList).overflowY === "auto") {
+      return msgList.clientHeight;
+    }
+    return outer ? outer.clientHeight : window.innerHeight;
+  }, []);
 
   const copyLink = useCallback(() => {
     navigator.clipboard.writeText(window.location.href).then(() => {
@@ -274,29 +330,25 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [started]);
 
-  // Scroll to bottom after streaming completes (committed message appears, not during streaming)
-  useEffect(() => {
-    if (isStreaming || isPreStreaming) return;
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages, isStreaming, isPreStreaming]);
 
-  // Follow streaming text as it generates word-by-word
-  useEffect(() => {
-    if (streamingText) {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-    }
-  }, [streamingText]);
-
-  // When pre-streaming starts, scroll the last candidate bubble to the top of the viewport
-  // so the AI response generates visibly below it
+  // When pre-streaming starts: if there is at least one candidate bubble (not the very
+  // first AI message), lock in a min-height equal to the visible chat area so that after
+  // streaming ends a short response stays anchored at the top rather than being pushed
+  // down by scroll clamping. We never explicitly clear exchangeMinHeight — the empty
+  // streaming zone keeps its height between exchanges, and the value is overwritten at the
+  // start of the next exchange.
   useEffect(() => {
     if (!isPreStreaming) return;
     const msgList = msgListRef.current;
-    if (!msgList) return;
-    const candidates = msgList.querySelectorAll('[data-role="candidate"]');
-    const last = candidates[candidates.length - 1] as HTMLElement | undefined;
-    last?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [isPreStreaming]);
+    const candidates = msgList?.querySelectorAll('[data-role="candidate"]');
+    if (!candidates?.length) return; // first AI message — no candidate to anchor yet
+    setExchangeMinHeight(getScrollContainerHeight());
+    const t = setTimeout(() => {
+      const last = candidates[candidates.length - 1] as HTMLElement;
+      last.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
+    return () => clearTimeout(t);
+  }, [isPreStreaming, getScrollContainerHeight]);
 
   // Close help dropdown on outside click
   useEffect(() => {
@@ -446,11 +498,17 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
       (submitted && postPhase === "done" && !isStreaming));
 
   const floatingInputPad = (() => {
-    if (!hasFloatingInput) return "";
+    const isGenerating = isStreaming || isPreStreaming;
+    if (!hasFloatingInput && !isGenerating) return "";
     if (submitted && postPhase === "demographic") return "pb-[36rem]";
     if (submitted && postPhase === "feedback") return "pb-[28rem]";
     if (submitted && postPhase === "done") return "pb-28";
-    const type = editingMessageId ? editingActiveType : activeType;
+    // During streaming stepIndex hasn't advanced yet, so peek at the next step's input type.
+    const type = editingMessageId
+      ? editingActiveType
+      : isGenerating
+        ? (mockInterview[stepIndex + 1]?.type ?? activeType)
+        : activeType;
     if (type === "profile") return "pb-[26rem]";
     if (type === "mcq" || type === "dropdown") return "pb-72";
     if (type === "text" || type === "phone") return "pb-44";
@@ -462,7 +520,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
     (inputReady && activeType === "profile");
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto bg-white sm:bg-white">
+    <div ref={outerScrollRef} className="flex h-dvh sm:h-full flex-col overflow-y-auto bg-white sm:bg-white">
 
       {/* Mobile header */}
       <motion.div
@@ -636,7 +694,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                     initial={{ y: 32, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ type: "spring", stiffness: 480, damping: 30, mass: 0.8 }}
-                    className="group flex flex-col items-end"
+                    className="group flex flex-col items-end scroll-mt-20"
                   >
                     <div className={cn("flex flex-col items-end gap-1", m.id === profileAcceptedMessageId && "w-full")}>
                       {m.videoUrl ? (
@@ -691,6 +749,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
               })}
               </AnimatePresence>
 
+              <div style={{ minHeight: exchangeMinHeight ?? undefined }}>
               <AnimatePresence mode="wait">
                 {/* Pre-stream loading indicator */}
                 {isPreStreaming ? (
@@ -737,8 +796,9 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                 ) : streamingText ? (
                   <motion.div
                     key="streaming-text"
+                    data-streaming="true"
                     className="flex flex-col items-start"
-                    initial={{ opacity: 0 }}
+initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.15 }}
                   >
@@ -767,6 +827,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                   </motion.div>
                 ) : null}
               </AnimatePresence>
+              </div>
 
               <div ref={bottomRef} />
             </div>
@@ -1061,9 +1122,14 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                                 {/* Card header: question */}
                                 <div className="flex items-start justify-between gap-3 px-4 pt-4 pb-3">
                                   <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                                    <p className="text-[10px] font-semibold uppercase tracking-widest text-foreground/25">
-                                      {isProfileAnswer ? "Your details" : `Question ${idx + 1}`}
-                                    </p>
+                                    <div className="flex items-center gap-1.5">
+                                      {isProfileAnswer && (
+                                        <img src="/details-icon.png" alt="" className="size-4 rounded-full" />
+                                      )}
+                                      <p className="text-[10px] font-semibold uppercase tracking-widest text-foreground/25">
+                                        {isProfileAnswer ? "Your details" : `Question ${idx + 1}`}
+                                      </p>
+                                    </div>
                                     <div className="border-l-2 border-[#30814C] pl-3">
                                       <p className="text-sm font-medium leading-snug text-foreground/70">
                                         {questionLabel}

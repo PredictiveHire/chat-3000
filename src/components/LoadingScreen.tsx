@@ -36,7 +36,7 @@ export function LoadingScreen({ name }: LoadingScreenProps) {
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="mb-6 w-full max-w-xs overflow-hidden rounded-2xl"
+        className="mb-6 w-full max-w-sm overflow-hidden rounded-2xl"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
