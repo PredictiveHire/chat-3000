@@ -274,12 +274,13 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [started]);
 
-  // Scroll to bottom when committed messages update
+  // Scroll to bottom after streaming completes (committed message appears, not during streaming)
   useEffect(() => {
+    if (isStreaming || isPreStreaming) return;
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages]);
+  }, [messages, isStreaming, isPreStreaming]);
 
-  // Follow streaming text as it generates
+  // Follow streaming text as it generates word-by-word
   useEffect(() => {
     if (streamingText) {
       bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -287,6 +288,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
   }, [streamingText]);
 
   // When pre-streaming starts, scroll the last candidate bubble to the top of the viewport
+  // so the AI response generates visibly below it
   useEffect(() => {
     if (!isPreStreaming) return;
     const msgList = msgListRef.current;
