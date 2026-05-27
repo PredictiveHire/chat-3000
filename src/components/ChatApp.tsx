@@ -6,9 +6,21 @@ import { InterviewChat } from "@/components/InterviewChat";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { PostInterviewPage } from "@/components/PostInterviewPage";
 import { ReportPage } from "@/components/ReportPage";
+import { BrandSelector } from "@/components/BrandSelector";
 import { CANDIDATE_NAME } from "@/lib/mockData";
 
-type View = "loading" | "interview" | "post" | "report";
+type View = "brand-select" | "loading" | "interview" | "post" | "report";
+
+type BrandConfig = {
+  id: string;
+  color: string;
+  image: string;
+};
+
+const BRAND_CONFIGS: Record<string, BrandConfig> = {
+  woolworths: { id: "woolworths", color: "#30814C", image: "/woolworths-team.png" },
+  qantas:     { id: "qantas",     color: "#F63200", image: "/qantas-team.png" },
+};
 
 // Progress bar fills over 4s, then holds ~1.5s before this fires and fades out
 const LOADING_DURATION = 5500;
@@ -23,13 +35,15 @@ const transition = { duration: 0.25 };
 const loadingTransition = { duration: 0.7 };
 
 export function ChatApp() {
-  const [view, setView] = useState<View>("loading");
+  const [view, setView] = useState<View>("brand-select");
   const [chatStarted, setChatStarted] = useState(false);
+  const [brand, setBrand] = useState<BrandConfig>(BRAND_CONFIGS.woolworths);
 
-  useEffect(() => {
-    const t = setTimeout(() => setView("interview"), LOADING_DURATION);
-    return () => clearTimeout(t);
-  }, []);
+  const startLoading = (brandId: string) => {
+    setBrand(BRAND_CONFIGS[brandId] ?? BRAND_CONFIGS.woolworths);
+    setView("loading");
+    setTimeout(() => setView("interview"), LOADING_DURATION);
+  };
 
   return (
     <div className="relative h-full">
@@ -37,6 +51,20 @@ export function ChatApp() {
       <div className={view === "interview" || view === "post" || view === "report" ? "h-full" : "hidden"}>
         <InterviewChat onComplete={() => setView("report")} started={chatStarted} />
       </div>
+
+      {/* Brand selector — shown before loading */}
+      <AnimatePresence>
+        {view === "brand-select" && (
+          <motion.div
+            key="brand-select"
+            className="absolute inset-0 z-50"
+            {...fadeVariants}
+            transition={transition}
+          >
+            <BrandSelector onSelect={(brandId) => startLoading(brandId)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* onExitComplete fires only when the fade-out is fully done — perfect moment to start streaming */}
       <AnimatePresence onExitComplete={() => setChatStarted(true)}>
@@ -47,7 +75,7 @@ export function ChatApp() {
             {...fadeVariants}
             transition={loadingTransition}
           >
-            <LoadingScreen name={CANDIDATE_NAME} />
+            <LoadingScreen name={CANDIDATE_NAME} image={brand.image} accentColor={brand.color} />
           </motion.div>
         )}
       </AnimatePresence>

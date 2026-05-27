@@ -74,7 +74,6 @@ export const mockInterview: InterviewStep[] = [
     id: "growth",
     type: "text",
     messages: [
-      "That's a really strong example, thanks for walking me through it.",
       "What's an area you're actively trying to level up in right now — technically or otherwise? Even a short phrase works.",
     ],
     widget: "text-question",
@@ -91,7 +90,6 @@ export const mockInterview: InterviewStep[] = [
     id: "video-q1",
     type: "video",
     messages: [
-      "You're all set! Here's your first video question.",
       "Tell us about a project you're most proud of and what made it successful.",
     ],
     widget: "video-question",
@@ -100,9 +98,16 @@ export const mockInterview: InterviewStep[] = [
     id: "experience",
     type: "mcq",
     messages: [
-      "Almost done! Just one last quick question.",
       "How many years of professional engineering experience do you have?",
     ],
     options: ["0–1 years", "2–4 years", "5–9 years", "10+ years"],
+  },
+  {
+    id: "availability",
+    type: "multi-select",
+    messages: [
+      "Which days are you available to work? Select all that apply.",
+    ],
+    options: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
   },
 ];

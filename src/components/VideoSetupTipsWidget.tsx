@@ -41,8 +41,8 @@ export function VideoSetupTipsWidget() {
               <Icon className="size-4 text-[#30814C]" />
             </div>
             <div className="flex flex-col gap-0.5">
-              <p className="text-sm font-semibold text-foreground">{title}</p>
-              <p className="text-sm leading-relaxed text-foreground/60">{body}</p>
+              <p className="text-base font-medium text-foreground">{title}</p>
+              <p className="text-base leading-relaxed text-foreground/60">{body}</p>
             </div>
           </div>
         ))}

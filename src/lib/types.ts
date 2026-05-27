@@ -1,4 +1,4 @@
-export type QuestionType = "text" | "mcq" | "dropdown" | "phone" | "next" | "profile" | "video-setup" | "video";
+export type QuestionType = "text" | "mcq" | "multi-select" | "dropdown" | "phone" | "next" | "profile" | "video-setup" | "video";
 export type MessageWidget = "question-format" | "text-question" | "video-question" | "company-intro-video" | "resume-link" | "video-setup-tips";
 
 export type TextLayout = "heading-first" | "heading-last";

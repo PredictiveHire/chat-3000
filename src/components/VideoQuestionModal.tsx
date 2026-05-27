@@ -78,16 +78,25 @@ export function VideoQuestionModal({
               )}
               <p className="text-base font-semibold leading-snug text-foreground">{question}</p>
             </div>
-            {onClose && (
+            <div className="flex shrink-0 items-center gap-2">
               <button
                 type="button"
-                onClick={onClose}
-                className="flex size-8 shrink-0 items-center justify-center rounded-full text-foreground/40 transition-colors hover:bg-black/5 hover:text-foreground"
-                aria-label="Minimise"
+                onClick={() => onSubmit("__video_submitted__")}
+                className="rounded-full border border-[#e5e5e5] px-3 py-1 text-xs font-medium text-foreground/40 transition-colors hover:border-foreground/20 hover:text-foreground/70"
               >
-                <Minus className="size-4" />
+                Skip
               </button>
-            )}
+              {onClose && (
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex size-8 shrink-0 items-center justify-center rounded-full text-foreground/40 transition-colors hover:bg-black/5 hover:text-foreground"
+                  aria-label="Minimise"
+                >
+                  <Minus className="size-4" />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Mobile header */}
@@ -101,6 +110,14 @@ export function VideoQuestionModal({
                     : "Video response"}
                 </span>
               </div>
+              <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => onSubmit("__video_submitted__")}
+                className="rounded-full border border-[#e5e5e5] bg-white px-3 py-1 text-xs font-medium text-foreground/40 transition-colors active:bg-black/5"
+              >
+                Skip
+              </button>
               {onClose && (
                 <button
                   onClick={onClose}
@@ -111,6 +128,7 @@ export function VideoQuestionModal({
                   <span className="text-xs font-semibold text-[#888]">Minimise</span>
                 </button>
               )}
+              </div>
             </div>
             <p className="text-[19px] font-bold leading-[1.4] tracking-[-0.025em] text-[#111]">
               {question}

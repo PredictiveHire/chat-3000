@@ -225,7 +225,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
       )}
     >
       {/* ── Header ── */}
-      <motion.div layout transition={{ duration: 0.22, ease: "easeInOut" }} className="relative">
+      <motion.div layout transition={{ duration: 0.22, ease: "easeInOut" }} className="relative overflow-visible">
         <AnimatePresence mode="wait" custom={dir}>
           <motion.div
             key={`header-${step}`}
@@ -246,7 +246,12 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                 <ArrowLeft className="size-4" />
               </button>
             )}
-            <p className="text-sm font-semibold text-[#373737]">{headerLabel[step]}</p>
+            <div className="flex items-center gap-1.5">
+              {step === 1 && (
+                <img src="/details-icon.png" alt="" className="size-5" />
+              )}
+              <p className="text-sm font-semibold text-[#373737]">{headerLabel[step]}</p>
+            </div>
           </motion.div>
         </AnimatePresence>
       </motion.div>
@@ -455,25 +460,27 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
           {/* ── Step 4: Review ── */}
           {step === 4 && (
             <motion.div key="s4" custom={dir} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.22, ease: "easeInOut" }} className="w-full">
-              <div className="flex flex-col divide-y divide-[#f0f0f0] px-4 pt-3">
-                {[
-                  { label: "Name",     value: name },
-                  { label: "Email",    value: email },
-                  { label: "Location", value: location },
-                  ...(smsConsent && phone
-                    ? [{ label: "Phone", value: `${countryCode} ${phone}` }]
-                    : []),
-                ].map(({ label, value }) => (
-                  <div key={label} className="flex items-center justify-between py-2.5">
-                    <span className="text-xs font-medium text-muted-foreground">{label}</span>
-                    <span className="max-w-[60%] truncate text-right text-sm font-medium text-foreground">{value}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="px-4 pt-3 pb-1">
-                <p className="text-xs leading-snug text-foreground/60">
-                  Please review your details carefully — this cannot be modified once you proceed.
+              <div className="px-4 pt-3 pb-2">
+                <p className="text-xs font-medium text-foreground/50">
+                  Please review your details carefully
                 </p>
+              </div>
+              <div className="mx-4 overflow-hidden rounded-xl border border-[#e5e5e5]">
+                <div className="flex flex-col divide-y divide-[#f0f0f0]">
+                  {[
+                    { label: "name",     value: name },
+                    { label: "email",    value: email },
+                    { label: "location", value: location },
+                    ...(smsConsent && phone
+                      ? [{ label: "phone", value: `${countryCode} ${phone}` }]
+                      : []),
+                  ].map(({ label, value }) => (
+                    <div key={label} className="flex items-center justify-between px-3 py-2.5">
+                      <span className="text-xs font-medium text-muted-foreground">{label}</span>
+                      <span className="max-w-[60%] truncate text-right text-sm font-medium text-foreground">{value}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
               <div className="px-4 pb-3 pt-3">
                 <CTAButton onClick={handleSubmit} disabled={submitted}>Accept</CTAButton>

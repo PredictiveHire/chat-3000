@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { DropdownQuestion } from "@/components/DropdownQuestion";
 import { MCQQuestion } from "@/components/MCQQuestion";
+import { MultiSelectQuestion } from "@/components/MultiSelectQuestion";
 import { MobileNumberQuestion } from "@/components/MobileNumberQuestion";
 import { ProfileForm } from "@/components/ProfileForm";
 import { ReplyBar } from "@/components/ReplyBar";
@@ -206,6 +207,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
   const [streamingWidget, setStreamingWidget] = useState<MessageWidget | undefined>(undefined);
   const [isStreaming, setIsStreaming] = useState(false);
   const [isPreStreaming, setIsPreStreaming] = useState(false);
+  const [inputVisible, setInputVisible] = useState(false);
   const [preStreamPhrase, setPreStreamPhrase] = useState<string | null>(null);
   const [exchangeMinHeight, setExchangeMinHeight] = useState<number | null>(null);
   const streamRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -350,6 +352,18 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
     return () => clearTimeout(t);
   }, [isPreStreaming, getScrollContainerHeight]);
 
+  // Delay showing inputs until after streaming + any widget animations finish
+  useEffect(() => {
+    if (isStreaming || isPreStreaming) {
+      setInputVisible(false);
+      return;
+    }
+    const lastMsg = messages[messages.length - 1];
+    const delay = lastMsg?.widget ? 1050 : 400;
+    const t = setTimeout(() => setInputVisible(true), delay);
+    return () => clearTimeout(t);
+  }, [isStreaming, isPreStreaming, messages]);
+
   // Close help dropdown on outside click
   useEffect(() => {
     if (!helpOpen) return;
@@ -365,7 +379,8 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
   const currentStep = mockInterview[stepIndex];
   const activeType = inputTypeOverride ?? currentStep.type;
   const activeOptions = currentStep.options ?? [];
-  const inputReady = !isStreaming && !complete;
+  const inputReady = !isStreaming && !isPreStreaming && !complete;
+  const inputShown = inputReady && inputVisible;
   const progressCurrent = complete ? total : stepIndex + 1;
 
   // For text-question widget counter
@@ -511,6 +526,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
         : activeType;
     if (type === "profile") return "pb-[26rem]";
     if (type === "mcq" || type === "dropdown") return "pb-72";
+    if (type === "multi-select") return "pb-[26rem]";
     if (type === "text" || type === "phone") return "pb-44";
     return "pb-28";
   })();
@@ -588,6 +604,9 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                 </button>
               </div>
             </motion.div>
+
+            {/* Top fade — negative margin so it overlays the top of the scroll area */}
+            <div className="pointer-events-none hidden sm:block shrink-0 h-8 -mb-8 relative z-10 bg-gradient-to-b from-white to-transparent" />
 
             {/* Message list */}
             <div
@@ -720,7 +739,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                       ) : m.id === profileAcceptedMessageId ? (
                         <div className="flex w-full flex-col items-end gap-1.5">
                           {(() => {
-                            const labels = ["Name", "Email", "Location", "Phone"];
+                            const labels = ["name", "email", "location", "phone"];
                             return m.content.split(" · ").map((detail, i) => (
                               <div key={i} className="flex max-w-full min-w-0 items-center gap-2.5 rounded-2xl rounded-tr-sm border border-black/[0.06] bg-[#F4F4F4] px-4 py-2.5">
                                 <span className="shrink-0 text-[11px] font-semibold uppercase tracking-wider text-foreground/30">{labels[i] ?? ""}</span>
@@ -917,12 +936,12 @@ initial={{ opacity: 0 }}
               </div>
             ) : (
               <>
-                {inputReady && activeType === "next" && (
+                {inputShown && activeType === "next" && (
                   <div className="animate-fade-up shrink-0">
                     <CTAButton onClick={() => advance("__next__")}>Next</CTAButton>
                   </div>
                 )}
-                {inputReady && activeType === "profile" && (
+                {inputShown && activeType === "profile" && (
                   <div className="animate-fade-up-delayed shrink-0">
                     <ProfileForm
                       edgeToEdge
@@ -954,7 +973,7 @@ initial={{ opacity: 0 }}
                     />
                   </div>
                 )}
-                {inputReady && activeType === "mcq" && (
+                {inputShown && activeType === "mcq" && (
                   <div className="animate-fade-up shrink-0">
                     <MCQQuestion
                       question={currentStep.messages[currentStep.messages.length - 1]}
@@ -963,7 +982,15 @@ initial={{ opacity: 0 }}
                     />
                   </div>
                 )}
-                {inputReady && activeType === "dropdown" && (
+                {inputShown && activeType === "multi-select" && (
+                  <div className="animate-fade-up shrink-0">
+                    <MultiSelectQuestion
+                      options={activeOptions.length ? activeOptions : ["Option A", "Option B", "Option C"]}
+                      onConfirm={(values) => advance(values.join(", "))}
+                    />
+                  </div>
+                )}
+                {inputShown && activeType === "dropdown" && (
                   <div className="animate-fade-up">
                     <DropdownQuestion
                       key={`${currentStep.id}-${activeType}`}
@@ -972,15 +999,15 @@ initial={{ opacity: 0 }}
                     />
                   </div>
                 )}
-                {inputReady && activeType === "text" && (
+                {inputShown && activeType === "text" && (
                   <ReplyBar onSend={advance} />
                 )}
-                {inputReady && activeType === "phone" && (
+                {inputShown && activeType === "phone" && (
                   <div className="animate-fade-up">
                     <MobileNumberQuestion onConfirm={advance} />
                   </div>
                 )}
-                {inputReady && activeType === "video-setup" && (
+                {inputShown && activeType === "video-setup" && (
                   <div className="animate-fade-up shrink-0 flex flex-col gap-2">
                     <CTAButton onClick={() => setCameraModalOpen(true)}>
                       Test microphone and camera
@@ -990,24 +1017,24 @@ initial={{ opacity: 0 }}
                     </CTAButton>
                   </div>
                 )}
-                {inputReady && activeType === "video" && (
+                {inputShown && activeType === "video" && (
                   <div className="animate-fade-up shrink-0">
                     <CTAButton onClick={() => setVideoModalOpen(true)}>Record your answer</CTAButton>
                   </div>
                 )}
-                {complete && !isStreaming && !submitted && !reviewDone && (
+                {complete && !isStreaming && inputVisible && !submitted && !reviewDone && (
                   <div className="animate-fade-up shrink-0">
                     <CTAButton onClick={() => setReviewMode(true)}>Review responses</CTAButton>
                   </div>
                 )}
-                {complete && !isStreaming && !submitted && reviewDone && (
+                {complete && !isStreaming && inputVisible && !submitted && reviewDone && (
                   <div className="animate-fade-up shrink-0 flex flex-col gap-2">
                     <CTAButton variant="secondary" onClick={() => setReviewMode(true)}>Review responses</CTAButton>
                     <CTAButton onClick={() => {
                       setSubmitted(true);
                       setMessages(prev => [...prev, { id: newId(), role: "candidate" as const, content: "Submit interview" }]);
                       streamMessage(
-                        "Your interview has been submitted — great work!\n\nBefore you go, we have a couple of optional questions to help us with diversity and inclusion. All answers are voluntary.",
+                        "Thank you! Your interview has been successfully submitted. We'll send a personality insights report to your inbox so you can learn a bit about yourself too.\n\nBefore you go, we have a couple of optional questions to help us with diversity and inclusion. All answers are voluntary.",
                         () => setPostPhase("demographic"),
                       );
                     }}>
@@ -1015,7 +1042,7 @@ initial={{ opacity: 0 }}
                     </CTAButton>
                   </div>
                 )}
-                {submitted && !isStreaming && postPhase === "demographic" && (
+                {submitted && !isStreaming && inputVisible && postPhase === "demographic" && (
                   <div className="animate-fade-up shrink-0">
                     <DemographicForm onSubmit={(answers) => {
                       const filled = Object.values(answers).filter(Boolean);
@@ -1031,29 +1058,29 @@ initial={{ opacity: 0 }}
                     }} />
                   </div>
                 )}
-                {submitted && !isStreaming && postPhase === "feedback" && (
+                {submitted && !isStreaming && inputVisible && postPhase === "feedback" && (
                   <div className="animate-fade-up shrink-0">
                     <FeedbackWidget
                       onSubmit={(rating, comment) => {
                         const content = `${"★".repeat(rating)}${"☆".repeat(5 - rating)}${comment ? ` — ${comment}` : ""}`;
                         setMessages(prev => [...prev, { id: newId(), role: "candidate" as const, content }]);
                         streamMessage(
-                          "All done — thank you so much for your time. We'll be in touch soon!",
+                          "Thank you so much for your responses — we really appreciate you taking the time!\n\nBefore you go, you now have the opportunity to ask us anything about Woolworths, our culture, or the hiring process. We'd love to answer your questions.",
                           () => setPostPhase("done"),
                         );
                       }}
                       onSkip={() => {
                         streamMessage(
-                          "All done — thank you so much for your time. We'll be in touch soon!",
+                          "Thank you so much for your responses — we really appreciate you taking the time!\n\nBefore you go, you now have the opportunity to ask us anything about Woolworths, our culture, or the hiring process. We'd love to answer your questions.",
                           () => setPostPhase("done"),
                         );
                       }}
                     />
                   </div>
                 )}
-                {submitted && !isStreaming && postPhase === "done" && (
+                {submitted && !isStreaming && inputVisible && postPhase === "done" && (
                   <div className="animate-fade-up shrink-0">
-                    <CTAButton onClick={onComplete}>View your insights report</CTAButton>
+                    <CTAButton onClick={onComplete}>Ask Woolworths questions!</CTAButton>
                   </div>
                 )}
               </>
@@ -1169,7 +1196,7 @@ initial={{ opacity: 0 }}
 
                       {/* Review footer */}
                       <div className="shrink-0 border-t border-border bg-white px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3 sm:px-6 sm:pb-5 sm:pt-4">
-                        <CTAButton onClick={() => { setReviewMode(false); setReviewDone(true); }}>Done</CTAButton>
+                        <CTAButton onClick={() => { setReviewMode(false); setReviewDone(true); }}>Submit</CTAButton>
                       </div>
                     </motion.div>
                   </div>
