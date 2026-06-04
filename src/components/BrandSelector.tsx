@@ -38,10 +38,10 @@ const brands: Brand[] = [
     id: "sephora",
     name: "Sephora",
     role: "Beauty Advisor",
-    color: "#000000",
+    color: "#DD0032",
     textColor: "#fff",
-    bg: "#f0f0f0",
-    available: false,
+    bg: "#fde8ec",
+    available: true,
     initial: "S",
   },
   {

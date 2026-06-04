@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, X } from "lucide-react";
 import { VideoQuestion } from "@/components/VideoQuestion";
+import { useBrand } from "@/lib/BrandContext";
 
 type VideoQuestionModalProps = {
   open: boolean;
@@ -26,6 +27,7 @@ export function VideoQuestionModal({
   onSubmit,
   onClose,
 }: VideoQuestionModalProps) {
+  const { accent } = useBrand();
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
@@ -59,7 +61,7 @@ export function VideoQuestionModal({
         aria-hidden={!open}
       >
         <motion.div
-          className="pointer-events-auto flex h-full w-full flex-col bg-[#F7F7F5] sm:h-auto sm:max-w-3xl sm:overflow-hidden sm:rounded-[28px] sm:bg-background"
+          className="pointer-events-auto flex h-full w-full flex-col bg-[#F7F7F5] sm:h-auto sm:max-w-3xl sm:overflow-hidden sm:rounded-[28px] sm:bg-background sm:shadow-[0_18px_60px_rgba(15,23,42,0.12),0_2px_8px_rgba(15,23,42,0.08)]"
           initial={false}
           animate={{
             opacity: open ? 1 : 0,
@@ -73,7 +75,7 @@ export function VideoQuestionModal({
             <div className="min-w-0 flex-1 pr-3">
               {currentIndex !== undefined && total !== undefined && (
                 <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-foreground/30">
-                  Video · {currentIndex} of {total}
+                  Question {currentIndex} of {total}
                 </p>
               )}
               <p className="text-base font-semibold leading-snug text-foreground">{question}</p>
@@ -103,11 +105,11 @@ export function VideoQuestionModal({
           <div className="flex shrink-0 flex-col gap-3 px-5 pb-4 pt-5 sm:hidden">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <div className="size-2 rounded-full bg-[#30814C]" />
-                <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#30814C]">
+                <div className="size-2 rounded-full" style={{ backgroundColor: accent }} />
+                <span className="text-[11px] font-semibold uppercase tracking-[0.06em]" style={{ color: accent }}>
                   {currentIndex !== undefined && total !== undefined
-                    ? `Video · ${currentIndex} of ${total}`
-                    : "Video response"}
+                    ? `Question ${currentIndex} of ${total}`
+                    : "Question"}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -137,9 +139,6 @@ export function VideoQuestionModal({
 
           {/* VideoQuestion — portrait on mobile, landscape on desktop */}
           <VideoQuestion
-            question={question}
-            currentIndex={currentIndex}
-            total={total}
             initialTriesUsed={initialTriesUsed}
             onTriesUsedChange={onTriesUsedChange}
             onSubmit={onSubmit}

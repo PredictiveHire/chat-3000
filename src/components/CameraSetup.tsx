@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Camera, Mic, CheckCircle2, AlertCircle, RefreshCw, Circle, Square, RotateCcw, Play, Pause, HelpCircle } from "lucide-react";
+import { useBrand } from "@/lib/BrandContext";
 
 type Permission = "idle" | "requesting" | "granted" | "denied";
 type TestStage = "idle" | "recording" | "review";
@@ -20,6 +21,7 @@ function formatTime(s: number) {
 const TEST_MAX = 10; // seconds for test recording
 
 export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
+  const { accent } = useBrand();
   const liveVideoRef = useRef<HTMLVideoElement>(null);
   const reviewVideoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -199,12 +201,12 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
             <div className="flex items-center gap-3 px-4 py-3">
               <Camera className="size-4 shrink-0 text-foreground/40" />
               <p className="flex-1 truncate text-sm text-foreground/70">{cameraLabel}</p>
-              <CheckCircle2 className="size-4 shrink-0 text-green-500" />
+              <CheckCircle2 className="size-4 shrink-0" style={{ color: accent }} />
             </div>
             <div className="flex items-center gap-3 px-4 py-3">
               <Mic className="size-4 shrink-0 text-foreground/40" />
               <p className="flex-1 truncate text-sm text-foreground/70">{micLabel}</p>
-              <CheckCircle2 className="size-4 shrink-0 text-green-500" />
+              <CheckCircle2 className="size-4 shrink-0" style={{ color: accent }} />
             </div>
           </div>
         )}
@@ -220,7 +222,7 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
         )}
 
         {/* Test recording status */}
-        {permission === "granted" && (testStage === "recording" || testStage === "review") && (
+        {permission === "granted" && testStage === "recording" && (
           <div className="border-t border-[#f0f0f0] px-4 py-3 flex flex-col gap-2">
             {testStage === "recording" && (
               <>
@@ -232,46 +234,15 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
                 </div>
                 <div className="h-1 w-full overflow-hidden rounded-full bg-[#f0f0f0]">
                   <div
-                    className={cn("h-full rounded-full transition-all duration-1000 ease-linear", recLeft <= 3 ? "bg-red-400" : "bg-[#30814C]")}
-                    style={{ width: `${recPct}%` }}
+                    className="h-full rounded-full transition-all duration-1000 ease-linear"
+                    style={{ backgroundColor: recLeft <= 3 ? "#f87171" : accent, width: `${recPct}%` }}
                   />
                 </div>
               </>
             )}
-            {testStage === "review" && (
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-foreground/50">Looks good? Play it back above.</p>
-                <button
-                  onClick={retakeTest}
-                  className="flex items-center gap-1.5 text-xs font-medium text-foreground/50 hover:text-foreground transition-colors"
-                >
-                  <RotateCcw className="size-3" />
-                  Retake
-                </button>
-              </div>
-            )}
           </div>
         )}
 
-        {/* Troubleshooting note */}
-        <div className="border-t border-[#f0f0f0] px-4 py-4">
-          <div className="mb-1.5 flex items-center justify-between gap-3">
-            <p className="text-xs font-semibold text-foreground/30">
-              If your microphone and camera are not working
-            </p>
-            <button
-              type="button"
-              onClick={onHelp}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#f6f0f6] px-2.5 py-1 text-xs font-semibold text-foreground/60 transition-[background-color,color,scale] duration-150 ease-out hover:bg-[#f0e4f0] hover:text-foreground active:scale-[0.96]"
-            >
-              <HelpCircle className="size-3" />
-              Help
-            </button>
-          </div>
-          <p className="text-xs leading-relaxed text-foreground/50">
-            Issue may be caused by missing the &quot;Allow&quot; prompt or having restricted device settings. Double-check your system permissions.
-          </p>
-        </div>
       </div>
 
       {/* CTA */}
@@ -290,6 +261,7 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
           >
             Looks good — start video questions
           </button>
+          <HelpTextButton onClick={onHelp} />
         </div>
       ) : (
         <div className="flex flex-col gap-2">
@@ -319,8 +291,22 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
               Continue anyway
             </button>
           )}
+          <HelpTextButton onClick={onHelp} />
         </div>
       )}
     </div>
+  );
+}
+
+function HelpTextButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="mt-1 inline-flex items-center justify-center gap-1.5 self-center text-xs font-medium text-foreground/40 transition-colors hover:text-foreground"
+    >
+      <HelpCircle className="size-3.5" />
+      Help
+    </button>
   );
 }

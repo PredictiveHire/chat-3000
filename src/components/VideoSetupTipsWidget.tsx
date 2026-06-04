@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { RotateCcw, Wifi, UserCheck, Star } from "lucide-react";
+import { useBrand } from "@/lib/BrandContext";
 
 const tips = [
   {
@@ -27,6 +28,7 @@ const tips = [
 ];
 
 export function VideoSetupTipsWidget() {
+  const { accent, accentLight } = useBrand();
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
@@ -37,8 +39,8 @@ export function VideoSetupTipsWidget() {
       <div className="flex flex-col gap-4 rounded-[20px] border border-[#e6e6e6] bg-white p-5">
         {tips.map(({ icon: Icon, title, body }) => (
           <div key={title} className="flex gap-3">
-            <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#d1ead9]">
-              <Icon className="size-4 text-[#30814C]" />
+            <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: accentLight }}>
+              <Icon className="size-4" style={{ color: accent }} />
             </div>
             <div className="flex flex-col gap-0.5">
               <p className="text-base font-medium text-foreground">{title}</p>

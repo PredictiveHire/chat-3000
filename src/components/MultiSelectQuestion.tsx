@@ -3,21 +3,30 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useBrand } from "@/lib/BrandContext";
+
+const PRIVACY_AND_DATA_URL = "https://sapia.ai/privacy-policy/";
 
 type MultiSelectQuestionProps = {
   options: string[];
   onConfirm: (values: string[]) => void;
+  initialValues?: string[];
 };
 
-export function MultiSelectQuestion({ options, onConfirm }: MultiSelectQuestionProps) {
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+export function MultiSelectQuestion({ options, onConfirm, initialValues = [] }: MultiSelectQuestionProps) {
+  const { accent, buttonColor } = useBrand();
+  const [selected, setSelected] = useState<Set<string>>(() => new Set(initialValues));
   const [submitted, setSubmitted] = useState(false);
 
   const toggle = (opt: string) => {
     if (submitted) return;
     setSelected(prev => {
       const next = new Set(prev);
-      next.has(opt) ? next.delete(opt) : next.add(opt);
+      if (next.has(opt)) {
+        next.delete(opt);
+      } else {
+        next.add(opt);
+      }
       return next;
     });
   };
@@ -49,10 +58,10 @@ export function MultiSelectQuestion({ options, onConfirm }: MultiSelectQuestionP
                   submitted && "cursor-not-allowed",
                 )}
               >
-                <div className={cn(
-                  "flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[8px] transition-colors duration-150",
-                  isChosen ? "bg-[#30814C]" : "bg-[#f2f2f2]",
-                )}>
+                <div
+                  className="flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[8px] transition-colors duration-150"
+                  style={{ backgroundColor: isChosen ? accent : "#f2f2f2" }}
+                >
                   {isChosen
                     ? <Check className="size-4 text-white" strokeWidth={2.5} />
                     : <span className="text-xs font-medium text-[#666666]">{i + 1}</span>
@@ -63,6 +72,18 @@ export function MultiSelectQuestion({ options, onConfirm }: MultiSelectQuestionP
             </div>
           );
         })}
+        <div className="mx-5 h-px bg-[#efefef]" />
+        <div className="px-5 py-3">
+          <a
+            href={PRIVACY_AND_DATA_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm font-medium underline underline-offset-2 transition-colors hover:text-foreground"
+            style={{ color: accent }}
+          >
+            Privacy and data
+          </a>
+        </div>
       </div>
 
       <button
@@ -72,9 +93,10 @@ export function MultiSelectQuestion({ options, onConfirm }: MultiSelectQuestionP
         className={cn(
           "w-full rounded-[14px] py-4 text-[15px] font-semibold transition-all duration-150",
           selected.size > 0 && !submitted
-            ? "bg-[#30814C] text-white active:scale-[0.98]"
+            ? "text-white active:scale-[0.98]"
             : "bg-[#f2f2f2] text-[#b0b0b0] cursor-not-allowed",
         )}
+        style={selected.size > 0 && !submitted ? { backgroundColor: buttonColor } : undefined}
       >
         Confirm
       </button>

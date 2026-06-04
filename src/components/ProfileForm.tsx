@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useMemo, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Check, ChevronDown, MessageSquare } from "lucide-react";
+import { ArrowLeft, ChevronDown, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CTAButton } from "@/components/ui/cta-button";
+import { useBrand } from "@/lib/BrandContext";
 
 type ProfileData = {
   name: string;
@@ -49,6 +50,7 @@ const variants = {
 type Step = 1 | 2 | 3 | 4;
 
 export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileFormProps) {
+  const { accent, accentLight } = useBrand();
   // ── Step 1 fields ──────────────────────────────────────────────
   const [name, setName]   = useState(initialValues?.name  ?? "");
   const [email, setEmail] = useState(initialValues?.email ?? "");
@@ -196,9 +198,6 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
     });
   };
 
-  // ── Step label helpers ─────────────────────────────────────────
-  const totalSteps = smsConsent === true ? 4 : 3; // with phone: 4 steps, without: 3
-
   const headerLabel: Record<Step, string> = {
     1: "Your details",
     2: "SMS updates",
@@ -219,8 +218,8 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
       className={cn(
         "w-full bg-white",
         edgeToEdge
-          ? "rounded-t-[20px] rounded-b-2xl shadow-[0_-2px_12px_rgba(0,0,0,0.06)]"
-          : "rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.08)]",
+          ? "rounded-[16px] border border-[#e5e5e5] shadow-[0_8px_24px_rgba(15,23,42,0.04),0_1px_2px_rgba(15,23,42,0.04)]"
+          : "rounded-[20px] border border-[#e5e5e5] shadow-[0_10px_30px_rgba(15,23,42,0.05),0_1px_2px_rgba(15,23,42,0.04)]",
         (locationOpen || countryCodeOpen) ? "overflow-visible" : "overflow-hidden",
       )}
     >
@@ -247,9 +246,6 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
               </button>
             )}
             <div className="flex items-center gap-1.5">
-              {step === 1 && (
-                <img src="/details-icon.png" alt="" className="size-5" />
-              )}
               <p className="text-sm font-semibold text-[#373737]">{headerLabel[step]}</p>
             </div>
           </motion.div>
@@ -261,8 +257,8 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
         layout
         transition={{ duration: 0.22, ease: "easeInOut" }}
         className={cn(
-          "relative mx-4 mb-4 rounded-[16px] bg-white",
-          (locationOpen || countryCodeOpen) ? "overflow-visible" : "overflow-hidden",
+          "relative mx-4 rounded-[16px] bg-white",
+          (locationOpen || countryCodeOpen || step === 4) ? "overflow-visible" : "overflow-hidden",
         )}
       >
         <AnimatePresence mode="wait" custom={dir}>
@@ -272,13 +268,13 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
             <motion.div key="s1" custom={dir} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.22, ease: "easeInOut" }} className="w-full">
 
               {/* Name */}
-              <div className="px-4 py-3">
+              <div className="py-3">
                 <div className={cn(
                   "flex flex-col rounded-xl border bg-white px-3 py-2.5 transition-colors focus-within:border-[#aaa] focus-within:ring-1 focus-within:ring-black/10",
                   attemptedNext && !isNameValid ? "border-red-400" : "border-[#e5e5e5]",
                 )}>
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-medium text-muted-foreground">Full name</label>
+                    <label className="text-xs font-medium text-muted-foreground">Name</label>
                     {attemptedNext && !isNameValid && <span className="text-xs text-red-500">Required</span>}
                   </div>
                   <input
@@ -286,14 +282,14 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                     value={name}
                     onChange={e => { setName(e.target.value); setAttemptedNext(false); }}
                     onKeyDown={e => e.key === "Enter" && goTo2()}
-                    placeholder="Enter your full name"
+                    placeholder="Enter your name"
                     className={cn("mt-0.5 w-full bg-transparent text-sm placeholder-[#bbb] outline-none", attemptedNext && !isNameValid ? "text-red-500" : "text-black")}
                   />
                 </div>
               </div>
 
               {/* Email */}
-              <div className="px-4 pb-3">
+              <div className="pb-3">
                 <div className={cn(
                   "flex flex-col rounded-xl border bg-white px-3 py-2.5 transition-colors focus-within:border-[#aaa] focus-within:ring-1 focus-within:ring-black/10",
                   attemptedNext && !isEmailValid ? "border-red-400" : "border-[#e5e5e5]",
@@ -316,7 +312,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
               </div>
 
               {/* Location */}
-              <div className="px-4 pb-3 relative" ref={locationRef}>
+              <div className="relative pb-3" ref={locationRef}>
                 <div className={cn(
                   "flex flex-col rounded-xl border bg-white px-3 py-2.5 transition-colors focus-within:border-[#aaa] focus-within:ring-1 focus-within:ring-black/10",
                   attemptedNext && !isLocationValid ? "border-red-400" : "border-[#e5e5e5]",
@@ -346,7 +342,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                   />
                 </div>
                 {locationOpen && filteredCountries.length > 0 && (
-                  <div className="absolute left-4 right-4 bottom-[calc(100%+4px)] z-50 animate-in fade-in zoom-in-95 overflow-hidden rounded-xl border border-border bg-white shadow-lg">
+                  <div className="absolute inset-x-0 bottom-[calc(100%+4px)] z-50 animate-in fade-in zoom-in-95 overflow-hidden rounded-xl border border-border bg-white shadow-lg">
                     <div className="flex max-h-[160px] flex-col overflow-y-auto py-1">
                       {filteredCountries.map(country => (
                         <button
@@ -369,7 +365,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
               </div>
 
               {/* Next */}
-              <div className="px-4 pb-3 pt-1">
+              <div className="pb-3 pt-1">
                 <CTAButton onClick={goTo2}>Next</CTAButton>
               </div>
             </motion.div>
@@ -378,10 +374,10 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
           {/* ── Step 2: SMS consent ── */}
           {step === 2 && (
             <motion.div key="s2" custom={dir} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.22, ease: "easeInOut" }} className="w-full">
-              <div className="px-4 py-5 flex flex-col gap-4">
+              <div className="flex flex-col gap-4 py-5">
                 <div className="flex items-start gap-3">
-                  <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#d1ead9]">
-                    <MessageSquare className="size-4 text-[#30814C]" />
+                  <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: accentLight }}>
+                    <MessageSquare className="size-4" style={{ color: accent }} />
                   </div>
                   <p className="text-sm leading-snug text-foreground/70 pt-1.5">
                     Do you consent to receive SMS updates about your application status? This will be optional and only application updates will be sent.
@@ -398,7 +394,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
           {/* ── Step 3: Phone number (only when smsConsent === true) ── */}
           {step === 3 && (
             <motion.div key="s3" custom={dir} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.22, ease: "easeInOut" }} className="w-full">
-              <div className="px-4 py-3">
+              <div className="py-3">
                 <div
                   className="flex flex-col rounded-xl border border-[#e5e5e5] bg-white px-3 py-2.5 transition-colors focus-within:border-[#aaa] focus-within:ring-1 focus-within:ring-black/10"
                   ref={countryCodeRef}
@@ -451,7 +447,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                   <p className="mt-1.5 px-1 text-xs text-red-500">Please enter a valid phone number</p>
                 )}
               </div>
-              <div className="px-4 pb-3">
+              <div className="pb-3">
                 <CTAButton onClick={goTo4FromPhone} disabled={!isPhoneValid}>Continue</CTAButton>
               </div>
             </motion.div>
@@ -460,29 +456,29 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
           {/* ── Step 4: Review ── */}
           {step === 4 && (
             <motion.div key="s4" custom={dir} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.22, ease: "easeInOut" }} className="w-full">
-              <div className="px-4 pt-3 pb-2">
-                <p className="text-xs font-medium text-foreground/50">
-                  Please review your details carefully
-                </p>
-              </div>
-              <div className="mx-4 overflow-hidden rounded-xl border border-[#e5e5e5]">
+              <div className="overflow-hidden rounded-xl border border-[#e5e5e5]">
                 <div className="flex flex-col divide-y divide-[#f0f0f0]">
                   {[
-                    { label: "name",     value: name },
-                    { label: "email",    value: email },
-                    { label: "location", value: location },
+                    { label: "Name",     value: name },
+                    { label: "Email",    value: email },
+                    { label: "Location", value: location },
                     ...(smsConsent && phone
-                      ? [{ label: "phone", value: `${countryCode} ${phone}` }]
+                      ? [{ label: "Phone", value: `${countryCode} ${phone}` }]
                       : []),
                   ].map(({ label, value }) => (
-                    <div key={label} className="flex items-center justify-between px-3 py-2.5">
+                    <div key={label} className="flex flex-col gap-1 px-3 py-2.5">
                       <span className="text-xs font-medium text-muted-foreground">{label}</span>
-                      <span className="max-w-[60%] truncate text-right text-sm font-medium text-foreground">{value}</span>
+                      <span className="text-sm font-medium text-foreground">{value}</span>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="px-4 pb-3 pt-3">
+              <div className="pt-3">
+                <p className="text-xs font-medium text-foreground/50">
+                  Please review your details carefully as you cannot change this later
+                </p>
+              </div>
+              <div className="pb-3 pt-3">
                 <CTAButton onClick={handleSubmit} disabled={submitted}>Accept</CTAButton>
               </div>
             </motion.div>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { CTAButton } from "@/components/ui/cta-button";
+import { useBrand } from "@/lib/BrandContext";
 
 const questions = [
   {
@@ -28,6 +29,7 @@ const questions = [
 ];
 
 export function DemographicForm({ onSubmit }: { onSubmit: (answers: Record<string, string>) => void }) {
+  const { buttonColor } = useBrand();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const allAnswered = questions.every(q => answers[q.id]);
 
@@ -50,9 +52,10 @@ export function DemographicForm({ onSubmit }: { onSubmit: (answers: Record<strin
                 className={cn(
                   "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
                   answers[q.id] === opt
-                    ? "border-[#30814C] bg-[#30814C] text-white"
+                    ? "text-white"
                     : "border-[#e5e5e5] text-foreground/60 hover:border-foreground/30 hover:text-foreground"
                 )}
+                style={answers[q.id] === opt ? { backgroundColor: buttonColor, borderColor: buttonColor } : undefined}
               >
                 {opt}
               </button>

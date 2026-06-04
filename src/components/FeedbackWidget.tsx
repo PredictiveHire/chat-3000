@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CTAButton } from "@/components/ui/cta-button";
+import { useBrand } from "@/lib/BrandContext";
 
 const ratingLabels: Record<number, string> = {
   1: "Poor",
@@ -14,6 +15,7 @@ const ratingLabels: Record<number, string> = {
 };
 
 export function FeedbackWidget({ onSubmit, onSkip }: { onSubmit: (rating: number, comment: string) => void; onSkip: () => void }) {
+  const { accent } = useBrand();
   const [rating, setRating] = useState(0);
   const [hovered, setHovered] = useState(0);
   const [comment, setComment] = useState("");
@@ -40,10 +42,8 @@ export function FeedbackWidget({ onSubmit, onSkip }: { onSubmit: (rating: number
               aria-label={`Rate ${i} out of 5`}
             >
               <Star
-                className={cn(
-                  "size-8 transition-colors duration-100",
-                  i <= active ? "fill-[#30814C] text-[#30814C]" : "fill-none text-foreground/20"
-                )}
+                className="size-8 transition-colors duration-100"
+                style={i <= active ? { fill: accent, color: accent } : { fill: "none", color: "rgba(0,0,0,0.2)" }}
               />
             </button>
           ))}

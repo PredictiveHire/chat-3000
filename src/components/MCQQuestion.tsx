@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useBrand } from "@/lib/BrandContext";
 
 type MCQQuestionProps = {
   question?: string;
@@ -11,6 +12,7 @@ type MCQQuestionProps = {
 };
 
 export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuestionProps) {
+  const { accent } = useBrand();
   const [selected, setSelected] = useState<string | null>(null);
 
   const pick = (opt: string) => {
@@ -46,10 +48,10 @@ export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuesti
                   locked && !isChosen && "cursor-not-allowed opacity-40",
                 )}
               >
-                <div className={cn(
-                  "flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[8px] transition-colors duration-150",
-                  isChosen ? "bg-[#30814C]" : "bg-[#f2f2f2]",
-                )}>
+                <div
+                  className="flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[8px] transition-colors duration-150"
+                  style={{ backgroundColor: isChosen ? accent : "#f2f2f2" }}
+                >
                   <span className={cn("text-xs font-medium", isChosen ? "text-white" : "text-[#666666]")}>
                     {i + 1}
                   </span>

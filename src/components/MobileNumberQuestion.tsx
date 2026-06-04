@@ -5,6 +5,7 @@ import { Check } from "lucide-react";
 import { SendHorizontal, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useBrand } from "@/lib/BrandContext";
 
 type CountryCodeOption = {
   label: string;
@@ -26,6 +27,7 @@ type MobileNumberQuestionProps = {
 };
 
 export function MobileNumberQuestion({ onConfirm, disabled, initialValue = "" }: MobileNumberQuestionProps) {
+  const { accent, accentLight } = useBrand();
   const defaultCode = COUNTRY_CODES.find((option) => initialValue.startsWith(option.code))?.code ?? COUNTRY_CODES[0].code;
   const initialDigits = initialValue.replace(defaultCode, "").replace(/\D/g, "");
 
@@ -157,13 +159,11 @@ export function MobileNumberQuestion({ onConfirm, disabled, initialValue = "" }:
                 className="flex items-start gap-2.5 text-left disabled:cursor-not-allowed"
                 aria-pressed={smsConsent}
               >
-                <span className={cn(
-                  "mt-[1px] flex h-[16px] w-[16px] shrink-0 items-center justify-center rounded-[4px] border transition-colors duration-150",
-                  smsConsent
-                    ? "border-[#30814C] bg-[#d1ead9]"
-                    : "border-[#d4d4d4] bg-white",
-                )}>
-                  {smsConsent && <Check className="size-2.5 text-[#30814C]" strokeWidth={3} />}
+                <span
+                  className="mt-[1px] flex h-[16px] w-[16px] shrink-0 items-center justify-center rounded-[4px] border transition-colors duration-150"
+                  style={smsConsent ? { borderColor: accent, backgroundColor: accentLight } : { borderColor: "#d4d4d4", backgroundColor: "white" }}
+                >
+                  {smsConsent && <Check className="size-2.5" strokeWidth={3} style={{ color: accent }} />}
                 </span>
                 <span className="text-xs leading-snug text-foreground/60">
                   I consent receiving SMS about my application status.

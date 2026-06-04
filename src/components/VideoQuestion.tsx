@@ -3,15 +3,13 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { Circle, Square, RotateCcw, Send, Play, Pause, Camera, Mic } from "lucide-react";
+import { useBrand } from "@/lib/BrandContext";
 
 const MAX_TRIES = 5;
 
 type Stage = "prepare" | "recording" | "review";
 
 type VideoQuestionProps = {
-  question: string;
-  currentIndex?: number;
-  total?: number;
   maxSeconds?: number;
   initialTriesUsed?: number;
   portrait?: boolean;
@@ -26,9 +24,6 @@ function formatTime(seconds: number) {
 }
 
 export function VideoQuestion({
-  question,
-  currentIndex,
-  total,
   maxSeconds = 120,
   initialTriesUsed = 0,
   portrait = false,
@@ -36,6 +31,7 @@ export function VideoQuestion({
   onSubmit,
 }: VideoQuestionProps) {
   const liveVideoRef = useRef<HTMLVideoElement>(null);
+  const { accent, buttonColor } = useBrand();
   const reviewVideoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -200,11 +196,11 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
         {stage !== "review" && (
           <div className="absolute right-3 top-3 flex items-center gap-1.5">
             <div className="flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 backdrop-blur-sm">
-              <Camera className="size-3 text-[#30814C]" />
+              <Camera className="size-3" style={{ color: accent }} />
               <span className="text-[10px] font-medium text-white">On</span>
             </div>
             <div className="flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 backdrop-blur-sm">
-              <Mic className="size-3 text-[#30814C]" />
+              <Mic className="size-3" style={{ color: accent }} />
               <span className="text-[10px] font-medium text-white">On</span>
             </div>
           </div>
@@ -238,7 +234,8 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
           <div className="flex flex-col items-center gap-2">
             <button
               onClick={startCountdown}
-              className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
+              className="w-full rounded-2xl py-3.5 text-sm font-semibold text-white transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
+              style={{ backgroundColor: buttonColor }}
             >
               <span className="flex items-center justify-center gap-2">
                 <Circle className="size-3.5 fill-current" />
@@ -261,11 +258,8 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
             </div>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#f0f0f0]">
               <div
-                className={cn(
-                  "h-full rounded-full transition-all duration-1000 ease-linear",
-                  recLeft <= 10 ? "bg-red-400" : "bg-[#30814C]"
-                )}
-                style={{ width: `${recPct}%` }}
+                className="h-full rounded-full transition-all duration-1000 ease-linear"
+                style={{ width: `${recPct}%`, backgroundColor: recLeft <= 10 ? "#f87171" : accent }}
               />
             </div>
             <button

@@ -5,16 +5,20 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowUp, Maximize2, Minimize2, List } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useBrand } from "@/lib/BrandContext";
 
-function WordCount({ text, min }: { text: string; min: number }) {
+function WordCount({ text, min, accentColor }: { text: string; min: number; accentColor: string }) {
   const count = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
   const met = count >= min;
   return (
-    <span className={cn(
-      "shrink-0 tabular-nums text-xs font-medium transition-colors",
-      count === 0 ? "text-muted-foreground/50" : met ? "text-green-500" : "text-muted-foreground"
-    )}>
-      {count}<span className="text-muted-foreground/50">/{min}</span>
+    <span
+      className="shrink-0 tabular-nums text-xs font-medium transition-colors"
+      style={{ color: count === 0 ? undefined : met ? accentColor : undefined }}
+    >
+      <span className={count === 0 || met ? undefined : "text-muted-foreground"}>
+        {count}
+      </span>
+      <span className="text-muted-foreground/50">/{min}</span>
     </span>
   );
 }
@@ -34,6 +38,7 @@ export function ReplyBar({
   placeholder = "Share your experiences...",
   initialText = "",
 }: ReplyBarProps) {
+  const { accent, buttonColor } = useBrand();
   const [text, setText] = useState(initialText);
 
   useEffect(() => {
@@ -227,16 +232,17 @@ export function ReplyBar({
               >
                 <List className="size-4" />
               </Button>
-              {expanded && <WordCount text={text} min={50} />}
+              {expanded && <WordCount text={text} min={50} accentColor={accent} />}
             </div>
             <Button
               type="submit"
               disabled={disabled || !text.trim()}
               size="icon"
               className={cn(
-                "size-8 shrink-0 rounded-full bg-primary text-primary-foreground transition-[background-color,scale] duration-150 ease-out hover:opacity-90 active:not-disabled:scale-[0.96]",
+                "size-8 shrink-0 rounded-full text-white transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:not-disabled:scale-[0.96] disabled:opacity-30",
                 !expanded && "mb-0.5 sm:mb-0"
               )}
+              style={{ backgroundColor: buttonColor }}
               aria-label="Send reply"
             >
               <ArrowUp className="size-3.5" />
@@ -290,7 +296,7 @@ export function ReplyBar({
           <p className="text-xs text-muted-foreground">
             We encourage a minimum of 50 words so we can better evaluate your experience
           </p>
-          <WordCount text={text} min={50} />
+          <WordCount text={text} min={50} accentColor={accent} />
         </div>
       )}
       {expanded && (

@@ -1,8 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useBrand } from "@/lib/BrandContext";
+
+const COMPANY_VIDEO_IDS: Record<string, string> = {
+  sephora: "9DgStODERG4",
+  woolworths: "avMiDvYP8IQ",
+};
 
 export function CompanyIntroVideo() {
+  const brand = useBrand();
+  const videoId = COMPANY_VIDEO_IDS[brand.id] ?? COMPANY_VIDEO_IDS.woolworths;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
@@ -13,8 +22,8 @@ export function CompanyIntroVideo() {
       <div className="aspect-video w-full overflow-hidden bg-black">
         <iframe
           className="h-full w-full"
-          src="https://www.youtube.com/embed/avMiDvYP8IQ"
-          title="Woolworths company introduction video"
+          src={`https://www.youtube.com/embed/${videoId}`}
+          title={`${brand.name} company introduction video`}
           loading="eager"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerPolicy="strict-origin-when-cross-origin"
