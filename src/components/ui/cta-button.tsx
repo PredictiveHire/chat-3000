@@ -6,6 +6,12 @@ type CTAButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "secondary";
 };
 
+type PrimaryButtonProps = Omit<CTAButtonProps, "variant">;
+
+export function PrimaryButton(props: PrimaryButtonProps) {
+  return <CTAButton variant="primary" {...props} />;
+}
+
 export function CTAButton({ variant = "primary", className, style, children, ...props }: CTAButtonProps) {
   const { buttonColor } = useBrand();
   return (

@@ -21,7 +21,7 @@ function formatTime(s: number) {
 const TEST_MAX = 10; // seconds for test recording
 
 export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
-  const { accent } = useBrand();
+  const { accent, buttonColor } = useBrand();
   const liveVideoRef = useRef<HTMLVideoElement>(null);
   const reviewVideoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -119,11 +119,11 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
   const recPct = (recLeft / TEST_MAX) * 100;
 
   return (
-    <div className="animate-fade-up flex flex-col gap-4 px-3 pb-3 pt-2">
+    <div className="animate-fade-up flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-2 sm:px-3 sm:pb-3">
       <div className="overflow-hidden rounded-[20px] border border-[#e5e5e5] bg-white">
 
         {/* Video area */}
-        <div className="relative aspect-video w-full overflow-hidden bg-[#f3f2ed]">
+        <div className="relative aspect-[9/16] w-full overflow-hidden bg-[#f3f2ed] sm:aspect-video">
           {/* Live feed */}
           {testStage !== "review" && (
             permission === "granted" ? (
@@ -257,7 +257,8 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
           </button>
           <button
             onClick={onReady}
-            className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
+            className="w-full rounded-2xl py-3.5 text-sm font-semibold text-white transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
+            style={{ backgroundColor: buttonColor }}
           >
             Looks good — start video questions
           </button>

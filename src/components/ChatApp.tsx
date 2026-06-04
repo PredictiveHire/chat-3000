@@ -4,13 +4,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { InterviewChat } from "@/components/InterviewChat";
 import { LoadingScreen } from "@/components/LoadingScreen";
-import { PostInterviewPage } from "@/components/PostInterviewPage";
-import { ReportPage } from "@/components/ReportPage";
 import { BrandSelector } from "@/components/BrandSelector";
 import { CANDIDATE_NAME } from "@/lib/mockData";
 import { BrandContext, type BrandCtx } from "@/lib/BrandContext";
 
-type View = "brand-select" | "loading" | "interview" | "post" | "report";
+type View = "brand-select" | "loading" | "interview";
 
 const BRAND_CONFIGS: Record<string, BrandCtx & { image: string }> = {
   woolworths: {
@@ -73,8 +71,8 @@ export function ChatApp() {
     <BrandContext.Provider value={brandConfig}>
       <div className="relative h-full">
         {/* key resets the component for each brand so closures always see fresh mock data */}
-        <div className={view === "interview" || view === "post" || view === "report" ? "h-full" : "hidden"}>
-          <InterviewChat key={brandConfig.id} onComplete={() => setView("report")} started={chatStarted} />
+        <div className={view === "interview" ? "h-full" : "hidden"}>
+          <InterviewChat key={brandConfig.id} started={chatStarted} />
         </div>
 
         {/* Brand selector — shown before loading */}
@@ -105,22 +103,6 @@ export function ChatApp() {
           )}
         </AnimatePresence>
 
-        <AnimatePresence mode="wait">
-          {view === "post" && (
-            <motion.div key="post" className="absolute inset-0" {...fadeVariants} transition={transition}>
-              <PostInterviewPage
-                reportProgress={100}
-                onViewReport={() => setView("report")}
-                onBack={() => setView("interview")}
-              />
-            </motion.div>
-          )}
-          {view === "report" && (
-            <motion.div key="report" className="absolute inset-0" {...fadeVariants} transition={transition}>
-              <ReportPage onBack={() => setView("interview")} />
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </BrandContext.Provider>
   );

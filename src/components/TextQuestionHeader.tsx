@@ -1,14 +1,16 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useBrand } from "@/lib/BrandContext";
 
 type TextQuestionHeaderProps = {
   question: string;
   currentIndex?: number;
   total?: number;
+  children?: ReactNode;
 };
 
-export function TextQuestionHeader({ question, currentIndex, total }: TextQuestionHeaderProps) {
+export function TextQuestionHeader({ question, currentIndex, total, children }: TextQuestionHeaderProps) {
   const { accent } = useBrand();
   return (
     <div className="flex items-stretch gap-3">
@@ -20,7 +22,7 @@ export function TextQuestionHeader({ question, currentIndex, total }: TextQuesti
           </p>
         )}
         <p className="flex-1 text-xl font-semibold leading-snug text-foreground">
-          {question}
+          {children ?? question}
         </p>
       </div>
     </div>

@@ -62,7 +62,7 @@ export function CameraSetupModal({ open, onReady, onClose }: CameraSetupModalPro
       {open && (
         <motion.div
           key="camera-modal-backdrop"
-          className="fixed inset-0 z-[300] flex items-end justify-center sm:items-center"
+          className="fixed inset-0 z-[300] flex items-stretch justify-center sm:items-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -77,7 +77,7 @@ export function CameraSetupModal({ open, onReady, onClose }: CameraSetupModalPro
           {/* Sheet / modal */}
           <motion.div
             key="camera-modal-panel"
-            className="relative z-10 mx-3 mb-3 w-full max-w-3xl overflow-hidden rounded-[28px] bg-white shadow-[0_18px_60px_rgba(15,23,42,0.12),0_2px_8px_rgba(15,23,42,0.08)] sm:mx-0 sm:mb-0"
+            className="relative z-10 flex h-full w-full flex-col overflow-hidden bg-[#F7F7F5] sm:h-auto sm:max-w-3xl sm:rounded-[28px] sm:bg-white sm:shadow-[0_18px_60px_rgba(15,23,42,0.12),0_2px_8px_rgba(15,23,42,0.08)]"
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}

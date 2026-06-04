@@ -4,13 +4,10 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, X } from "lucide-react";
 import { VideoQuestion } from "@/components/VideoQuestion";
-import { useBrand } from "@/lib/BrandContext";
 
 type VideoQuestionModalProps = {
   open: boolean;
   question: string;
-  currentIndex?: number;
-  total?: number;
   initialTriesUsed?: number;
   onTriesUsedChange?: (triesUsed: number) => void;
   onSubmit: (value: string, videoUrl?: string) => void;
@@ -20,14 +17,11 @@ type VideoQuestionModalProps = {
 export function VideoQuestionModal({
   open,
   question,
-  currentIndex,
-  total,
   initialTriesUsed,
   onTriesUsedChange,
   onSubmit,
   onClose,
 }: VideoQuestionModalProps) {
-  const { accent } = useBrand();
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
@@ -73,11 +67,6 @@ export function VideoQuestionModal({
           {/* Desktop header — matches CameraSetupModal */}
           <div className="hidden sm:flex items-start justify-between px-5 pb-2 pt-5">
             <div className="min-w-0 flex-1 pr-3">
-              {currentIndex !== undefined && total !== undefined && (
-                <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-foreground/30">
-                  Question {currentIndex} of {total}
-                </p>
-              )}
               <p className="text-base font-semibold leading-snug text-foreground">{question}</p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
@@ -103,15 +92,7 @@ export function VideoQuestionModal({
 
           {/* Mobile header */}
           <div className="flex shrink-0 flex-col gap-3 px-5 pb-4 pt-5 sm:hidden">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <div className="size-2 rounded-full" style={{ backgroundColor: accent }} />
-                <span className="text-[11px] font-semibold uppercase tracking-[0.06em]" style={{ color: accent }}>
-                  {currentIndex !== undefined && total !== undefined
-                    ? `Question ${currentIndex} of ${total}`
-                    : "Question"}
-                </span>
-              </div>
+            <div className="flex items-center justify-end">
               <div className="flex items-center gap-2">
               <button
                 type="button"

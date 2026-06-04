@@ -17,7 +17,7 @@ export function CompanyIntroVideo() {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "easeOut" }}
-      className="mt-4 w-full overflow-hidden rounded-[20px] border border-[#e6e6e6] bg-white shadow-sm"
+      className="mt-4 w-full overflow-hidden rounded-[20px] border border-[#e6e6e6] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.035)]"
     >
       <div className="aspect-video w-full overflow-hidden bg-black">
         <iframe

@@ -197,7 +197,7 @@ export function ReplyBar({
     )}>
       <form onSubmit={onSubmit} className={cn("flex flex-col", expanded && "h-full")}>
         <div className={cn(
-          "relative flex flex-col rounded-[16px] border border-[#e5e5e5] bg-white",
+          "relative flex flex-col overflow-hidden rounded-[16px] border border-[#e5e5e5] bg-white",
           expanded && "flex-1"
         )}>
           <textarea
@@ -212,16 +212,50 @@ export function ReplyBar({
               "w-full resize-none bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
               expanded
                 ? "flex-1 p-4"
-                : "min-h-20 px-4 pt-3 pr-4 sm:min-h-24"
+                : "min-h-20 px-4 pt-3 sm:min-h-24"
             )}
             aria-label="Your reply"
           />
 
           <div className={cn(
-            "flex items-center",
+            "flex items-center bg-transparent",
             expanded ? "justify-between p-3" : "justify-between px-3 pb-2 pt-1"
           )}>
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setExpanded(!expanded)}
+                className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition-[background-color,scale] duration-150 ease-out hover:bg-black/5 active:scale-[0.96] sm:hidden"
+                aria-label={expanded ? "Collapse" : "Expand"}
+              >
+                <div className="relative size-4">
+                  <AnimatePresence initial={false} mode="popLayout">
+                    {expanded ? (
+                      <motion.span
+                        key="minimize"
+                        initial={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+                        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+                        transition={{ type: "spring", duration: 0.3, bounce: 0 }}
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        <Minimize2 className="size-4" />
+                      </motion.span>
+                    ) : (
+                      <motion.span
+                        key="maximize"
+                        initial={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+                        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+                        transition={{ type: "spring", duration: 0.3, bounce: 0 }}
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        <Maximize2 className="size-4" />
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </button>
               <Button
                 type="button"
                 variant="ghost"
@@ -248,45 +282,6 @@ export function ReplyBar({
               <ArrowUp className="size-3.5" />
             </Button>
           </div>
-
-          {/* Expand/Collapse Button (Mobile Only) */}
-          <button
-            type="button"
-            onClick={() => setExpanded(!expanded)}
-            className={cn(
-              "absolute flex items-center justify-center size-8 rounded-full text-muted-foreground hover:bg-black/5 active:scale-[0.96] transition-[background-color,scale] duration-150 ease-out sm:hidden",
-              expanded ? "top-3 right-3" : "top-1 right-1"
-            )}
-            aria-label={expanded ? "Collapse" : "Expand"}
-          >
-              <div className="relative size-4">
-                <AnimatePresence initial={false} mode="popLayout">
-                  {expanded ? (
-                    <motion.span
-                      key="minimize"
-                      initial={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
-                      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                      exit={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
-                      transition={{ type: "spring", duration: 0.3, bounce: 0 }}
-                      className="absolute inset-0 flex items-center justify-center"
-                    >
-                      <Minimize2 className="size-4" />
-                    </motion.span>
-                  ) : (
-                    <motion.span
-                      key="maximize"
-                      initial={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
-                      animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                      exit={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
-                      transition={{ type: "spring", duration: 0.3, bounce: 0 }}
-                      className="absolute inset-0 flex items-center justify-center"
-                    >
-                      <Maximize2 className="size-4" />
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </div>
-            </button>
         </div>
       </form>
       

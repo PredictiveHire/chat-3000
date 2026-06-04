@@ -13,7 +13,7 @@ import type { ChatMessage, MessageWidget, QuestionType, TextLayout } from "@/lib
 import { useBrand } from "@/lib/BrandContext";
 import { cn } from "@/lib/utils";
 import { CTAButton } from "@/components/ui/cta-button";
-import { Accessibility, Check, ChevronDown, Link, Pencil, RotateCcw } from "lucide-react";
+import { Accessibility, Check, Link, Pencil, RotateCcw } from "lucide-react";
 import { QuestionFormatWidget } from "@/components/QuestionFormatWidget";
 import { TextQuestionHeader } from "@/components/TextQuestionHeader";
 import { CameraSetupModal } from "@/components/CameraSetupModal";
@@ -177,7 +177,7 @@ function newId() {
     : Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
-export function InterviewChat({ onComplete, started = true }: { onComplete: () => void; started?: boolean }) {
+export function InterviewChat({ started = true }: { started?: boolean }) {
   const brand = useBrand();
   const mockInterview = getMockInterview(brand.id);
   const [stepIndex, setStepIndex] = useState(0);
@@ -217,20 +217,9 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
   const streamRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const preStreamTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  const [showScrollButton, setShowScrollButton] = useState(false);
-
   const bottomRef = useRef<HTMLDivElement>(null);
   const msgListRef = useRef<HTMLDivElement>(null);
   const outerScrollRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
-    const msgList = msgListRef.current;
-    if (msgList && getComputedStyle(msgList).overflowY === "auto") {
-      msgList.scrollTo({ top: msgList.scrollHeight, behavior });
-    } else {
-      outerScrollRef.current?.scrollTo({ top: outerScrollRef.current.scrollHeight, behavior });
-    }
-  }, []);
 
   // Returns the visible height of the scrollable chat region.
   const getScrollContainerHeight = useCallback((): number => {
@@ -240,17 +229,6 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
       return msgList.clientHeight;
     }
     return outer ? outer.clientHeight : window.innerHeight;
-  }, []);
-
-  useEffect(() => {
-    const el = msgListRef.current;
-    if (!el) return;
-    const onScroll = () => {
-      const distFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
-      setShowScrollButton(distFromBottom > el.clientHeight);
-    };
-    el.addEventListener("scroll", onScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onScroll);
   }, []);
 
   const copyLink = useCallback(() => {
@@ -495,15 +473,13 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
     (editingMessageId != null ||
       inputReady ||
       (complete && !isStreaming && !submitted) ||
-      (submitted && !isStreaming && postPhase !== "done") ||
-      (submitted && postPhase === "done" && !isStreaming));
+      (submitted && !isStreaming && postPhase !== "done"));
 
   const floatingInputPad = (() => {
     const isGenerating = isStreaming || isPreStreaming;
     if (!hasFloatingInput && !isGenerating) return "";
     if (submitted && postPhase === "demographic") return "pb-[36rem]";
     if (submitted && postPhase === "feedback") return "pb-[28rem]";
-    if (submitted && postPhase === "done") return "pb-28";
     // During streaming stepIndex hasn't advanced yet, so peek at the next step's input type.
     const type = editingMessageId
       ? editingActiveType
@@ -522,7 +498,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
     (inputReady && activeType === "profile");
 
   return (
-    <div ref={outerScrollRef} className="flex h-dvh sm:h-full flex-col overflow-y-auto bg-white sm:bg-white">
+    <div ref={outerScrollRef} className="flex h-dvh flex-col overflow-y-auto bg-white sm:h-full">
 
       {/* Mobile header */}
       <motion.div
@@ -586,10 +562,10 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
         </div>
       </motion.div>
 
-      <div className="mx-auto flex w-full max-w-4xl gap-4 sm:min-h-0 sm:flex-1 sm:px-8 sm:pb-8">
-        <main className="relative flex min-w-0 flex-col sm:flex-1">
+      <div className="mx-auto flex w-full max-w-4xl gap-4 bg-white sm:min-h-0 sm:flex-1 sm:px-8 sm:pb-8">
+        <main className="relative flex min-w-0 flex-col bg-white sm:flex-1">
 
-          <div className="relative flex flex-col min-h-[calc(100dvh-5rem)] sm:min-h-0 sm:flex-1">
+          <div className="relative flex min-h-[calc(100dvh-5rem)] flex-col bg-white sm:min-h-0 sm:flex-1">
 
             {/* Message list */}
             <div
@@ -660,19 +636,11 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                         const parts = m.content.split("\n\n");
                         const question = parts.at(-1) ?? m.content;
                         return (
-                          <div className="flex w-full flex-col gap-3">
-                            {m.widgetMeta?.currentIndex !== undefined && m.widgetMeta?.total !== undefined && (
-                              <p className="text-xs font-medium text-foreground/60">
-                                Question {m.widgetMeta.currentIndex} of {m.widgetMeta.total}
-                              </p>
-                            )}
-                            <div className="flex items-stretch gap-3">
-                              <div className="w-[6px] shrink-0 rounded-full" style={{ backgroundColor: brand.accent }} />
-                              <p className="flex-1 text-xl font-semibold leading-snug text-foreground">
-                                {question}
-                              </p>
-                            </div>
-                          </div>
+                          <TextQuestionHeader
+                            question={question}
+                            currentIndex={m.widgetMeta?.currentIndex as number | undefined}
+                            total={m.widgetMeta?.total as number | undefined}
+                          />
                         );
                       })()}
                     </motion.div>
@@ -776,19 +744,13 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                       const parts = streamingText.split("\n\n");
                       const question = parts.at(-1) ?? streamingText;
                       return (
-                        <div className="flex items-stretch gap-3">
-                          <div className="w-[6px] shrink-0 rounded-full" style={{ backgroundColor: brand.accent }} />
-                          <div className="flex flex-col gap-3">
-                            {streamingWidgetMeta?.currentIndex !== undefined && streamingWidgetMeta?.total !== undefined && (
-                              <p className="text-xs font-medium text-foreground/60">
-                                Question {streamingWidgetMeta.currentIndex} of {streamingWidgetMeta.total}
-                              </p>
-                            )}
-                            <p className="text-xl font-semibold leading-snug text-foreground">
-                              <AnimatedTextContent text={question} cursor />
-                            </p>
-                          </div>
-                        </div>
+                        <TextQuestionHeader
+                          question={question}
+                          currentIndex={streamingWidgetMeta?.currentIndex as number | undefined}
+                          total={streamingWidgetMeta?.total as number | undefined}
+                        >
+                          <AnimatedTextContent text={question} cursor />
+                        </TextQuestionHeader>
                       );
                     })() : (
                       <>
@@ -807,39 +769,19 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
               <div ref={bottomRef} />
             </div>
 
-            {/* Bottom fade */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 hidden h-8 bg-gradient-to-t from-white to-transparent sm:block" />
-
-            {/* Inputs — transparent overlay on chat container */}
+            {/* Inputs — white bottom panel keeps scrolled content from showing behind the controls */}
             {hasFloatingInput && (
             <div
               className={cn(
-                "pointer-events-none fixed inset-x-0 bottom-0 z-[70] bg-gradient-to-t from-white via-white to-transparent pb-[max(1rem,env(safe-area-inset-bottom))] pt-10 sm:absolute",
+                "pointer-events-none fixed inset-x-0 bottom-0 z-[70] bg-white pb-[max(1rem,env(safe-area-inset-bottom))] sm:absolute",
                 isProfileInput ? "px-4 sm:px-5 sm:pb-4" : "px-5 sm:px-6",
               )}
             >
-            {/* Scroll-to-bottom button — sits directly above the input */}
-            <AnimatePresence>
-              {showScrollButton && (
-                <motion.button
-                  key="scroll-btn"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.15 }}
-                  onClick={() => scrollToBottom("smooth")}
-                  className="pointer-events-auto mx-auto mb-2 flex size-9 items-center justify-center rounded-full border border-[#e5e5e5] bg-white shadow-md"
-                  aria-label="Scroll to bottom"
-                >
-                  <ChevronDown className="size-4 text-foreground/60" />
-                </motion.button>
-              )}
-            </AnimatePresence>
             <div className="pointer-events-auto">
             {editingMessageId ? (
               <div className="animate-fade-up flex flex-col">
                 {editingActiveType !== "mcq" && (
-                  <div className="flex items-center gap-2 rounded-xl bg-white px-3 py-2.5 shadow-sm">
+                  <div className="mb-3 flex items-center gap-2 rounded-xl bg-white px-3 py-2.5 shadow-sm">
                     <Pencil className="size-3.5 shrink-0 text-muted-foreground" />
                     <p className="flex-1 line-clamp-2 text-xs leading-snug text-muted-foreground">
                       <span className="font-medium text-foreground">Editing: </span>
@@ -1017,7 +959,7 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                       setSubmitted(true);
                       setMessages(prev => [...prev, { id: newId(), role: "candidate" as const, content: "Submit interview" }]);
                       streamMessage(
-                        "Thank you! Your interview has been successfully submitted. We'll send a personality insights report to your inbox so you can learn a bit about yourself too.\n\nBefore you go, we have a couple of optional questions to help us with diversity and inclusion. All answers are voluntary.",
+                        "Thank you! Your interview has been successfully submitted.\n\nBefore you go, we have a couple of optional questions to help us with diversity and inclusion. All answers are voluntary.",
                         () => setPostPhase("demographic"),
                       );
                     }}>
@@ -1048,14 +990,14 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
                         const content = `${"★".repeat(rating)}${"☆".repeat(5 - rating)}${comment ? ` — ${comment}` : ""}`;
                         setMessages(prev => [...prev, { id: newId(), role: "candidate" as const, content }]);
                         streamMessage(
-                          `Thank you! Your interview has been successfully submitted. We'll send a personality insights report to your inbox so you can learn a bit about yourself too.`,
-                          () => onComplete(),
+                          "Thank you! You're all set.",
+                          () => setPostPhase("done"),
                         );
                       }}
                       onSkip={() => {
                         streamMessage(
-                          `Thank you! Your interview has been successfully submitted. We'll send a personality insights report to your inbox so you can learn a bit about yourself too.`,
-                          () => onComplete(),
+                          "Thank you! You're all set.",
+                          () => setPostPhase("done"),
                         );
                       }}
                     />
@@ -1198,8 +1140,6 @@ export function InterviewChat({ onComplete, started = true }: { onComplete: () =
       <VideoQuestionModal
         open={videoModalOpen}
         question={activeType === "video" ? currentStep.messages[currentStep.messages.length - 1] : ""}
-        currentIndex={activeType === "video" ? getQuestionMeta(stepIndex)?.currentIndex : undefined}
-        total={activeType === "video" ? getQuestionMeta(stepIndex)?.total : undefined}
         initialTriesUsed={videoTriesUsed}
         onTriesUsedChange={setVideoTriesUsed}
         onClose={() => setVideoModalOpen(false)}

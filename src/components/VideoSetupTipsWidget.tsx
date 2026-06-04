@@ -1,34 +1,42 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { RotateCcw, Wifi, UserCheck, Star } from "lucide-react";
-import { useBrand } from "@/lib/BrandContext";
 
-const tips = [
+const sections = [
   {
-    icon: Star,
-    title: "Use the STAR method",
-    body: "Structure your answers as Situation, Task, Action, Result — it helps tell a clear, compelling story.",
+    label: "Before you record",
+    items: [
+      {
+        title: "Set up your space",
+        body: "A quiet, well-lit spot with your face visible and minimal background noise.",
+      },
+    ],
   },
   {
-    icon: RotateCcw,
-    title: "5 Retries per question",
-    body: "Review your recording and re-record until you're happy.",
+    label: "While you're recording",
+    items: [
+      {
+        title: "Use the STAR method",
+        body: "Situation, Task, Action, Result — for a clear, compelling story.",
+      },
+      {
+        title: "Five retries per question",
+        body: "Review and re-record until you're happy.",
+      },
+    ],
   },
   {
-    icon: Wifi,
-    title: "Environment",
-    body: "Find a quiet, well-lit spot with your face clearly visible and minimal background noise.",
-  },
-  {
-    icon: UserCheck,
-    title: "Reviewed by a person",
-    body: "These responses are not AI assessed — a member of the recruiting team will personally view your application.",
+    label: "After you submit",
+    items: [
+      {
+        title: "Reviewed by a person",
+        body: "Not AI assessed — the recruiting team personally views your application.",
+      },
+    ],
   },
 ];
 
 export function VideoSetupTipsWidget() {
-  const { accent, accentLight } = useBrand();
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
@@ -36,18 +44,24 @@ export function VideoSetupTipsWidget() {
       transition={{ delay: 0.55, duration: 0.4, ease: "easeOut" }}
       className="mt-3 w-full"
     >
-      <div className="flex flex-col gap-4 rounded-[20px] border border-[#e6e6e6] bg-white p-5">
-        {tips.map(({ icon: Icon, title, body }) => (
-          <div key={title} className="flex gap-3">
-            <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: accentLight }}>
-              <Icon className="size-4" style={{ color: accent }} />
+      <div className="overflow-hidden rounded-[28px] border border-[#e8e8e8] bg-white px-6 shadow-[0_14px_40px_rgba(15,23,42,0.06),0_1px_2px_rgba(15,23,42,0.04)] sm:px-8">
+        <div className="flex flex-col divide-y divide-[#f0f0f0]">
+          {sections.map(section => (
+            <div key={section.label} className="py-6">
+              <p className="mb-5 text-sm font-medium text-muted-foreground">
+                {section.label}
+              </p>
+              <div className="flex flex-col gap-5">
+                {section.items.map(({ title, body }) => (
+                  <div key={title} className="min-w-0">
+                    <p className="text-base font-semibold leading-snug text-foreground">{title}</p>
+                    <p className="mt-1 text-base leading-relaxed text-foreground/60">{body}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-col gap-0.5">
-              <p className="text-base font-medium text-foreground">{title}</p>
-              <p className="text-base leading-relaxed text-foreground/60">{body}</p>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </motion.div>
   );

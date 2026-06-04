@@ -127,7 +127,18 @@ const woolworthsInterview: InterviewStep[] = [
     messages: [
       "How much experience do you have in retail, hospitality, customer service, volunteering, or other people-facing work?",
     ],
-    options: ["No experience yet", "Less than 6 months", "6 months to 2 years", "More than 2 years"],
+    options: [
+      "No experience yet",
+      "Less than 6 months",
+      "6 months to 1 year",
+      "1 to 2 years",
+      "2 to 4 years",
+      "More than 4 years",
+      "I have volunteering experience only",
+      "I have informal customer service experience",
+      "I am returning to work after a break",
+      "I have team leadership experience",
+    ],
   },
   {
     id: "weekly-availability",
@@ -135,7 +146,20 @@ const woolworthsInterview: InterviewStep[] = [
     messages: [
       "Which best describes your weekly availability for store shifts?",
     ],
-    options: ["Weekdays only", "Weekends only", "Weekdays and weekends", "Flexible across most days"],
+    options: [
+      "Weekdays only",
+      "Weekends only",
+      "Weekdays and weekends",
+      "Flexible across most days",
+      "School hours only",
+      "Evenings after 5pm",
+      "Early mornings",
+      "Late nights",
+      "Public holidays",
+      "Short-notice shifts",
+      "One fixed day per week",
+      "Open availability",
+    ],
   },
   {
     id: "shift-preference",
@@ -143,7 +167,18 @@ const woolworthsInterview: InterviewStep[] = [
     messages: [
       "Team Member shifts can include mornings, afternoons, evenings, and weekends. Which shift pattern suits you best?",
     ],
-    options: ["Morning shifts", "Afternoon shifts", "Evening shifts", "Any shift pattern"],
+    options: [
+      "Morning shifts",
+      "Afternoon shifts",
+      "Evening shifts",
+      "Overnight shifts",
+      "Weekend shifts",
+      "Short shifts around study",
+      "Longer shifts when available",
+      "A consistent weekly roster",
+      "Rotating shifts",
+      "Any shift pattern",
+    ],
   },
   {
     id: "work-areas",

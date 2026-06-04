@@ -11,6 +11,8 @@ type MCQQuestionProps = {
   disabled?: boolean;
 };
 
+const MAX_VISIBLE_OPTIONS = 7;
+
 export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuestionProps) {
   const { accent } = useBrand();
   const [selected, setSelected] = useState<string | null>(null);
@@ -22,6 +24,7 @@ export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuesti
   };
 
   const locked = Boolean(disabled || selected);
+  const shouldScroll = options.length > MAX_VISIBLE_OPTIONS;
 
   return (
     <div
@@ -29,7 +32,13 @@ export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuesti
       aria-label="Choose one answer"
       className="w-full"
     >
-      <div className="overflow-hidden rounded-[16px] border border-[#e5e5e5] bg-white">
+      <div
+        className={cn(
+          "rounded-[16px] border border-[#e5e5e5] bg-white",
+          shouldScroll ? "overflow-y-auto overscroll-contain" : "overflow-hidden",
+        )}
+        style={shouldScroll ? { maxHeight: `calc(${MAX_VISIBLE_OPTIONS} * 4rem + ${MAX_VISIBLE_OPTIONS - 1}px)` } : undefined}
+      >
         {options.map((opt, i) => {
           const isChosen = selected === opt;
           return (
@@ -43,7 +52,7 @@ export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuesti
                 onClick={() => pick(opt)}
                 style={{ animationDelay: `${i * 40}ms` }}
                 className={cn(
-                  "animate-bubble-in flex w-full items-center gap-3 px-5 py-[14px] text-left transition-[background-color] duration-150",
+                  "animate-bubble-in flex min-h-16 w-full items-center gap-3 px-5 py-[14px] text-left transition-[background-color] duration-150",
                   isChosen ? "bg-[#f2f2f2]" : "hover:bg-[#fafafa]",
                   locked && !isChosen && "cursor-not-allowed opacity-40",
                 )}

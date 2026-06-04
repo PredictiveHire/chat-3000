@@ -4,8 +4,7 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBrand } from "@/lib/BrandContext";
-
-const PRIVACY_AND_DATA_URL = "https://sapia.ai/privacy-policy/";
+import { PrimaryButton } from "@/components/ui/cta-button";
 
 type MultiSelectQuestionProps = {
   options: string[];
@@ -14,7 +13,7 @@ type MultiSelectQuestionProps = {
 };
 
 export function MultiSelectQuestion({ options, onConfirm, initialValues = [] }: MultiSelectQuestionProps) {
-  const { accent, buttonColor } = useBrand();
+  const { accent } = useBrand();
   const [selected, setSelected] = useState<Set<string>>(() => new Set(initialValues));
   const [submitted, setSubmitted] = useState(false);
 
@@ -72,34 +71,14 @@ export function MultiSelectQuestion({ options, onConfirm, initialValues = [] }: 
             </div>
           );
         })}
-        <div className="mx-5 h-px bg-[#efefef]" />
-        <div className="px-5 py-3">
-          <a
-            href={PRIVACY_AND_DATA_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm font-medium underline underline-offset-2 transition-colors hover:text-foreground"
-            style={{ color: accent }}
-          >
-            Privacy and data
-          </a>
-        </div>
       </div>
 
-      <button
-        type="button"
+      <PrimaryButton
         onClick={confirm}
         disabled={selected.size === 0 || submitted}
-        className={cn(
-          "w-full rounded-[14px] py-4 text-[15px] font-semibold transition-all duration-150",
-          selected.size > 0 && !submitted
-            ? "text-white active:scale-[0.98]"
-            : "bg-[#f2f2f2] text-[#b0b0b0] cursor-not-allowed",
-        )}
-        style={selected.size > 0 && !submitted ? { backgroundColor: buttonColor } : undefined}
       >
         Confirm
-      </button>
+      </PrimaryButton>
     </div>
   );
 }
