@@ -12,7 +12,7 @@ function WordCount({ text, min, accentColor }: { text: string; min: number; acce
   const met = count >= min;
   return (
     <span
-      className="shrink-0 tabular-nums text-xs font-medium transition-colors"
+      className="shrink-0 tabular-nums text-base font-medium transition-colors"
       style={{ color: count === 0 ? undefined : met ? accentColor : undefined }}
     >
       <span className={count === 0 || met ? undefined : "text-muted-foreground"}>
@@ -288,14 +288,14 @@ export function ReplyBar({
       {/* Word count hint */}
       {!expanded && (
         <div className="mt-2 flex items-center justify-between px-1">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             We encourage a minimum of 50 words so we can better evaluate your experience
           </p>
           <WordCount text={text} min={50} accentColor={accent} />
         </div>
       )}
       {expanded && (
-        <p className="mt-2 text-xs text-muted-foreground px-1">
+        <p className="mt-2 text-sm text-muted-foreground px-1">
           We encourage a minimum of 50 words so we can better evaluate your experience
         </p>
       )}

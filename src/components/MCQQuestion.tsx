@@ -11,7 +11,7 @@ type MCQQuestionProps = {
   disabled?: boolean;
 };
 
-const MAX_VISIBLE_OPTIONS = 7;
+const MAX_FULLY_VISIBLE_OPTIONS = 7;
 
 export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuestionProps) {
   const { accent } = useBrand();
@@ -24,7 +24,7 @@ export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuesti
   };
 
   const locked = Boolean(disabled || selected);
-  const shouldScroll = options.length > MAX_VISIBLE_OPTIONS;
+  const shouldScroll = options.length > MAX_FULLY_VISIBLE_OPTIONS;
 
   return (
     <div
@@ -37,7 +37,7 @@ export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuesti
           "rounded-[16px] border border-[#e5e5e5] bg-white",
           shouldScroll ? "overflow-y-auto overscroll-contain" : "overflow-hidden",
         )}
-        style={shouldScroll ? { maxHeight: `calc(${MAX_VISIBLE_OPTIONS} * 4rem + ${MAX_VISIBLE_OPTIONS - 1}px)` } : undefined}
+        style={shouldScroll ? { maxHeight: `calc(${MAX_FULLY_VISIBLE_OPTIONS + 0.5} * 4rem + ${MAX_FULLY_VISIBLE_OPTIONS}px)` } : undefined}
       >
         {options.map((opt, i) => {
           const isChosen = selected === opt;
@@ -61,11 +61,11 @@ export function MCQQuestion({ question, options, onSelect, disabled }: MCQQuesti
                   className="flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[8px] transition-colors duration-150"
                   style={{ backgroundColor: isChosen ? accent : "#f2f2f2" }}
                 >
-                  <span className={cn("text-xs font-medium", isChosen ? "text-white" : "text-[#666666]")}>
+                  <span className={cn("text-base font-medium", isChosen ? "text-white" : "text-[#666666]")}>
                     {i + 1}
                   </span>
                 </div>
-                <p className="text-lg font-medium text-black">{opt}</p>
+                <p className="text-base font-medium text-black">{opt}</p>
               </button>
             </div>
           );

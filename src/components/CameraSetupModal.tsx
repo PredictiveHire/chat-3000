@@ -146,7 +146,7 @@ function CameraSetupFaq() {
                       className="flex w-full items-center justify-between gap-3 py-3.5 text-left"
                       aria-expanded={isOpen}
                     >
-                      <span className="text-sm font-medium text-foreground/80">{item.question}</span>
+                      <span className="text-base font-medium text-foreground/80">{item.question}</span>
                       <ChevronDown
                         className={`size-4 shrink-0 text-foreground/40 transition-transform duration-200 ${
                           isOpen ? "rotate-180" : ""
@@ -162,7 +162,7 @@ function CameraSetupFaq() {
                           transition={{ duration: 0.2, ease: "easeInOut" }}
                           className="overflow-hidden"
                         >
-                          <p className="pb-4 pr-7 text-xs leading-relaxed text-foreground/50">
+                          <p className="pb-4 pr-7 text-base leading-relaxed text-foreground/50">
                             {item.answer}
                           </p>
                         </motion.div>

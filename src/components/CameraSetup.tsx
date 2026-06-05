@@ -131,12 +131,12 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
             ) : permission === "denied" ? (
               <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
                 <AlertCircle className="size-8 text-red-400" />
-                <p className="text-sm font-medium text-foreground/70">Camera access was blocked</p>
+                <p className="text-base font-medium text-foreground/70">Camera access was blocked</p>
               </div>
             ) : (
               <div className="flex h-full flex-col items-center justify-center gap-3">
                 <div className="size-10 animate-pulse rounded-full bg-foreground/10" />
-                <p className="text-sm text-foreground/40">
+                <p className="text-base text-foreground/40">
                   {permission === "requesting" ? "Requesting access…" : "Initialising camera…"}
                 </p>
               </div>
@@ -175,7 +175,7 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
           {permission === "granted" && testStage === "idle" && (
             <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 backdrop-blur-sm">
               <span className="size-1.5 animate-pulse rounded-full bg-red-400" />
-              <span className="text-xs font-medium text-white">Live preview</span>
+              <span className="text-base font-medium text-white">Live preview</span>
             </div>
           )}
 
@@ -183,14 +183,14 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
           {testStage === "recording" && (
             <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 backdrop-blur-sm">
               <span className="size-1.5 animate-pulse rounded-full bg-red-400" />
-              <span className="text-xs font-medium text-white">REC {formatTime(recLeft)}</span>
+              <span className="text-base font-medium text-white">REC {formatTime(recLeft)}</span>
             </div>
           )}
 
           {/* Preview badge */}
           {testStage === "review" && (
             <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 backdrop-blur-sm">
-              <span className="text-xs font-medium text-white">Test preview</span>
+              <span className="text-base font-medium text-white">Test preview</span>
             </div>
           )}
         </div>
@@ -200,12 +200,12 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
           <div className="flex flex-col divide-y divide-[#f0f0f0]">
             <div className="flex items-center gap-3 px-4 py-3">
               <Camera className="size-4 shrink-0 text-foreground/40" />
-              <p className="flex-1 truncate text-sm text-foreground/70">{cameraLabel}</p>
+              <p className="flex-1 truncate text-base text-foreground/70">{cameraLabel}</p>
               <CheckCircle2 className="size-4 shrink-0" style={{ color: accent }} />
             </div>
             <div className="flex items-center gap-3 px-4 py-3">
               <Mic className="size-4 shrink-0 text-foreground/40" />
-              <p className="flex-1 truncate text-sm text-foreground/70">{micLabel}</p>
+              <p className="flex-1 truncate text-base text-foreground/70">{micLabel}</p>
               <CheckCircle2 className="size-4 shrink-0" style={{ color: accent }} />
             </div>
           </div>
@@ -214,7 +214,7 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
         {/* Retry when denied */}
         {permission === "denied" && (
           <div className="px-4 py-3">
-            <button onClick={startStream} className="flex items-center gap-2 text-sm font-medium text-foreground/60 hover:text-foreground transition-colors">
+            <button onClick={startStream} className="flex items-center gap-2 text-base font-medium text-foreground/60 hover:text-foreground transition-colors">
               <RefreshCw className="size-3.5" />
               Try again
             </button>
@@ -227,8 +227,8 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
             {testStage === "recording" && (
               <>
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-foreground/50">Recording test…</p>
-                  <p className={cn("text-xs font-semibold tabular-nums", recLeft <= 3 ? "text-red-500" : "text-foreground/60")}>
+                  <p className="text-base text-foreground/50">Recording test…</p>
+                  <p className={cn("text-base font-semibold tabular-nums", recLeft <= 3 ? "text-red-500" : "text-foreground/60")}>
                     {formatTime(recLeft)}
                   </p>
                 </div>
@@ -250,14 +250,14 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
         <div className="flex flex-col gap-2">
           <button
             onClick={retakeTest}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border py-3.5 text-sm font-semibold text-foreground transition-[opacity,scale] duration-150 ease-out hover:bg-black/5 active:scale-[0.96]"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border py-3.5 text-base font-semibold text-foreground transition-[opacity,scale] duration-150 ease-out hover:bg-black/5 active:scale-[0.96]"
           >
             <RotateCcw className="size-3.5" />
             Retry
           </button>
           <button
             onClick={onReady}
-            className="w-full rounded-2xl py-3.5 text-sm font-semibold text-white transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
+            className="w-full rounded-2xl py-3.5 text-base font-semibold text-white transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
             style={{ backgroundColor: buttonColor }}
           >
             Looks good — start video questions
@@ -270,7 +270,7 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
             onClick={testStage === "idle" ? startTestRecording : stopTestRecording}
             disabled={permission !== "granted"}
             className={cn(
-              "flex w-full items-center justify-center gap-2 rounded-2xl border py-3.5 text-sm font-semibold transition-[opacity,scale] duration-150 ease-out",
+              "flex w-full items-center justify-center gap-2 rounded-2xl border py-3.5 text-base font-semibold transition-[opacity,scale] duration-150 ease-out",
               permission === "granted"
                 ? "border-border text-foreground hover:bg-black/5 active:scale-[0.96]"
                 : "cursor-not-allowed border-transparent bg-[#f0f0f0] text-foreground/30"
@@ -287,7 +287,7 @@ export function CameraSetup({ onReady, onSkip, onHelp }: CameraSetupProps) {
           {permission !== "granted" && (
             <button
               onClick={onSkip}
-              className="w-full rounded-2xl bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
+              className="w-full rounded-2xl bg-primary py-3.5 text-base font-semibold text-primary-foreground transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
             >
               Continue anyway
             </button>
@@ -304,7 +304,7 @@ function HelpTextButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="mt-1 inline-flex items-center justify-center gap-1.5 self-center text-xs font-medium text-foreground/40 transition-colors hover:text-foreground"
+      className="mt-1 inline-flex items-center justify-center gap-1.5 self-center text-base font-medium text-foreground/40 transition-colors hover:text-foreground"
     >
       <HelpCircle className="size-3.5" />
       Help

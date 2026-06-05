@@ -52,21 +52,35 @@ export function MultiSelectQuestion({ options, onConfirm, initialValues = [] }: 
                 onClick={() => toggle(opt)}
                 style={{ animationDelay: `${i * 40}ms` }}
                 className={cn(
-                  "animate-bubble-in flex w-full items-center gap-3 px-5 py-[14px] text-left transition-[background-color] duration-150",
+                  "group animate-bubble-in flex w-full items-center gap-3 px-5 py-[14px] text-left transition-[background-color] duration-150",
                   isChosen ? "bg-[#f2f2f2]" : "hover:bg-[#fafafa]",
                   submitted && "cursor-not-allowed",
                 )}
               >
                 <div
-                  className="flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[8px] transition-colors duration-150"
+                  className={cn(
+                    "relative flex h-[35px] w-[35px] shrink-0 items-center justify-center rounded-[8px] transition-colors duration-150",
+                    isChosen ? "text-white" : "text-[#666666]",
+                  )}
                   style={{ backgroundColor: isChosen ? accent : "#f2f2f2" }}
                 >
-                  {isChosen
-                    ? <Check className="size-4 text-white" strokeWidth={2.5} />
-                    : <span className="text-xs font-medium text-[#666666]">{i + 1}</span>
-                  }
+                  <span
+                    className={cn(
+                      "text-base font-medium transition-opacity duration-150",
+                      isChosen ? "opacity-0" : "opacity-100 group-hover:opacity-0",
+                    )}
+                  >
+                    {i + 1}
+                  </span>
+                  <Check
+                    className={cn(
+                      "absolute size-4 text-current transition-opacity duration-150",
+                      isChosen ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+                    )}
+                    strokeWidth={2.5}
+                  />
                 </div>
-                <p className="text-lg font-medium text-black">{opt}</p>
+                <p className="text-base font-medium text-black">{opt}</p>
               </button>
             </div>
           );

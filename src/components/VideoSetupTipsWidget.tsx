@@ -48,7 +48,7 @@ export function VideoSetupTipsWidget() {
         <div className="flex flex-col divide-y divide-[#f0f0f0]">
           {sections.map(section => (
             <div key={section.label} className="py-6">
-              <p className="mb-5 text-sm font-medium text-muted-foreground">
+              <p className="mb-5 text-base font-medium text-muted-foreground">
                 {section.label}
               </p>
               <div className="flex flex-col gap-5">

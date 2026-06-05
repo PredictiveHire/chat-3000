@@ -17,11 +17,11 @@ export function TextQuestionHeader({ question, currentIndex, total, children }: 
       <div className="w-[6px] shrink-0 rounded-full" style={{ backgroundColor: accent }} />
       <div className="flex flex-col gap-3">
         {currentIndex !== undefined && total !== undefined && (
-          <p className="text-xs font-medium text-foreground/60">
+          <p className="text-sm font-medium text-foreground/60">
             Question {currentIndex} of {total}
           </p>
         )}
-        <p className="flex-1 text-xl font-semibold leading-snug text-foreground">
+        <p className="flex-1 text-base font-semibold leading-relaxed text-foreground">
           {children ?? question}
         </p>
       </div>

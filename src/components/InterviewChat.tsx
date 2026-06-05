@@ -82,7 +82,7 @@ function InterviewerText({ content, cursor, textLayout = "heading-last", plain }
         const isHeading = !plain && i === headingIdx;
         const isLast = i === paragraphs.length - 1;
         return isHeading ? (
-          <p key={i} className="text-xl font-semibold leading-snug text-foreground">
+          <p key={i} className="text-base font-semibold leading-relaxed text-foreground">
             <AnimatedTextContent text={p} cursor={cursor && isLast} />
           </p>
         ) : (
@@ -95,7 +95,7 @@ function InterviewerText({ content, cursor, textLayout = "heading-last", plain }
   );
 }
 
-const LINE_HEIGHT_PX = 20; // text-sm leading-relaxed ≈ 20 px
+const LINE_HEIGHT_PX = 24; // text-base leading-relaxed ≈ 24 px
 const MAX_LINES = 8;
 const MAX_HEIGHT_PX = LINE_HEIGHT_PX * MAX_LINES;
 
@@ -125,7 +125,7 @@ function CandidateTextBubble({ content, isNextVariant }: { content: string; isNe
     <div
       ref={bubbleRef}
       className={cn(
-        "px-4 py-2.5 text-sm leading-relaxed break-words antialiased",
+        "max-w-full px-4 py-2.5 text-base leading-relaxed break-words antialiased",
         isMultiline ? "rounded-[20px] rounded-tr-md" : "rounded-full rounded-tr-lg",
         !isNextVariant && "bg-[#F4F4F4] text-black",
       )}
@@ -135,7 +135,7 @@ function CandidateTextBubble({ content, isNextVariant }: { content: string; isNe
         className="relative overflow-hidden transition-[max-height] duration-300 ease-in-out"
         style={{ maxHeight: collapsed ? MAX_HEIGHT_PX : (textRef.current?.scrollHeight ?? 9999) }}
       >
-        <p ref={textRef} className="whitespace-pre-wrap">{content}</p>
+        <p ref={textRef} className="whitespace-pre-wrap break-all">{content}</p>
         {collapsed && (
           <div
             className="absolute bottom-0 inset-x-0 h-8 pointer-events-none"
@@ -146,7 +146,7 @@ function CandidateTextBubble({ content, isNextVariant }: { content: string; isNe
       {overflows && (
         <button
           onClick={() => setExpanded(v => !v)}
-          className="mt-1.5 text-xs font-medium text-foreground/50 hover:text-foreground/80 transition-colors"
+          className="mt-1.5 text-base font-medium text-foreground/50 hover:text-foreground/80 transition-colors"
         >
           {expanded ? "Show less" : "Show more"}
         </button>
@@ -161,12 +161,40 @@ function ResumeLinkAction({ onCopyLink, copied }: { onCopyLink: () => void; copi
     <button
       type="button"
       onClick={onCopyLink}
-      className="mt-2 inline-flex items-center gap-2 rounded-full border border-border bg-white px-3 py-1.5 text-sm font-semibold shadow-sm transition-colors"
+      className="mt-2 inline-flex items-center gap-2 rounded-full border border-border bg-white px-3 py-1.5 text-base font-semibold shadow-sm transition-colors"
       style={{ color: accent }}
     >
       {copied ? <Check className="size-4" /> : <Link className="size-4" />}
       {copied ? "Copied link" : "Copy link"}
     </button>
+  );
+}
+
+function CandidateDetailsCard({ content }: { content: string }) {
+  const { accent } = useBrand();
+  const [name = "", email = "", location = "", phone = ""] = content.split(" · ");
+  const rows = [
+    { label: "Name", value: name },
+    { label: "Email", value: email },
+    { label: "Location", value: location },
+    { label: "Phone", value: phone },
+  ].filter(row => row.value);
+
+  return (
+    <div className="w-full max-w-md overflow-hidden rounded-2xl border border-[#e5e5e5] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.035)]">
+      <div className="flex items-center gap-2 border-b border-[#f0f0f0] px-4 py-3">
+        <div className="h-5 w-[4px] rounded-full" style={{ backgroundColor: accent }} />
+        <p className="text-base font-semibold text-foreground">Your details</p>
+      </div>
+      <div className="divide-y divide-[#f0f0f0]">
+        {rows.map(row => (
+          <div key={row.label} className="grid grid-cols-[7rem,1fr] gap-3 px-4 py-3">
+            <p className="text-base font-medium text-foreground/50">{row.label}</p>
+            <p className="min-w-0 break-words text-base font-medium text-foreground">{row.value}</p>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -497,6 +525,20 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
     (editingMessageId != null && editingActiveType === "profile") ||
     (inputReady && activeType === "profile");
 
+  const editCancelButton = editingMessageId ? (
+    <button
+      onClick={() => handleCancelClick(editingText !== editingOriginalText)}
+      className={cn(
+        "mt-2 w-full rounded-2xl border bg-white px-4 py-3 text-base font-semibold shadow-[0_1px_3px_rgba(15,23,42,0.035)] transition-colors",
+        cancelPending
+          ? "border-destructive/20 text-destructive hover:bg-destructive/5"
+          : "border-[#e5e5e5] text-muted-foreground hover:bg-black/[0.03] hover:text-foreground",
+      )}
+    >
+      {cancelPending ? "Confirm discard" : editReturnToReview ? "Back to review" : "Cancel"}
+    </button>
+  ) : null;
+
   return (
     <div ref={outerScrollRef} className="flex h-dvh flex-col overflow-y-auto bg-white sm:h-full">
 
@@ -518,16 +560,6 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
             <Accessibility className="size-4" />
           </button>
         </div>
-        <div className="mt-1 flex items-center gap-2">
-          <p className="text-xs font-normal text-muted-foreground">You can pause and come back later with this link</p>
-          <button
-            onClick={copyLink}
-            className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            {linkCopied ? <Check className="size-3" style={{ color: brand.accent }} /> : <Link className="size-3" />}
-            {linkCopied ? "Copied link" : "Copy link"}
-          </button>
-        </div>
       </motion.div>
 
       {/* Desktop header */}
@@ -540,17 +572,7 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
       >
         <div className="relative flex w-full max-w-4xl items-center px-14">
           <div className="flex min-w-0 flex-col items-start gap-1 text-left">
-            <p className="text-[15px] font-semibold leading-snug text-black">{brand.headerTitle}</p>
-            <div className="flex items-center gap-1.5">
-              <p className="text-[13px] text-[#858585]">You can pause and come back later with this link</p>
-              <button
-                onClick={copyLink}
-                className="flex shrink-0 items-center gap-1 text-[13px] font-medium text-[#858585] transition-colors hover:text-foreground"
-              >
-                {linkCopied ? <Check className="size-3" style={{ color: brand.accent }} /> : <Link className="size-3" />}
-                {linkCopied ? "Copied" : "Copy link"}
-              </button>
-            </div>
+            <p className="text-base font-semibold leading-snug text-black">{brand.headerTitle}</p>
           </div>
           <button
             onClick={() => setHelpOpen(v => !v)}
@@ -657,7 +679,7 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
                     transition={{ type: "spring", stiffness: 480, damping: 30, mass: 0.8 }}
                     className="group flex flex-col items-end scroll-mt-20"
                   >
-                    <div className="flex flex-col items-end gap-1">
+                    <div className="flex max-w-full flex-col items-end gap-1">
                       {m.videoUrl ? (
                         <div className="flex flex-col items-end gap-1.5">
                           <div className="overflow-hidden rounded-[16px] rounded-tr-sm border border-[#e5e5e5] bg-black w-[260px] sm:w-full">
@@ -671,7 +693,7 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
                           {m.id === submittedVideoMessageId && videoTriesUsed < 5 && (
                             <button
                               onClick={() => setVideoModalOpen(true)}
-                              className="flex items-center gap-1.5 mr-1 text-xs font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
+                              className="flex items-center gap-1.5 mr-1 text-base font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
                             >
                               <RotateCcw className="size-3" />
                               Re-record ({5 - videoTriesUsed} attempt{5 - videoTriesUsed === 1 ? "" : "s"} left)
@@ -679,18 +701,18 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
                           )}
                         </div>
                       ) : m.id === profileAcceptedMessageId ? (
-                        <div>
-                          <CandidateTextBubble content={m.content} isNextVariant={false} />
+                        <div className="w-full max-w-md">
+                          <CandidateDetailsCard content={m.content} />
                         </div>
                       ) : (
-                        <div>
+                        <div className="max-w-full">
                           <CandidateTextBubble content={m.content} isNextVariant={isNextVariant} />
                         </div>
                       )}
                       {!submitted && !editingMessageId && !isNextVariant && m.id !== profileAcceptedMessageId && !m.videoUrl && (
                         <button
                           onClick={() => startEditing(m.id, m.content)}
-                          className="mr-2 text-xs font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
+                          className="mr-2 text-sm font-medium text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
                           aria-label="Edit response"
                         >
                           Edit
@@ -780,17 +802,17 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
             <div className="pointer-events-auto">
             {editingMessageId ? (
               <div className="animate-fade-up flex flex-col">
-                {editingActiveType !== "mcq" && (
+                {editingActiveType !== "mcq" && editingActiveType !== "multi-select" && (
                   <div className="mb-3 flex items-center gap-2 rounded-xl bg-white px-3 py-2.5 shadow-sm">
                     <Pencil className="size-3.5 shrink-0 text-muted-foreground" />
-                    <p className="flex-1 line-clamp-2 text-xs leading-snug text-muted-foreground">
+                    <p className="flex-1 line-clamp-2 text-base leading-snug text-muted-foreground">
                       <span className="font-medium text-foreground">Editing: </span>
                       {editingQuestion}
                     </p>
                     <button
                       onClick={() => handleCancelClick(editingText !== editingOriginalText)}
                       className={cn(
-                        "shrink-0 rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
+                        "shrink-0 rounded-full px-2.5 py-1 text-base font-medium transition-colors",
                         cancelPending
                           ? "bg-destructive/10 text-destructive hover:bg-destructive/20"
                           : "text-muted-foreground hover:bg-black/5 hover:text-foreground"
@@ -801,23 +823,13 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
                   </div>
                 )}
                 {editingActiveType === "mcq" ? (
-                  <div className="relative shrink-0 pt-3">
-                    <button
-                      onClick={() => handleCancelClick(editingText !== editingOriginalText)}
-                      className={cn(
-                        "absolute right-6 top-6 z-10 rounded-full px-2.5 py-1 text-xs font-medium transition-colors",
-                        cancelPending
-                          ? "bg-destructive/10 text-destructive hover:bg-destructive/20"
-                          : "bg-muted text-muted-foreground hover:bg-black/5 hover:text-foreground"
-                      )}
-                    >
-                      {cancelPending ? "Confirm discard" : editReturnToReview ? "Back to review" : "Cancel"}
-                    </button>
+                  <div className="shrink-0">
                     <MCQQuestion
                       question={editingQuestion}
                       options={editingActiveOptions.length ? editingActiveOptions : ["Option A", "Option B", "Option C", "Option D"]}
                       onSelect={submitEditing}
                     />
+                    {editCancelButton}
                   </div>
                 ) : editingActiveType === "dropdown" ? (
                   <DropdownQuestion
@@ -826,12 +838,15 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
                     onConfirm={submitEditing}
                   />
                 ) : editingActiveType === "multi-select" ? (
-                  <MultiSelectQuestion
-                    key={`${editingMessageId}-multi-select`}
-                    options={editingActiveOptions.length ? editingActiveOptions : ["Option A", "Option B", "Option C"]}
-                    initialValues={editingText.split(", ").filter(Boolean)}
-                    onConfirm={(values) => submitEditing(values.join(", "))}
-                  />
+                  <div className="shrink-0">
+                    <MultiSelectQuestion
+                      key={`${editingMessageId}-multi-select`}
+                      options={editingActiveOptions.length ? editingActiveOptions : ["Option A", "Option B", "Option C"]}
+                      initialValues={editingText.split(", ").filter(Boolean)}
+                      onConfirm={(values) => submitEditing(values.join(", "))}
+                    />
+                    {editCancelButton}
+                  </div>
                 ) : editingActiveType === "phone" ? (
                   <MobileNumberQuestion onConfirm={submitEditing} initialValue={editingText} />
                 ) : editingActiveType === "profile" ? (
@@ -959,7 +974,7 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
                       setSubmitted(true);
                       setMessages(prev => [...prev, { id: newId(), role: "candidate" as const, content: "Submit interview" }]);
                       streamMessage(
-                        "Thank you! Your interview has been successfully submitted.\n\nBefore you go, we have a couple of optional questions to help us with diversity and inclusion. All answers are voluntary.",
+                        "Thank you! Your interview has been successfully submitted. You’ll receive your Talent Insights Report in your inbox shortly. This personalized report provides valuable insights into your strengths, preferences, and potential, helping you better understand yourself and support your career growth journey.",
                         () => setPostPhase("demographic"),
                       );
                     }}>
@@ -1035,10 +1050,10 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
                       className="relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-[28px] bg-white mx-3 mb-3 sm:mx-0 sm:mb-0 sm:max-h-[80vh] sm:max-w-4xl"
                     >
                       {/* Review header */}
-                      <div className="shrink-0 flex items-center gap-3 border-b border-[#f0f0f0] bg-[#fafaf8] px-4 py-4 sm:px-6">
+                      <div className="shrink-0 flex items-center gap-3 border-b border-[#f0f0f0] bg-white px-4 py-4 sm:px-6">
                         <div className="flex-1 min-w-0">
                           <h2 className="text-base font-semibold text-foreground">Review your responses</h2>
-                          <p className="text-xs text-muted-foreground mt-0.5">Edit any answer before submitting</p>
+                          <p className="text-base text-muted-foreground mt-0.5">Edit any answer before submitting</p>
                         </div>
                       </div>
 
@@ -1073,12 +1088,12 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
                                       {isProfileAnswer && (
                                         <img src="/details-icon.png" alt="" className="size-4 rounded-full" />
                                       )}
-                                      <p className="text-[10px] font-semibold uppercase tracking-widest text-foreground/25">
+                                      <p className="text-sm font-semibold uppercase tracking-widest text-foreground/25">
                                         {isProfileAnswer ? "Your details" : `Question ${idx + 1}`}
                                       </p>
                                     </div>
                                     <div className="border-l-2 pl-3" style={{ borderColor: brand.accent }}>
-                                      <p className="text-sm font-medium leading-snug text-foreground/70">
+                                      <p className="text-base font-medium leading-snug text-foreground/70">
                                         {questionLabel}
                                       </p>
                                     </div>
@@ -1090,7 +1105,7 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
                                         setEditReturnToReview(true);
                                         startEditing(answer.id, answer.content);
                                       }}
-                                      className="shrink-0 flex items-center gap-1.5 rounded-full border border-[#e5e5e5] bg-[#fafafa] px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground active:scale-95"
+                                      className="shrink-0 flex items-center gap-1.5 rounded-full border border-[#e5e5e5] bg-[#fafafa] px-2.5 py-1 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground active:scale-95"
                                     >
                                       <Pencil className="size-3" />
                                       Edit
@@ -1105,7 +1120,9 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
                                       <video src={answer.videoUrl} controls playsInline className="aspect-video w-full object-cover" />
                                     </div>
                                   ) : (
-                                    <InterviewerText content={isProfileAnswer ? answer.content.replace(/ · /g, "\n\n") : answer.content} plain />
+                                    <p className="whitespace-pre-wrap break-all text-base leading-relaxed text-foreground">
+                                      {isProfileAnswer ? answer.content.replace(/ · /g, "\n\n") : answer.content}
+                                    </p>
                                   )}
                                 </div>
                               </div>

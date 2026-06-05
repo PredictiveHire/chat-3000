@@ -139,7 +139,7 @@ export function DropdownQuestion({
                   onMouseDown={(e) => { e.preventDefault(); pick(opt); }}
                   onMouseEnter={() => setHighlightIdx(i)}
                   className={cn(
-                    "flex w-full items-center px-4 py-3 text-left text-sm font-medium transition-colors duration-100",
+                    "flex w-full items-center px-4 py-3 text-left text-base font-medium transition-colors duration-100",
                     isHighlighted
                       ? "bg-chat-primary/10 text-foreground"
                       : "text-foreground",
@@ -167,7 +167,7 @@ export function DropdownQuestion({
               disabled={locked}
               placeholder={selected ? selected : placeholder}
               autoFocus
-              className="w-full resize-none bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 min-h-10 py-2.5 pl-4 pr-10 sm:px-4 sm:py-2.5 sm:pr-4 text-sm leading-relaxed"
+              className="w-full resize-none bg-transparent outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 min-h-10 py-2.5 pl-4 pr-10 sm:px-4 sm:py-2.5 sm:pr-4 text-base leading-relaxed"
               style={{ overflowY: "hidden" }}
               aria-autocomplete="list"
               aria-expanded={open}
@@ -188,7 +188,7 @@ export function DropdownQuestion({
       </form>
       
       {/* Mobile hint text (outside container) */}
-      <p className="mt-2 text-center text-xs text-muted-foreground">
+      <p className="mt-2 text-center text-base text-muted-foreground">
         We encourage you to share more about your experiences to get better evaluation
       </p>
     </div>

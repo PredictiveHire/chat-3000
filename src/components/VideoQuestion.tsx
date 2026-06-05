@@ -197,11 +197,11 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
           <div className="absolute right-3 top-3 flex items-center gap-1.5">
             <div className="flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 backdrop-blur-sm">
               <Camera className="size-3" style={{ color: accent }} />
-              <span className="text-[10px] font-medium text-white">On</span>
+              <span className="text-base font-medium text-white">On</span>
             </div>
             <div className="flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 backdrop-blur-sm">
               <Mic className="size-3" style={{ color: accent }} />
-              <span className="text-[10px] font-medium text-white">On</span>
+              <span className="text-base font-medium text-white">On</span>
             </div>
           </div>
         )}
@@ -210,14 +210,14 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
         {stage === "recording" && (
           <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 backdrop-blur-sm">
             <span className="size-1.5 animate-pulse rounded-full bg-red-400" />
-            <span className="text-xs font-medium text-white">REC {formatTime(recLeft)}</span>
+            <span className="text-base font-medium text-white">REC {formatTime(recLeft)}</span>
           </div>
         )}
 
         {/* Review badge */}
         {stage === "review" && (
           <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 backdrop-blur-sm">
-            <span className="text-xs font-medium text-white">Preview</span>
+            <span className="text-base font-medium text-white">Preview</span>
           </div>
         )}
       </div>
@@ -234,7 +234,7 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
           <div className="flex flex-col items-center gap-2">
             <button
               onClick={startCountdown}
-              className="w-full rounded-2xl py-3.5 text-sm font-semibold text-white transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
+              className="w-full rounded-full py-3.5 text-base font-semibold text-white transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
               style={{ backgroundColor: buttonColor }}
             >
               <span className="flex items-center justify-center gap-2">
@@ -242,7 +242,7 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
                 Start recording
               </span>
             </button>
-            <p className="text-xs text-foreground/40">
+            <p className="text-base text-foreground/40">
               {triesUsed + 1}/{MAX_TRIES} attempt{MAX_TRIES > 1 ? "s" : ""}
             </p>
           </div>
@@ -251,8 +251,8 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
         {stage === "recording" && (
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm text-foreground/50">Time remaining</p>
-              <p className={cn("text-sm font-semibold tabular-nums", recLeft <= 10 ? "text-red-500" : "text-foreground/70")}>
+              <p className="text-base text-foreground/50">Time remaining</p>
+              <p className={cn("text-base font-semibold tabular-nums", recLeft <= 10 ? "text-red-500" : "text-foreground/70")}>
                 {formatTime(recLeft)}
               </p>
             </div>
@@ -264,7 +264,7 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
             </div>
             <button
               onClick={stopRecording}
-              className="w-full rounded-2xl bg-[#f3f2ed] py-3.5 text-sm font-semibold text-foreground/70 transition-[opacity,scale] duration-150 ease-out hover:opacity-80 active:scale-[0.96]"
+              className="w-full rounded-full bg-[#f3f2ed] py-3.5 text-base font-semibold text-foreground/70 transition-[opacity,scale] duration-150 ease-out hover:opacity-80 active:scale-[0.96]"
             >
               <span className="flex items-center justify-center gap-2">
                 <Square className="size-3.5 fill-current" />
@@ -276,7 +276,7 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
 
         {stage === "review" && (
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-foreground/60 text-center">
+            <p className="text-base text-foreground/60 text-center">
               Happy with your response? Submit, or re-record{canRetry ? ` (${triesLeft} attempt${triesLeft === 1 ? "" : "s"} left)` : " — no attempts left"}.
             </p>
             <div className="flex gap-2">
@@ -284,7 +284,7 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
                 onClick={reRecord}
                 disabled={!canRetry}
                 className={cn(
-                  "flex flex-1 items-center justify-center gap-2 rounded-2xl border py-3.5 text-sm font-medium transition-[opacity,scale] duration-150 ease-out",
+                  "flex flex-1 items-center justify-center gap-2 rounded-full border py-3.5 text-base font-medium transition-[opacity,scale] duration-150 ease-out",
                   canRetry
                     ? "border-[#e5e5e5] text-foreground/60 hover:opacity-80 active:scale-[0.96]"
                     : "cursor-not-allowed border-[#f0f0f0] text-foreground/20"
@@ -295,7 +295,8 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
               </button>
               <button
                 onClick={handleSubmit}
-                className="flex flex-[2] items-center justify-center gap-2 rounded-2xl bg-primary py-3.5 text-sm font-semibold text-primary-foreground transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
+                className="flex flex-[2] items-center justify-center gap-2 rounded-full py-3.5 text-base font-semibold text-white transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
+                style={{ backgroundColor: buttonColor }}
               >
                 <Send className="size-3.5" />
                 Submit answer

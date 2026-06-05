@@ -25,8 +25,8 @@ export function FeedbackWidget({ onSubmit, onSkip }: { onSubmit: (rating: number
   return (
     <div className="animate-fade-up flex flex-col gap-5 rounded-[20px] border border-[#e6e6e6] bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
       <div className="flex flex-col gap-0.5">
-        <p className="text-sm font-semibold text-foreground">How was your experience?</p>
-        <p className="text-xs text-foreground/50">Your feedback helps us improve the process.</p>
+        <p className="text-base font-semibold text-foreground">How was your experience?</p>
+        <p className="text-base text-foreground/50">Your feedback helps us improve the process.</p>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -48,7 +48,7 @@ export function FeedbackWidget({ onSubmit, onSkip }: { onSubmit: (rating: number
             </button>
           ))}
           {active > 0 && (
-            <span className="ml-2 text-sm font-medium text-foreground/60">{ratingLabels[active]}</span>
+            <span className="ml-2 text-base font-medium text-foreground/60">{ratingLabels[active]}</span>
           )}
         </div>
       </div>
@@ -58,7 +58,7 @@ export function FeedbackWidget({ onSubmit, onSkip }: { onSubmit: (rating: number
         onChange={e => setComment(e.target.value)}
         placeholder="Any comments? (optional)"
         rows={3}
-        className="w-full resize-none rounded-xl border border-[#e5e5e5] bg-white p-3 text-sm leading-relaxed placeholder:text-foreground/30 outline-none focus:border-foreground/20 transition-colors"
+        className="w-full resize-none rounded-xl border border-[#e5e5e5] bg-white p-3 text-base leading-relaxed placeholder:text-foreground/30 outline-none focus:border-foreground/20 transition-colors"
       />
 
       <CTAButton onClick={() => onSubmit(rating, comment)} disabled={!rating}>
@@ -67,7 +67,7 @@ export function FeedbackWidget({ onSubmit, onSkip }: { onSubmit: (rating: number
       <button
         type="button"
         onClick={onSkip}
-        className="py-1 text-xs font-medium text-foreground/40 transition-colors hover:text-foreground/60"
+        className="py-1 text-base font-medium text-foreground/40 transition-colors hover:text-foreground/60"
       >
         Skip
       </button>

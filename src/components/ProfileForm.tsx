@@ -246,7 +246,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
               </button>
             )}
             <div className="flex items-center gap-1.5">
-              <p className="text-sm font-semibold text-[#373737]">{headerLabel[step]}</p>
+              <p className="text-base font-semibold text-[#373737]">{headerLabel[step]}</p>
             </div>
           </motion.div>
         </AnimatePresence>
@@ -274,8 +274,8 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                   attemptedNext && !isNameValid ? "border-red-400" : "border-[#e5e5e5]",
                 )}>
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-medium text-muted-foreground">Name</label>
-                    {attemptedNext && !isNameValid && <span className="text-xs text-red-500">Required</span>}
+                    <label className="text-base font-medium text-muted-foreground">Name</label>
+                    {attemptedNext && !isNameValid && <span className="text-base text-red-500">Required</span>}
                   </div>
                   <input
                     type="text"
@@ -283,7 +283,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                     onChange={e => { setName(e.target.value); setAttemptedNext(false); }}
                     onKeyDown={e => e.key === "Enter" && goTo2()}
                     placeholder="Enter your name"
-                    className={cn("mt-0.5 w-full bg-transparent text-sm placeholder-[#bbb] outline-none", attemptedNext && !isNameValid ? "text-red-500" : "text-black")}
+                    className={cn("mt-0.5 w-full bg-transparent text-base placeholder-[#bbb] outline-none", attemptedNext && !isNameValid ? "text-red-500" : "text-black")}
                   />
                 </div>
               </div>
@@ -295,9 +295,9 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                   attemptedNext && !isEmailValid ? "border-red-400" : "border-[#e5e5e5]",
                 )}>
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-medium text-muted-foreground">Email address</label>
+                    <label className="text-base font-medium text-muted-foreground">Email address</label>
                     {attemptedNext && !isEmailValid && (
-                      <span className="text-xs text-red-500">{email.length === 0 ? "Required" : "Invalid email"}</span>
+                      <span className="text-base text-red-500">{email.length === 0 ? "Required" : "Invalid email"}</span>
                     )}
                   </div>
                   <input
@@ -306,7 +306,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                     onChange={e => { setEmail(e.target.value); setAttemptedNext(false); }}
                     onKeyDown={e => e.key === "Enter" && goTo2()}
                     placeholder="Enter your email"
-                    className={cn("mt-0.5 w-full bg-transparent text-sm placeholder-[#bbb] outline-none", attemptedNext && !isEmailValid ? "text-red-500" : "text-black")}
+                    className={cn("mt-0.5 w-full bg-transparent text-base placeholder-[#bbb] outline-none", attemptedNext && !isEmailValid ? "text-red-500" : "text-black")}
                   />
                 </div>
               </div>
@@ -318,8 +318,8 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                   attemptedNext && !isLocationValid ? "border-red-400" : "border-[#e5e5e5]",
                 )}>
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-medium text-muted-foreground">Location</label>
-                    {attemptedNext && !isLocationValid && <span className="text-xs text-red-500">Required</span>}
+                    <label className="text-base font-medium text-muted-foreground">Location</label>
+                    {attemptedNext && !isLocationValid && <span className="text-base text-red-500">Required</span>}
                   </div>
                   <input
                     type="text"
@@ -338,7 +338,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                       }
                     }}
                     placeholder="Search countries..."
-                    className={cn("mt-0.5 w-full bg-transparent text-sm placeholder-[#bbb] outline-none", attemptedNext && !isLocationValid ? "text-red-500" : "text-black")}
+                    className={cn("mt-0.5 w-full bg-transparent text-base placeholder-[#bbb] outline-none", attemptedNext && !isLocationValid ? "text-red-500" : "text-black")}
                   />
                 </div>
                 {locationOpen && filteredCountries.length > 0 && (
@@ -354,7 +354,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                             if (country.code) setCountryCode(country.code);
                             setLocationOpen(false);
                           }}
-                          className="px-3 py-2 text-left text-sm text-black hover:bg-black/5"
+                          className="px-3 py-2 text-left text-base text-black hover:bg-black/5"
                         >
                           {country.name}
                         </button>
@@ -379,7 +379,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                   <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: accentLight }}>
                     <MessageSquare className="size-4" style={{ color: accent }} />
                   </div>
-                  <p className="text-sm leading-snug text-foreground/70 pt-1.5">
+                  <p className="text-base leading-snug text-foreground/70 pt-1.5">
                     Do you consent to receive SMS updates about your application status? This will be optional and only application updates will be sent.
                   </p>
                 </div>
@@ -399,12 +399,12 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                   className="flex flex-col rounded-xl border border-[#e5e5e5] bg-white px-3 py-2.5 transition-colors focus-within:border-[#aaa] focus-within:ring-1 focus-within:ring-black/10"
                   ref={countryCodeRef}
                 >
-                  <label className="text-xs font-medium text-muted-foreground">Phone number</label>
+                  <label className="text-base font-medium text-muted-foreground">Phone number</label>
                   <div className="relative mt-0.5 flex items-center">
                     <button
                       type="button"
                       onClick={() => setCountryCodeOpen(v => !v)}
-                      className="flex shrink-0 items-center gap-1 pr-2 text-sm font-medium text-black outline-none transition-colors hover:text-foreground/70"
+                      className="flex shrink-0 items-center gap-1 pr-2 text-base font-medium text-black outline-none transition-colors hover:text-foreground/70"
                     >
                       {countryCode}
                       <ChevronDown className={cn("size-3 text-muted-foreground transition-transform duration-150", countryCodeOpen && "rotate-180")} />
@@ -422,7 +422,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                                 setCountryCodeOpen(false);
                               }}
                               className={cn(
-                                "flex w-full items-center px-4 py-3 text-left text-sm font-medium transition-colors duration-100",
+                                "flex w-full items-center px-4 py-3 text-left text-base font-medium transition-colors duration-100",
                                 countryCode === c.code ? "bg-primary/20 text-foreground" : "text-foreground hover:bg-black/5",
                               )}
                             >
@@ -439,12 +439,12 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                       onKeyDown={e => e.key === "Enter" && goTo4FromPhone()}
                       placeholder="e.g. 400 000 000"
                       autoFocus
-                      className="w-full bg-transparent text-sm text-black placeholder-[#bbb] outline-none"
+                      className="w-full bg-transparent text-base text-black placeholder-[#bbb] outline-none"
                     />
                   </div>
                 </div>
                 {attemptedPhone && !isPhoneValid && (
-                  <p className="mt-1.5 px-1 text-xs text-red-500">Please enter a valid phone number</p>
+                  <p className="mt-1.5 px-1 text-base text-red-500">Please enter a valid phone number</p>
                 )}
               </div>
               <div className="pb-3">
@@ -467,14 +467,14 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                       : []),
                   ].map(({ label, value }) => (
                     <div key={label} className="flex flex-col gap-1 px-3 py-2.5">
-                      <span className="text-xs font-medium text-muted-foreground">{label}</span>
-                      <span className="text-sm font-medium text-foreground">{value}</span>
+                      <span className="text-base font-medium text-muted-foreground">{label}</span>
+                      <span className="text-base font-medium text-foreground">{value}</span>
                     </div>
                   ))}
                 </div>
               </div>
               <div className="pt-3">
-                <p className="text-xs font-medium text-foreground/50">
+                <p className="text-sm font-medium text-foreground/50">
                   Please review your details carefully as you cannot change this later
                 </p>
               </div>

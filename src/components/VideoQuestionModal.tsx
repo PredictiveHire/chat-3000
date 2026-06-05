@@ -73,7 +73,7 @@ export function VideoQuestionModal({
               <button
                 type="button"
                 onClick={() => onSubmit("__video_submitted__")}
-                className="rounded-full border border-[#e5e5e5] px-3 py-1 text-xs font-medium text-foreground/40 transition-colors hover:border-foreground/20 hover:text-foreground/70"
+                className="rounded-full border border-[#e5e5e5] px-3 py-1 text-sm font-medium text-foreground/40 transition-colors hover:border-foreground/20 hover:text-foreground/70"
               >
                 Skip
               </button>
@@ -97,7 +97,7 @@ export function VideoQuestionModal({
               <button
                 type="button"
                 onClick={() => onSubmit("__video_submitted__")}
-                className="rounded-full border border-[#e5e5e5] bg-white px-3 py-1 text-xs font-medium text-foreground/40 transition-colors active:bg-black/5"
+                className="rounded-full border border-[#e5e5e5] bg-white px-3 py-1 text-sm font-medium text-foreground/40 transition-colors active:bg-black/5"
               >
                 Skip
               </button>
@@ -108,12 +108,12 @@ export function VideoQuestionModal({
                   aria-label="Minimise"
                 >
                   <X className="size-3 text-[#888]" />
-                  <span className="text-xs font-semibold text-[#888]">Minimise</span>
+                  <span className="text-sm font-semibold text-[#888]">Minimise</span>
                 </button>
               )}
               </div>
             </div>
-            <p className="text-[19px] font-bold leading-[1.4] tracking-[-0.025em] text-[#111]">
+            <p className="text-base font-bold leading-relaxed tracking-[-0.025em] text-[#111]">
               {question}
             </p>
           </div>

@@ -34,7 +34,7 @@ function buildRows(interview: InterviewStep[]): Row[] {
       icon: Video,
       desc: (
         <>
-          These responses will not be assessed with AI. You can retry <span className="font-bold">5 times</span> per question and submit when you&apos;re ready.
+          You can retry <span className="font-bold">5 times</span> per question and submit when you&apos;re ready.
         </>
       ),
     },
@@ -42,13 +42,13 @@ function buildRows(interview: InterviewStep[]): Row[] {
       count: singleChoiceCount,
       label: "Single Choice Questions",
       icon: ListChecks,
-      desc: "We want to get to know more about your experiences and qualifications. These questions will not be assesed with AI.",
+      desc: "We want to get to know more about your experiences and qualifications.",
     },
     {
       count: multipleChoiceCount,
       label: "Multiple Choice Questions",
       icon: ListChecks,
-      desc: "We want to get to know more about your experiences and qualifications. These questions will not be assesed with AI.",
+      desc: "We want to get to know more about your experiences and qualifications.",
     },
   ].filter(row => row.count > 0);
 }
@@ -68,7 +68,7 @@ export function QuestionFormatWidget({ interview }: { interview: InterviewStep[]
       <div className="overflow-hidden rounded-[28px] border border-[#e8e8e8] bg-white px-6 shadow-[0_3px_10px_rgba(15,23,42,0.035),0_1px_2px_rgba(15,23,42,0.025)] sm:px-8">
         {/* Total summary */}
         <div className="mt-6 flex flex-col items-center gap-2 rounded-[18px] bg-[#f8f8f8] px-3 py-3">
-          <p className="text-xs font-medium uppercase tracking-wide text-[#7c7c7c]">Total</p>
+          <p className="text-base font-medium uppercase tracking-wide text-[#7c7c7c]">Total</p>
           <div className="flex items-center gap-1">
             <span className="text-base font-medium text-black">{totalQuestions} Questions</span>
             <span className="text-base font-medium text-[#616161]">&nbsp;(~ 30 minutes)</span>
@@ -83,7 +83,7 @@ export function QuestionFormatWidget({ interview }: { interview: InterviewStep[]
                 <div className="h-[22px] w-[5px] shrink-0 rounded-full" style={{ backgroundColor: accent }} />
                 <Icon className="size-4 shrink-0 text-black" strokeWidth={1.5} />
                 <p className="text-base font-medium text-black">
-                  {count}&nbsp;&nbsp;{label}
+                  <span className="text-foreground/50">{count}</span>&nbsp;&nbsp;{label}
                 </p>
               </div>
               <p className="pl-4 text-base leading-relaxed text-black/65">{desc}</p>

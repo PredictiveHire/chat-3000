@@ -35,14 +35,14 @@ export function DemographicForm({ onSubmit }: { onSubmit: (answers: Record<strin
 
   return (
     <div className="animate-fade-up flex flex-col gap-5 rounded-[20px] border border-[#e6e6e6] bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
-      <div className="flex flex-col gap-0.5">
-        <p className="text-sm font-semibold text-foreground">Diversity & inclusion</p>
-        <p className="text-xs text-foreground/50">All questions are optional — you can skip any or all.</p>
+      <div className="flex flex-col gap-0.5 border-b border-[#f0f0f0] pb-4">
+        <p className="text-base font-semibold text-foreground">Diversity & inclusion</p>
+        <p className="text-base text-foreground/50">All questions are optional — you can skip any or all.</p>
       </div>
 
       {questions.map(q => (
         <div key={q.id} className="flex flex-col gap-2">
-          <p className="text-xs font-semibold text-foreground/70">{q.label}</p>
+          <p className="text-base font-semibold text-foreground/70">{q.label}</p>
           <div className="flex flex-wrap gap-1.5">
             {q.options.map(opt => (
               <button
@@ -50,7 +50,7 @@ export function DemographicForm({ onSubmit }: { onSubmit: (answers: Record<strin
                 type="button"
                 onClick={() => setAnswers(prev => ({ ...prev, [q.id]: opt }))}
                 className={cn(
-                  "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                  "rounded-full border px-3 py-1.5 text-base font-medium transition-colors",
                   answers[q.id] === opt
                     ? "text-white"
                     : "border-[#e5e5e5] text-foreground/60 hover:border-foreground/30 hover:text-foreground"
@@ -71,7 +71,7 @@ export function DemographicForm({ onSubmit }: { onSubmit: (answers: Record<strin
         <button
           type="button"
           onClick={() => onSubmit({})}
-          className="py-1 text-xs font-medium text-foreground/40 transition-colors hover:text-foreground/60"
+          className="py-1 text-base font-medium text-foreground/40 transition-colors hover:text-foreground/60"
         >
           Skip all questions
         </button>
