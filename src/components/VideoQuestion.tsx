@@ -2,12 +2,12 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { Circle, Square, RotateCcw, Send, Play, Pause, Camera, Mic } from "lucide-react";
+import { Square, RotateCcw, Send, Play, Pause, Camera, Mic } from "lucide-react";
 import { useBrand } from "@/lib/BrandContext";
 
 const MAX_TRIES = 5;
 
-type Stage = "prepare" | "recording" | "review";
+type Stage = "recording" | "review";
 
 type VideoQuestionProps = {
   maxSeconds?: number;
@@ -37,8 +37,9 @@ export function VideoQuestion({
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const startRecordingRef = useRef<(() => void) | null>(null);
 
-  const [stage, setStage] = useState<Stage>("prepare");
+  const [stage, setStage] = useState<Stage>("recording");
   const [recLeft, setRecLeft] = useState(maxSeconds);
 const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
   const [triesUsed, setTriesUsed] = useState(initialTriesUsed);
@@ -55,6 +56,7 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
       if (liveVideoRef.current) {
         liveVideoRef.current.srcObject = stream;
       }
+      startRecordingRef.current?.();
     } catch {
       // stream may already be open from CameraSetup
     }
@@ -76,10 +78,6 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
       liveVideoRef.current.srcObject = streamRef.current;
     }
   }, [stage]);
-
-  const startCountdown = useCallback(() => {
-    startRecording();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const startRecording = useCallback(() => {
     if (!streamRef.current) return;
@@ -110,6 +108,9 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
     }, 1000);
   }, [maxSeconds]);
 
+  // Keep ref in sync so attachStream can call it after the stream is ready
+  startRecordingRef.current = startRecording;
+
   const stopRecording = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     recorderRef.current?.stop();
@@ -124,9 +125,9 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
     if (recordingUrl) URL.revokeObjectURL(recordingUrl);
     setRecordingUrl(null);
     setRecLeft(maxSeconds);
-    setStage("prepare");
     setIsPlaying(false);
-  }, [maxSeconds, recordingUrl]);
+    startRecording();
+  }, [maxSeconds, recordingUrl, startRecording]);
 
   const togglePlayback = useCallback(() => {
     const vid = reviewVideoRef.current;
@@ -230,24 +231,6 @@ const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
           ? "fixed inset-x-0 bottom-0 bg-[#F7F7F5] pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:relative sm:inset-x-auto sm:bottom-auto sm:bg-background sm:pb-5"
           : "bg-background pb-5"
       )}>
-        {stage === "prepare" && (
-          <div className="flex flex-col items-center gap-2">
-            <button
-              onClick={startCountdown}
-              className="w-full rounded-full py-3.5 text-base font-semibold text-white transition-[opacity,scale] duration-150 ease-out hover:opacity-90 active:scale-[0.96]"
-              style={{ backgroundColor: buttonColor }}
-            >
-              <span className="flex items-center justify-center gap-2">
-                <Circle className="size-3.5 fill-current" />
-                Start recording
-              </span>
-            </button>
-            <p className="text-base text-foreground/40">
-              {triesUsed + 1}/{MAX_TRIES} attempt{MAX_TRIES > 1 ? "s" : ""}
-            </p>
-          </div>
-        )}
-
         {stage === "recording" && (
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">

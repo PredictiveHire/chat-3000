@@ -12,6 +12,7 @@ type ProfileData = {
   email: string;
   phone: string;
   location: string;
+  smsConsent?: boolean;
 };
 
 type ProfileFormProps = {
@@ -195,6 +196,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
       email,
       phone: smsConsent && phone ? `${countryCode} ${phone}`.trim() : "",
       location,
+      smsConsent: smsConsent ?? false,
     });
   };
 
@@ -274,7 +276,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                   attemptedNext && !isNameValid ? "border-red-400" : "border-[#e5e5e5]",
                 )}>
                   <div className="flex items-center justify-between">
-                    <label className="text-base font-medium text-muted-foreground">Name</label>
+                    <label className="text-sm font-medium text-muted-foreground">Name</label>
                     {attemptedNext && !isNameValid && <span className="text-base text-red-500">Required</span>}
                   </div>
                   <input
@@ -295,7 +297,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                   attemptedNext && !isEmailValid ? "border-red-400" : "border-[#e5e5e5]",
                 )}>
                   <div className="flex items-center justify-between">
-                    <label className="text-base font-medium text-muted-foreground">Email address</label>
+                    <label className="text-sm font-medium text-muted-foreground">Email address</label>
                     {attemptedNext && !isEmailValid && (
                       <span className="text-base text-red-500">{email.length === 0 ? "Required" : "Invalid email"}</span>
                     )}
@@ -318,7 +320,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                   attemptedNext && !isLocationValid ? "border-red-400" : "border-[#e5e5e5]",
                 )}>
                   <div className="flex items-center justify-between">
-                    <label className="text-base font-medium text-muted-foreground">Location</label>
+                    <label className="text-sm font-medium text-muted-foreground">Location</label>
                     {attemptedNext && !isLocationValid && <span className="text-base text-red-500">Required</span>}
                   </div>
                   <input
@@ -399,7 +401,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                   className="flex flex-col rounded-xl border border-[#e5e5e5] bg-white px-3 py-2.5 transition-colors focus-within:border-[#aaa] focus-within:ring-1 focus-within:ring-black/10"
                   ref={countryCodeRef}
                 >
-                  <label className="text-base font-medium text-muted-foreground">Phone number</label>
+                  <label className="text-sm font-medium text-muted-foreground">Phone number</label>
                   <div className="relative mt-0.5 flex items-center">
                     <button
                       type="button"
@@ -467,7 +469,7 @@ export function ProfileForm({ onSubmit, initialValues, edgeToEdge }: ProfileForm
                       : []),
                   ].map(({ label, value }) => (
                     <div key={label} className="flex flex-col gap-1 px-3 py-2.5">
-                      <span className="text-base font-medium text-muted-foreground">{label}</span>
+                      <span className="text-sm font-medium text-muted-foreground">{label}</span>
                       <span className="text-base font-medium text-foreground">{value}</span>
                     </div>
                   ))}

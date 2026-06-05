@@ -171,25 +171,29 @@ function ResumeLinkAction({ onCopyLink, copied }: { onCopyLink: () => void; copi
 }
 
 function CandidateDetailsCard({ content }: { content: string }) {
-  const { accent } = useBrand();
-  const [name = "", email = "", location = "", phone = ""] = content.split(" · ");
+  const parts = content.split(" · ");
+  const consentPart = parts.find(p => p.startsWith("consent:"));
+  const fields = parts.filter(p => !p.startsWith("consent:"));
+  const [name = "", email = "", location = "", phone = ""] = fields;
+  const smsConsent = consentPart === "consent:yes";
+
   const rows = [
     { label: "Name", value: name },
     { label: "Email", value: email },
     { label: "Location", value: location },
-    { label: "Phone", value: phone },
+    ...(phone ? [{ label: "Phone", value: phone }] : []),
+    { label: "SMS updates", value: smsConsent ? "Consented" : "Not consented" },
   ].filter(row => row.value);
 
   return (
     <div className="w-full max-w-md overflow-hidden rounded-2xl border border-[#e5e5e5] bg-white shadow-[0_1px_3px_rgba(15,23,42,0.035)]">
-      <div className="flex items-center gap-2 border-b border-[#f0f0f0] px-4 py-3">
-        <div className="h-5 w-[4px] rounded-full" style={{ backgroundColor: accent }} />
+      <div className="flex items-center border-b border-[#f0f0f0] px-4 py-3">
         <p className="text-base font-semibold text-foreground">Your details</p>
       </div>
       <div className="divide-y divide-[#f0f0f0]">
         {rows.map(row => (
-          <div key={row.label} className="grid grid-cols-[7rem,1fr] gap-3 px-4 py-3">
-            <p className="text-base font-medium text-foreground/50">{row.label}</p>
+          <div key={row.label} className="flex flex-col gap-0.5 px-4 py-3">
+            <p className="text-sm font-medium text-foreground/50">{row.label}</p>
             <p className="min-w-0 break-words text-base font-medium text-foreground">{row.value}</p>
           </div>
         ))}
@@ -861,6 +865,7 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
                       onSubmit={d => {
                         const parts = [d.name, d.email, d.location];
                         if (d.phone) parts.push(d.phone);
+                        parts.push(`consent:${d.smsConsent ? "yes" : "no"}`);
                         submitEditing(parts.join(" · "));
                       }}
                     />
@@ -893,7 +898,7 @@ export function InterviewChat({ started = true }: { started?: boolean }) {
                           {
                             id,
                             role: "candidate" as const,
-                            content: [d.name, d.email, d.location, ...(d.phone ? [d.phone] : [])].join(" · "),
+                            content: [d.name, d.email, d.location, ...(d.phone ? [d.phone] : []), `consent:${d.smsConsent ? "yes" : "no"}`].join(" · "),
                           },
                         ]);
                         const nextIdx = stepIndex + 1;
